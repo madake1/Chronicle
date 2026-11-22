@@ -6,6 +6,7 @@ import { bindPlaceSearch } from './places.mjs';
 import { bindMapSources } from './comparison.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
 import { addGeographicLabels, addGeographicDetail } from './geography.mjs';
+import { bindEvents } from './events.mjs';
 
 const status = document.querySelector('#atlas-status');
 const years = document.querySelector('#atlas-years');
@@ -154,6 +155,13 @@ function renderSources(items) {
 }
 
 async function initialize() {
+  const eventDataset = fetch('/atlas/events.json').then(async response => {
+    if (!response.ok) throw new Error('事件数据无法读取');
+    return response.json();
+  }).catch(error => {
+    console.warn(error.message);
+    return null;
+  });
   const [manifest, chronology, land, lakes, rivers, places] = await Promise.all([
     readData('manifest.json'), readData('chronology.json'), readData('land.geojson'), readData('lakes.geojson'),
     readData('rivers.geojson'),
@@ -214,7 +222,14 @@ async function initialize() {
     },
   });
   map.addControl(new NavigationControl({ showCompass: false }));
-  const updateGeography = addGeographicLabels(map, rivers, Marker);
+  let events;
+  let visibleYear;
+  const updateGeography = addGeographicLabels(map, rivers, Marker, () => events?.close());
+  function updateMapYear(year) {
+    visibleYear = year;
+    updateGeography(year);
+    events?.updateYear(year);
+  }
   if (manifest.geography) addGeographicDetail(map, readData, { land, lakes, rivers }, updateGeography);
   let active = initial;
   let loaded = false;
@@ -296,7 +311,7 @@ async function initialize() {
     loaded = true;
     slider.disabled = yearInput.disabled = document.querySelector('#atlas-jump-submit').disabled = false;
     document.querySelector('#atlas-polity-input').disabled = false;
-    mapSources = bindMapSources(map, readData, () => active, clearPolity, updateGeography, palette);
+    mapSources = bindMapSources(map, readData, () => active, clearPolity, updateMapYear, palette);
     refreshPlaceSearch = bindPlaceSearch((q, year) => readPlaceApi('search', { q, year }), () => active,
       async (place, year) => {
         const expected = requestNumber + Number(year !== undefined);
@@ -311,7 +326,17 @@ async function initialize() {
       });
     syncControls(active);
     showStatus();
-    updateGeography(active);
+    updateMapYear(active);
+    void eventDataset.then(dataset => {
+      if (!dataset) throw new Error('事件数据无法读取');
+      events = bindEvents(map, Marker, dataset, updateGeography.close);
+      events.updateYear(visibleYear);
+    }).catch(error => {
+      console.warn(error.message);
+      const status = document.querySelector('#atlas-event-status');
+      status.textContent = '历史事件资料暂时无法读取。';
+      document.querySelector('#atlas-events').hidden = false;
+    });
     prefetch();
   });
 

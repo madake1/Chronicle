@@ -1,0 +1,544 @@
+{
+  "version": "1.0.0",
+  "events": [
+    {
+      "id": "early-olympic-games",
+      "name": "古代奥林匹克竞技会的早期记录",
+      "startYear": -800,
+      "endYear": -701,
+      "datePrecision": "century",
+      "category": "culture",
+      "description": "古代竞技会在奥林匹亚的宙斯圣地举行。传统纪年以公元前776年为起点，早期活动本身的开端难以确定。",
+      "placeName": "奥林匹亚",
+      "dateLabel": "公元前8世纪（早期记录）",
+      "location": [
+        21.63,
+        37.64
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 古代奥运会",
+          "url": "https://www.metmuseum.org/perspectives/ancient-greek-olympic-games"
+        },
+        {
+          "title": "联合国教科文组织 · 奥林匹亚遗址",
+          "url": "https://whc.unesco.org/en/list/517/"
+        }
+      ]
+    },
+    {
+      "id": "historical-buddha-teachings",
+      "name": "历史上的佛陀开始传教",
+      "startYear": -600,
+      "endYear": -401,
+      "datePrecision": "approximate",
+      "category": "religion",
+      "description": "释迦牟尼在南亚北部传授关于苦及其止息的教导。早期传记传统和现代研究给出的生卒与传教年代并不完全一致。",
+      "placeName": "南亚北部",
+      "dateLabel": "约公元前6至5世纪",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 佛陀的一生",
+          "url": "https://www.metmuseum.org/ko/essays/life-of-the-buddha"
+        }
+      ]
+    },
+    {
+      "id": "parthenon-construction",
+      "name": "帕特农神庙兴建",
+      "startYear": -447,
+      "endYear": -432,
+      "datePrecision": "year",
+      "category": "culture",
+      "description": "雅典在卫城兴建献给雅典娜的神庙。雕刻与建筑工程延续多年，展示了古典雅典公共祭祀和艺术的规模。",
+      "placeName": "雅典卫城",
+      "location": [
+        23.726,
+        37.972
+      ],
+      "placeId": "pleiades-579885",
+      "sources": [
+        {
+          "title": "雅典卫城博物馆 · 帕特农展厅",
+          "url": "https://www.theacropolismuseum.gr/en/exhibit-halls/parthenon-gallery"
+        },
+        {
+          "title": "联合国教科文组织 · 雅典卫城",
+          "url": "https://whc.unesco.org/en/list/404/"
+        }
+      ]
+    },
+    {
+      "id": "qin-unification",
+      "name": "秦统一六国",
+      "startYear": -221,
+      "endYear": -221,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "秦完成对其主要对手的征服，秦王嬴政以始皇帝名号建立统一的帝国统治。",
+      "placeName": "战国诸国",
+      "sources": [
+        {
+          "title": "史密森学会亚洲艺术国家博物馆 · 中国历史、艺术与文化时间线",
+          "url": "https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/"
+        }
+      ]
+    },
+    {
+      "id": "tang-dynasty-founded",
+      "name": "唐朝建立",
+      "startYear": 618,
+      "endYear": 618,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "隋末战乱后，李渊建立唐朝。长安成为唐代都城，也是后来跨区域交流的重要中心。",
+      "placeName": "长安",
+      "sources": [
+        {
+          "title": "史密森学会亚洲艺术国家博物馆 · 中国历史时间线",
+          "url": "https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/"
+        },
+        {
+          "title": "哥伦比亚大学亚洲教育项目 · 中国历史时间线",
+          "url": "https://afe.easia.columbia.edu/mongols/pop/menu/class_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "edward-confessor-burial",
+      "name": "忏悔者爱德华安葬",
+      "startYear": 1066,
+      "endYear": 1066,
+      "datePrecision": "year",
+      "category": "religion",
+      "description": "英格兰国王爱德华死后安葬于他支持重建的威斯敏斯特修道院。王位继承争议很快引发争夺。",
+      "placeName": "威斯敏斯特修道院",
+      "location": [
+        -0.127,
+        51.4994
+      ],
+      "placeId": "london",
+      "sources": [
+        {
+          "title": "威斯敏斯特修道院 · 忏悔者爱德华与伊迪丝",
+          "url": "https://www.westminster-abbey.org/abbey-commemorations/royals/edward-the-confessor-and-edith"
+        },
+        {
+          "title": "联合国教科文组织 · 威斯敏斯特",
+          "url": "https://whc.unesco.org/en/list/426/"
+        }
+      ]
+    },
+    {
+      "id": "stamford-bridge-battle",
+      "name": "斯坦福桥战役",
+      "startYear": 1066,
+      "endYear": 1066,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "哈罗德率英格兰军队击败哈拉尔三世的挪威入侵军。获胜后不久，他便南下应对诺曼人的登陆。",
+      "placeName": "约克郡斯坦福桥一带",
+      "sources": [
+        {
+          "title": "English Heritage · 1066 年大事记",
+          "url": "https://www.english-heritage.org.uk/learn/teaching-resources/story-of-1066/"
+        },
+        {
+          "title": "Historic Royal Palaces · 征服者威廉",
+          "url": "https://www.hrp.org.uk/tower-of-london/history-and-stories/william-the-conqueror/"
+        }
+      ]
+    },
+    {
+      "id": "hastings-battle",
+      "name": "黑斯廷斯战役",
+      "startYear": 1066,
+      "endYear": 1066,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "诺曼底公爵威廉击败哈罗德二世，哈罗德阵亡。这场胜利为威廉取得英格兰王位扫清了主要障碍。",
+      "placeName": "巴特尔修道院与战场",
+      "location": [
+        0.488,
+        50.914
+      ],
+      "aliases": [
+        "诺曼征服",
+        "Hastings"
+      ],
+      "sources": [
+        {
+          "title": "English Heritage · 巴特尔修道院与 1066 年战场",
+          "url": "https://www.english-heritage.org.uk/visit/places/1066-battle-of-hastings-abbey-and-battlefield/history-and-stories/"
+        },
+        {
+          "title": "英国规划数据 · 巴特尔修道院地点",
+          "url": "https://www.planning.data.gov.uk/entity/13911917"
+        }
+      ]
+    },
+    {
+      "id": "william-coronation",
+      "name": "威廉一世加冕",
+      "startYear": 1066,
+      "endYear": 1066,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "击败哈罗德并取得英格兰部分显贵的承认后，威廉于圣诞节在威斯敏斯特修道院加冕。",
+      "placeName": "威斯敏斯特修道院",
+      "location": [
+        -0.127,
+        51.4994
+      ],
+      "placeId": "london",
+      "aliases": [
+        "诺曼征服",
+        "William the Conqueror"
+      ],
+      "sources": [
+        {
+          "title": "English Heritage · 英格兰加冕礼史",
+          "url": "https://www.english-heritage.org.uk/learn/histories/coronation-history/"
+        },
+        {
+          "title": "联合国教科文组织 · 威斯敏斯特",
+          "url": "https://whc.unesco.org/en/list/426/"
+        }
+      ]
+    },
+    {
+      "id": "stephen-coronation",
+      "name": "斯蒂芬继承英格兰王位",
+      "startYear": 1135,
+      "endYear": 1135,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "亨利一世死后，其外甥布卢瓦的斯蒂芬抢先加冕。斯蒂芬与亨利之女玛蒂尔达的继承权争夺成为其统治时期的主线。",
+      "placeName": "威斯敏斯特修道院",
+      "location": [
+        -0.127,
+        51.4994
+      ],
+      "placeId": "london",
+      "sources": [
+        {
+          "title": "威斯敏斯特修道院 · 斯蒂芬",
+          "url": "https://www.westminster-abbey.org/abbey-commemorations/royals/stephen"
+        },
+        {
+          "title": "联合国教科文组织 · 威斯敏斯特",
+          "url": "https://whc.unesco.org/en/list/426/"
+        }
+      ]
+    },
+    {
+      "id": "yuan-founded",
+      "name": "忽必烈定国号为元",
+      "startYear": 1271,
+      "endYear": 1271,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "忽必烈采用大元国号。此时南宋仍然存在，元军随后继续南下。",
+      "placeName": "元与南宋",
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目 · 中国历史时间线",
+          "url": "https://afe.easia.columbia.edu/mongols/pop/menu/class_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "hundred-years-war",
+      "name": "百年战争",
+      "startYear": 1337,
+      "endYear": 1453,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "英法王室围绕王位继承和领土展开多阶段冲突。战争中有停战期，1453年的卡斯蒂永战役通常被视为终点。",
+      "placeName": "英格兰与法国",
+      "sources": [
+        {
+          "title": "英国皇家军械博物馆 · 百年战争",
+          "url": "https://royalarmouries.org/objects-and-stories/stories/the-hundred-years-war-1337-1453"
+        }
+      ]
+    },
+    {
+      "id": "zheng-he-voyages",
+      "name": "郑和下西洋",
+      "startYear": 1405,
+      "endYear": 1433,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "明朝组织多次远洋航行，舰队访问印度洋沿岸多地，开展外交、贸易和物资交换。",
+      "placeName": "南海和印度洋航线",
+      "sources": [
+        {
+          "title": "史密森学会图书馆 · Edward L. Dreyer《郑和》",
+          "url": "https://siris-libraries.si.edu/ipac20/ipac.jsp?profile=liball&uri=full=3100001~!843382~!0&view=SUMMARY"
+        },
+        {
+          "title": "史密森学会亚洲艺术国家博物馆 · 中国历史时间线",
+          "url": "https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/"
+        }
+      ]
+    },
+    {
+      "id": "constantinople-fall",
+      "name": "君士坦丁堡陷落",
+      "startYear": 1453,
+      "endYear": 1453,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "穆罕默德二世的奥斯曼军队攻占君士坦丁堡，结束了拜占庭帝国的统治。地图点位标示被围城市。",
+      "placeName": "君士坦丁堡",
+      "location": [
+        28.98,
+        41.01
+      ],
+      "placeId": "constantinople-istanbul",
+      "sources": [
+        {
+          "title": "伊斯坦布尔旅游机构 · Panorama 1453 历史博物馆",
+          "url": "https://istanbul.travel/en/panorama-1453"
+        },
+        {
+          "title": "联合国教科文组织 · 伊斯坦布尔历史区",
+          "url": "https://whc.unesco.org/en/list/356"
+        }
+      ]
+    },
+    {
+      "id": "american-declaration",
+      "name": "美国《独立宣言》通过",
+      "startYear": 1776,
+      "endYear": 1776,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "大陆会议在费城通过宣言，宣布十三个殖民地脱离英国统治。随后完成的签署历时不止一天。",
+      "placeName": "费城独立厅",
+      "location": [
+        -75.15,
+        39.9488
+      ],
+      "sources": [
+        {
+          "title": "美国国家档案馆 · 《独立宣言》的历史",
+          "url": "https://www.archives.gov/founding-docs/declaration-history"
+        },
+        {
+          "title": "美国国家公园管理局 · 独立厅",
+          "url": "https://home.nps.gov/places/000/independence-hall.htm"
+        }
+      ]
+    },
+    {
+      "id": "us-constitution-convention",
+      "name": "美国制宪会议通过宪法文本",
+      "startYear": 1787,
+      "endYear": 1787,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "各州代表在费城开会，起草并签署新的美国联邦宪法文本。之后由各州分别批准。",
+      "placeName": "费城独立厅",
+      "location": [
+        -75.15,
+        39.9488
+      ],
+      "sources": [
+        {
+          "title": "美国国家档案馆 · 1787 年宪法",
+          "url": "https://www.archives.gov/milestone-documents/constitution"
+        },
+        {
+          "title": "美国国家公园管理局 · 独立厅",
+          "url": "https://home.nps.gov/places/000/independence-hall.htm"
+        }
+      ]
+    },
+    {
+      "id": "haitian-revolution",
+      "name": "海地革命",
+      "startYear": 1791,
+      "endYear": 1804,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "法属圣多明各的奴隶起义演变为争取解放和独立的革命。1804 年海地宣布独立。",
+      "placeName": "圣多明各殖民地（今海地）",
+      "sources": [
+        {
+          "title": "美国国会图书馆 · 海地资料指南",
+          "url": "https://guides.loc.gov/francophone-caribbean-collections-library-of-congress/haiti"
+        },
+        {
+          "title": "美国国务院历史办公室 · 海地革命",
+          "url": "https://history.state.gov/milestones/1784-1800/haitian-rev/1000"
+        }
+      ]
+    },
+    {
+      "id": "louisiana-purchase",
+      "name": "路易斯安那购地条约",
+      "startYear": 1803,
+      "endYear": 1803,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "美国与法国达成购买路易斯安那领地的条约，美国控制的领土大幅扩展。",
+      "placeName": "巴黎谈判；路易斯安那领地交割",
+      "sources": [
+        {
+          "title": "美国国家档案馆 · 路易斯安那购地条约",
+          "url": "https://www.archives.gov/milestone-documents/louisiana-purchase-treaty"
+        }
+      ]
+    },
+    {
+      "id": "slave-trade-act",
+      "name": "英国废止本国奴隶贸易",
+      "startYear": 1807,
+      "endYear": 1807,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "英国议会通过法律，禁止英国臣民参与奴隶贸易。英属殖民地的奴隶制度随后另有立法处理。",
+      "placeName": "英国及相关贸易网络",
+      "sources": [
+        {
+          "title": "英国议会 · 奴隶贸易关键年代",
+          "url": "https://www.parliament.uk/about/living-heritage/transformingsociety/tradeindustry/slavetrade/key-dates/"
+        }
+      ]
+    },
+    {
+      "id": "waitangi-treaty",
+      "name": "《怀唐伊条约》首次签署",
+      "startYear": 1840,
+      "endYear": 1840,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "英国王室代表和毛利首领首先在怀唐伊签署条约。其后不同文本和副本在新西兰多地继续征集签名。",
+      "placeName": "怀唐伊",
+      "sources": [
+        {
+          "title": "新西兰文化与遗产部 · 条约签署",
+          "url": "https://nzhistory.govt.nz/politics/treaty/making-the-treaty/signing-the-treaty"
+        },
+        {
+          "title": "Heritage New Zealand · 怀唐伊条约签署地",
+          "url": "https://www.heritage.org.nz/list-details/6/Listing"
+        }
+      ],
+      "location": [
+        174.081,
+        -35.266
+      ]
+    },
+    {
+      "id": "emancipation-proclamation",
+      "name": "美国《解放奴隶宣言》生效",
+      "startYear": 1863,
+      "endYear": 1863,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "美国内战中，林肯颁发宣言，宣布当时仍处于叛乱状态的指定地区内被奴役者获得自由。",
+      "placeName": "美国内战涉及地区",
+      "sources": [
+        {
+          "title": "美国国家档案馆 · 《解放奴隶宣言》",
+          "url": "https://www.archives.gov/milestone-documents/emancipation-proclamation"
+        }
+      ]
+    },
+    {
+      "id": "benin-expedition",
+      "name": "英国远征军攻占贝宁城",
+      "startYear": 1897,
+      "endYear": 1897,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "英军攻占贝宁王国首都并劫掠大量宫廷物品，其中许多后来进入欧洲收藏机构。",
+      "placeName": "贝宁城",
+      "sources": [
+        {
+          "title": "大英博物馆 · 贝宁艺术与王国",
+          "url": "https://www.britishmuseum.org/sites/default/files/2019-09/Benin_art_Nov2015.pdf"
+        }
+      ]
+    },
+    {
+      "id": "wright-first-flight",
+      "name": "莱特兄弟首次受控动力飞行",
+      "startYear": 1903,
+      "endYear": 1903,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "莱特兄弟在北卡罗来纳州沙丘附近完成了有人驾驶的受控动力飞行，并在同一天进行了数次尝试。",
+      "placeName": "北卡罗来纳州基尔德维尔山",
+      "location": [
+        -75.667,
+        36.018
+      ],
+      "sources": [
+        {
+          "title": "美国国家公园管理局 · 首次受控动力飞行地点",
+          "url": "https://www.nps.gov/articles/wright-brothers-national-memorial-site-of-the-first-controlled-powered-flight-teaching-with-historic-places.htm"
+        }
+      ]
+    },
+    {
+      "id": "apollo-11-launch",
+      "name": "阿波罗 11 号发射",
+      "startYear": 1969,
+      "endYear": 1969,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "土星五号从肯尼迪航天中心的 39A 发射台起飞，将执行首次载人登月任务的阿波罗 11 号送入太空。点位是地球上的发射场。",
+      "placeName": "肯尼迪航天中心 39A 发射台",
+      "location": [
+        -80.604,
+        28.608
+      ],
+      "sources": [
+        {
+          "title": "NASA · Apollo 11",
+          "url": "https://www.nasa.gov/mission/apollo-11/"
+        },
+        {
+          "title": "NASA Earth Observatory · 阿波罗 11 号发射台",
+          "url": "https://science.nasa.gov/earth/earth-observatory/apollo-11-launch-pad-39376/"
+        }
+      ]
+    },
+    {
+      "id": "mansa-musa-pilgrimage",
+      "name": "曼萨·穆萨启程赴麦加朝觐",
+      "startYear": 1324,
+      "endYear": 1324,
+      "datePrecision": "year",
+      "category": "religion",
+      "description": "马里统治者曼萨·穆萨经撒哈拉及埃及前往麦加。他的旅程让马里王国及西非黄金贸易为更多地中海和伊斯兰世界的记录者所知。",
+      "placeName": "马里至麦加的朝觐路线",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 跨撒哈拉黄金贸易",
+          "url": "https://www.metmuseum.org/essays/the-trans-saharan-gold-trade-7th-14th-century"
+        }
+      ]
+    },
+    {
+      "id": "tenochtitlan-tlatelolco-fall",
+      "name": "特诺奇蒂特兰与特拉特洛尔科陷落",
+      "startYear": 1521,
+      "endYear": 1521,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "围攻后，西班牙军队及其原住民盟友击败了墨西加守军，库奥赫特莫克被俘。特拉特洛尔科是抵抗的最后据点之一。",
+      "placeName": "墨西哥盆地的特诺奇蒂特兰与特拉特洛尔科",
+      "sources": [
+        {
+          "title": "墨西哥国家人类学与历史研究所 · 特拉特洛尔科抵抗",
+          "url": "https://inah.gob.mx/boletines/conmemoran-504-anos-de-la-resistencia-mexica-en-tlatelolco"
+        }
+      ]
+    }
+  ]
+}

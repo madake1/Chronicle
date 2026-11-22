@@ -56,6 +56,15 @@
 | [Wikipedia](https://www.wikipedia.org/) / [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) | 全球各时期政权名称和关联；已下载索引并导入，2,641 个分组有中文名，2,735 个有百科链接 | `atlas:prepare -- --refresh-encyclopedia` 调官方 API；`atlas-encyclopedia.json` 和手工补充 `atlas-polity-aliases.json` | 本地快照于 2026-11-22 核查；Wikidata 结构化数据 CC0；Wikipedia 只保存名称与链接 |
 | 本机作品及笔记 | 用户内容，数量随使用变化；`fixtures.json` 仅首次无作品索引时回退 | `data/chronicle.json`；笔记、图片同在 `data/` | 私有数据，备份优先级最高 |
 
+## 历史事件（V4）
+
+`public/atlas/events.json` 版本 `1.0.0`，2026-11-22 人工整理并已随程序加载。共 26 条，12 条含点位，14 条仅在列表显示，5 条通过稳定 ID 关联已有地点。类别分布为政治 8、战争 6、经济 2、宗教 3、科学与技术 2、文化与艺术 2、社会 3。
+
+- 各条记录的 `sources` 保存文献标题与链接，包括 [English Heritage 1066 年大事记](https://www.english-heritage.org.uk/learn/teaching-resources/story-of-1066/)、[英国皇家军械博物馆百年战争](https://royalarmouries.org/objects-and-stories/stories/the-hundred-years-war-1337-1453)、[史密森中国历史时间线](https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/)、[新西兰文化与遗产部条约史](https://nzhistory.govt.nz/politics/treaty/making-the-treaty/signing-the-treaty)和 [NASA Apollo 11](https://www.nasa.gov/mission/apollo-11/)。简介为本项目中文摘要。外部来源的原文、图片和数据各依发布者许可，当前仅引用链接及事实，没有下载或导入整套外部事件资料。
+- `startYear` 和 `endYear` 使用带符号的历史年份，公元前为负数，公元后为正数，均含端点。精度为 `year` 时按单年或持续区间筛选。`century` 和 `approximate` 必须附 `dateLabel`，区间是可能范围，显示在其中任一年不代表该年已获证实。
+- `location` 为经度、纬度，须由可核验的场址、历史城市或遗址资料支持。`placeId` 只记录经人工核对的关联。事件点位与关联地点的地图点位分别维护。多地持续进程和未核实地点可填写 `placeName`，省略坐标。
+- 新增事件时保留稳定 ID，填写来源和日期精度，运行 `npm test` 校验，再在地图切到相应年代复查。数据和简介离线可读，打开来源链接需要联网。首批资料仅覆盖少数时期和地区，不能用于判断某年是否没有发生其他事件。
+
 ## 尚未完成的数据
 
 - WHG 的 Viabundus 下载为 v1.2，本机使用发布者 v2。中国 1911 年城镇此前在登录后仍显示下载不可用，县、府此前也未出现可用导出。[WHG 目录](https://whgazetteer.org/public_data/)

@@ -19,7 +19,7 @@
   </header>
   <main>
     <div class="heading">
-      <div><h1>历史时空</h1><p class="meta">根据所选年份显示当时适用的疆界记录。</p></div>
+      <div><h1>历史时空</h1><p class="meta">按年份探索历史疆界、地点和事件。</p></div>
     </div>
     <section class="panel atlas-panel" aria-label="历史世界地图">
       <div class="atlas-source-controls">
@@ -94,6 +94,10 @@
           <button id="atlas-place-close" type="button" aria-label="关闭地点资料">×</button>
           <div id="atlas-place-content"></div>
         </section>
+        <section id="atlas-event-panel" class="panel atlas-place-panel" aria-label="事件资料" hidden>
+          <button id="atlas-event-close" type="button" aria-label="关闭事件资料">×</button>
+          <div id="atlas-event-content" class="atlas-place-popup"></div>
+        </section>
       </div>
       <footer class="atlas-footer">
         <span id="atlas-border-legend"><i aria-hidden="true"></i> Cliopatria 收录的历史疆界</span>
@@ -103,12 +107,22 @@
           <label><input id="atlas-show-rivers" type="checkbox" checked> 河流</label>
           <label><input id="atlas-show-terrain" type="checkbox" checked> 山地</label>
           <label><input id="atlas-show-places" type="checkbox" checked> 历史地点</label>
+          <label><input id="atlas-show-events" type="checkbox" checked disabled> 历史事件</label>
         </fieldset>
         <span>海岸线、湖泊、河流和山脉名称为现代地理参考。</span>
         <span id="atlas-place-layer-status" role="status" hidden>地点资料暂时无法读取，可移动地图重试。</span>
         <span>红色标记表示该年有资料支持的历史身份。</span>
         <span>未着色区域表示本数据集缺少记录，当时仍可能有人居住或存在政权。</span>
       </footer>
+      <section id="atlas-events" aria-labelledby="atlas-events-title" hidden>
+        <div class="atlas-event-toolbar">
+          <h2 id="atlas-events-title">历史事件</h2>
+          <label>事件类别 <select id="atlas-event-category" disabled><option value="">全部</option></select></label>
+          <label>搜索事件 <input id="atlas-event-search" type="search" placeholder="名称、地点或关键词" disabled></label>
+        </div>
+        <p id="atlas-event-status" class="meta" role="status"></p>
+        <ul id="atlas-event-list" aria-label="当前年份事件"></ul>
+      </section>
     </section>
     <details class="atlas-sources">
       <summary>地图数据来源</summary>

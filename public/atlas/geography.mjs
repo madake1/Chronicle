@@ -3,9 +3,8 @@ import { readPlaceApi, readViewportPlaces } from './place-api.mjs';
 
 export { placesAt };
 
-function placePopup({ place, name, role, coverage }, sources) {
-  const content = document.createElement('div');
-  content.className = 'atlas-place-popup';
+export function placePopup({ place, name, role, coverage }, sources, content = document.createElement('div')) {
+  content.classList.add('atlas-place-popup');
   const title = document.createElement('h2');
   title.textContent = name?.name ?? place.name;
   const period = document.createElement('p');
@@ -178,7 +177,7 @@ function riverAnchors(rivers) {
   return anchors.sort((a, b) => a.rank - b.rank);
 }
 
-export function addGeographicLabels(map, rivers, Marker) {
+export function addGeographicLabels(map, rivers, Marker, onPlaceOpen) {
   let anchors = riverAnchors(rivers);
   let mountains = [];
   const markers = new Map();
@@ -225,6 +224,7 @@ export function addGeographicLabels(map, rivers, Marker) {
     try {
       const detail = await readPlaceApi('detail', { id: place.id });
       if (request !== detailRequest) return;
+      onPlaceOpen?.();
       detailContent.replaceChildren(placePopup(placeAt(detail.place, selectedYear), detail.sources));
       panel.hidden = false;
     } catch {
@@ -347,6 +347,7 @@ export function addGeographicLabels(map, rivers, Marker) {
     map.jumpTo({ center: place.coordinates });
     void openPlace(place, selectedYear);
   };
+  updateYear.close = closePlace;
   return updateYear;
 }
 

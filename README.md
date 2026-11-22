@@ -7,6 +7,7 @@
 - 作品库、故事时间轴、Markdown 笔记、插图与单份或批量导出。
 - 历史地图支持公元前 3400 年至公元 2024 年、政权名称和别名搜索、疆域演变、百科链接。
 - 历史地点按年份和视野加载，可搜索并查看名称、史料和出处。没有可靠年代的地点可搜索和定位。
+- V4 历史事件随地图年份显示，可按类别和关键词筛选，查看简介、点位和出处。
 - Cliopatria 自由年份地图和 Historical Basemaps 固定快照可切换。海岸线、河流和山地标为现代参照。
 
 ## 安装和启动
@@ -39,4 +40,4 @@ Node.js HTTP 服务 + 原生 HTML、CSS 和 ES Modules + MapLibre GL JS。作品
 
 已接入 Cliopatria、Natural Earth、Historical Basemaps、Pleiades、WHG、日本 CODH、Viabundus、Reba 等的全球历史城市，以及 Wikipedia/Wikidata 名称关联。可搜索 GeoNames 全球现代城市和首都作为地理参照。历史覆盖随地区和年代变化，中国古代地名仍稀疏。
 
-下一阶段优先扩充、清洗和整合外部历史数据，改善年代覆盖、搜索和出处追溯。开发接手请先读 [数据源清单](docs/DATA_SOURCES.md) 和 [交接说明](docs/HANDOFF.md)，再检查实际工作区。测试运行 `npm test`。
+开发接手请先读 [数据源清单](docs/DATA_SOURCES.md) 和 [交接说明](docs/HANDOFF.md)，再检查实际工作区。测试运行 `npm test`。
