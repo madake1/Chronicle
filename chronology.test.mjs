@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { describe, formatYear, parseYear, ticks } from './public/chronology.mjs';
+import { describe, formatYear, parseYear, ticks, zoomView } from './public/chronology.mjs';
+
+test('缩放改变可见跨度并保留指针下的年份', () => {
+  assert.deepEqual(zoomView([-500, 1500], 0.5, 0.75), [250, 1250]);
+  assert.deepEqual(zoomView([250, 1250], 2, 0.75), [-500, 1500]);
+  assert.deepEqual(zoomView([100, 102], 0.5, 0.5), [100, 102]);
+});
 
 test('公元前 1 年与公元 1 年相邻，拒绝公元 0 年', () => {
   assert.equal(parseYear('公元 1 年') - parseYear('公元前1年'), 1);

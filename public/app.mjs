@@ -1,4 +1,4 @@
-import { parseYear, formatYear, ticks, describe } from './chronology.mjs';
+import { parseYear, formatYear, ticks, describe, zoomView } from './chronology.mjs';
 
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
@@ -84,11 +84,7 @@ function setView(view, record = true) {
 }
 
 function zoom(factor, fraction, record = true) {
-  const [left, right] = state.view;
-  const width = Math.min(230000, Math.max(2, (right - left) * factor));
-  const pivot = left + (right - left) * fraction;
-  const nextLeft = Math.max(-115000, Math.min(115000 - width, pivot - width * fraction));
-  setView([nextLeft, nextLeft + width], record);
+  setView(zoomView(state.view, factor, fraction), record);
 }
 
 function select(work) {
@@ -113,6 +109,7 @@ function drawTimeline(works = filtered()) {
   const width = $('ruler').clientWidth;
   if (!width) return;
   const [left, right] = state.view;
+  $('visible-span').textContent = `当前视野约 ${Math.round(right - left).toLocaleString('zh-CN')} 年`;
   const x = year => (year - left) / (right - left) * width;
   const years = ticks(left, right, width);
   function grid(plot, axis) {
@@ -397,7 +394,7 @@ scroll.addEventListener('wheel', event => {
   const rect = plot.getBoundingClientRect();
   wheelStart ||= state.view;
   const units = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.width : 1;
-  zoom(Math.exp(Math.max(-1, Math.min(1, event.deltaY * units * .0025))),
+  zoom(Math.exp(Math.max(-0.7, Math.min(0.7, event.deltaY * units * .004))),
     (event.clientX - rect.left) / rect.width, false);
   clearTimeout(wheelTimer);
   wheelTimer = setTimeout(finishWheel, 180);
@@ -407,6 +404,7 @@ scroll.addEventListener('pointerdown', event => {
   if (!plot || event.target.closest('button') || event.button !== 0) return;
   finishWheel();
   dragging = { id: event.pointerId, x: event.clientX, width: plot.clientWidth, start: state.view };
+  scroll.classList.add('dragging');
   scroll.setPointerCapture(event.pointerId);
 });
 scroll.addEventListener('pointermove', event => {
@@ -421,6 +419,7 @@ scroll.addEventListener('lostpointercapture', event => {
   if (dragging?.id !== event.pointerId) return;
   remember(dragging.start);
   dragging = undefined;
+  scroll.classList.remove('dragging');
   $('back').disabled = !state.history.length;
 });
 new ResizeObserver(() => drawTimeline()).observe($('ruler'));

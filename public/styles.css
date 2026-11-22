@@ -42,7 +42,7 @@ h3{font-size:1rem}
 .row-name:hover:not(:disabled){background:transparent;text-decoration:underline}
 .row-type{font-size:.8rem;color:var(--muted);display:block}
 .plot{position:relative;min-width:0;overflow:hidden;touch-action:pan-y;cursor:grab}
-.plot.dragging{cursor:grabbing;user-select:none}
+.timeline-scroll.dragging,.timeline-scroll.dragging .plot{cursor:grabbing;user-select:none}
 .gridline,.tick{position:absolute;top:0;bottom:0;border-left:1px solid var(--line);pointer-events:none}
 .tick span{white-space:nowrap;position:absolute;left:5px;top:8px}
 .selected{background:var(--soft)}
@@ -55,6 +55,7 @@ h3{font-size:1rem}
 .mark[data-kind=range][data-uncertain] .glyph{opacity:.65}
 .legend{justify-content:flex-start;gap:1rem;font-size:.85rem;border-top:1px solid var(--line)}
 .hint{margin-left:auto}
+#visible-span{font-variant-numeric:tabular-nums;color:var(--accent)}
 .empty,#notice{padding:1rem;color:var(--muted)}
 #details{padding:1rem;overflow-wrap:anywhere}
 .detail-head{display:flex;justify-content:space-between;align-items:start;gap:.5rem}

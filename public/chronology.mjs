@@ -12,6 +12,14 @@ export function formatYear(year) {
   return year < 1 ? `公元前 ${1 - year} 年` : `${year} 年`;
 }
 
+export function zoomView([left, right], factor, fraction) {
+  const span = right - left;
+  const width = Math.min(230000, Math.max(2, span * factor));
+  const anchor = left + span * fraction;
+  const nextLeft = Math.max(-115000, Math.min(115000 - width, anchor - width * fraction));
+  return [nextLeft, nextLeft + width];
+}
+
 export function ticks(left, right, width) {
   const ideal = Math.max(1, (right - left) * 125 / width);
   const magnitude = 10 ** Math.floor(Math.log10(ideal));
