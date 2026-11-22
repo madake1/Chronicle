@@ -62,6 +62,20 @@ test('作品笔记、图片及导出通过本机 API 往返', async () => {
     assert.deepEqual(Buffer.from(await (await request(`${path}/${image}`)).arrayBuffer()), png);
     assert.equal((await request(`/api/works/${works[0].id}/note/${image}`)).status, 404);
     assert.equal((await request(path + '/assets/%2e%2e%2fnote.md')).status, 404);
+    const other = works[0];
+    const batch = ids => request('/api/notes/export.zip', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ids }),
+    });
+    assert.equal((await batch([])).status, 400);
+    assert.equal((await batch([id, other.id])).status, 409);
+    assert.equal((await put(`/api/works/${other.id}/note`, { content: '第二份笔记', revision: null })).status, 200);
+    const bundle = await batch([id, other.id]);
+    assert.equal(bundle.status, 200);
+    const combined = unzipSync(new Uint8Array(await bundle.arrayBuffer()));
+    assert.equal(Buffer.from(combined['1 - 无年代作品/note.md']).toString(), content);
+    assert.deepEqual(Buffer.from(combined[`1 - 无年代作品/${image}`]), png);
+    const otherPath = Object.keys(combined).find(name => name.startsWith('2 - ') && name.endsWith('/note.md'));
+    assert.equal(Buffer.from(combined[otherPath]).toString(), '第二份笔记');
   } finally {
     if (server && server.exitCode === null && server.signalCode === null) {
       const closed = once(server, 'exit');

@@ -20,7 +20,10 @@
   <main>
     <div class="heading">
       <div><h1 id="page-title">作品库</h1><p id="summary"></p></div>
-      <button id="add" class="primary">＋ 新增作品</button>
+      <div class="library-actions">
+        <button id="export-notes" type="button" disabled>批量导出笔记</button>
+        <button id="add" class="primary">＋ 新增作品</button>
+      </div>
     </div>
     <div class="filters">
       <input id="search" type="search" placeholder="搜索作品名称" aria-label="搜索作品名称">
@@ -85,6 +88,26 @@
       <button type="button" data-note-action="image">插入图片</button>
       <button type="button" class="primary" data-note-action="edit">编辑笔记</button>
       <button type="button" class="primary" data-note-action="save">保存笔记</button>
+    </footer>
+  </dialog>
+  <dialog id="batch-notes" aria-labelledby="batch-notes-title">
+    <header class="note-header">
+      <h2 id="batch-notes-title">批量导出笔记</h2>
+      <button type="button" data-batch="close" aria-label="关闭批量导出">×</button>
+    </header>
+    <div class="batch-toolbar">
+      <label><input type="checkbox" data-batch="all"> 全选所有页</label>
+      <span data-batch="count" class="meta"></span>
+    </div>
+    <div data-batch="list" class="batch-list"></div>
+    <div class="batch-toolbar" aria-label="笔记列表翻页">
+      <button type="button" data-batch="prev">上一页</button>
+      <span data-batch="page" class="meta"></span>
+      <button type="button" data-batch="next">下一页</button>
+    </div>
+    <p data-batch="status" class="note-status" role="status"></p>
+    <footer class="note-actions">
+      <button type="button" data-batch="export" class="primary">导出 ZIP</button>
     </footer>
   </dialog>
 </body>

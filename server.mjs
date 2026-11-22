@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 import { mkdir, readFile } from 'node:fs/promises';
-import { atomicWrite, exportNote, imageLimit, loadImage, loadNote, NoteError, noteLimit,
+import { atomicWrite, exportNote, exportNotes, imageLimit, loadImage, loadNote, NoteError, noteLimit,
   notePath, saveImage, saveNote } from './note-storage.mjs';
 
 const dataDirectory = new URL('./data/', import.meta.url);
@@ -10,6 +10,7 @@ const assets = new Map([
   ['/styles.css', ['styles.css', 'text/css']],
   ['/app.mjs', ['app.mjs', 'text/javascript']],
   ['/notes.mjs', ['notes.mjs', 'text/javascript']],
+  ['/batch-notes.mjs', ['batch-notes.mjs', 'text/javascript']],
   ['/notes.css', ['notes.css', 'text/css']],
   ['/chronology.mjs', ['chronology.mjs', 'text/javascript']],
 ]);
@@ -150,6 +151,25 @@ createServer(async (request, response) => {
     }
     const noteRoute = /^\/api\/works\/([a-zA-Z0-9_-]{1,100})\/note(?:\/(assets|export\.md|export\.zip)(?:\/([a-zA-Z0-9.-]+))?)?$/.exec(request.url);
     if (noteRoute) return await handleNote(request, response, ...noteRoute.slice(1));
+    if (request.url === '/api/notes/export.zip' && request.method === 'POST') {
+      const { ids } = (await readJson(request, 2_000_000)) ?? {};
+      if (!Array.isArray(ids) || !ids.length || !ids.every(id => typeof id === 'string') ||
+          new Set(ids).size !== ids.length) {
+        throw new NoteError(400, '请选择要导出的作品');
+      }
+      const byId = new Map((await readWorks()).map(work => [work.id, work]));
+      const works = ids.map(id => byId.get(id));
+      if (works.some(work => !work?.notePath)) {
+        throw new NoteError(409, '部分作品的笔记已不可用，请刷新作品库后重试');
+      }
+      const zip = await exportNotes(dataDirectory, works);
+      response.writeHead(200, {
+        'Content-Type': 'application/zip',
+        'Content-Disposition': 'attachment; filename="chronicle-notes.zip"',
+        'Cache-Control': 'no-store',
+      });
+      return response.end(zip);
+    }
     if (request.url === '/api/works' && request.method === 'GET') {
       return send(response, 200, await readWorks());
     }

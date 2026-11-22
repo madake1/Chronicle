@@ -25,7 +25,7 @@ function refresh() {
   editor.readOnly = busy;
 }
 
-async function api(url, options) {
+export async function noteRequest(url, options) {
   const response = await fetch(url, options);
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
@@ -77,7 +77,7 @@ export function openNote(work, onSaved) {
   refresh();
   dialog.showModal();
   void run(async () => {
-    const note = await (await api(current.url)).json();
+    const note = await (await noteRequest(current.url)).json();
     current.content = editor.value = note.content;
     current.revision = note.revision;
     current.loaded = true;
@@ -101,7 +101,7 @@ window.addEventListener('beforeunload', event => {
   }
 });
 controls.save.onclick = () => run(async () => {
-  const note = await (await api(current.url, {
+  const note = await (await noteRequest(current.url, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ content: editor.value, revision: current.revision }),
@@ -123,7 +123,7 @@ image.onchange = () => {
   const { selectionStart, selectionEnd } = editor;
   void run(async () => {
     if (file.size > 8 * 1024 * 1024) throw new Error('每张图片最多 8 MB');
-    const { path } = await (await api(`${current.url}/assets`, {
+    const { path } = await (await noteRequest(`${current.url}/assets`, {
       method: 'POST',
       headers: { 'Content-Type': file.type || 'application/octet-stream' },
       body: file,
@@ -135,44 +135,48 @@ image.onchange = () => {
   }, '正在上传图片…');
 };
 
+export async function saveNoteDownload(filename, extension, request) {
+  const mime = extension === 'zip' ? 'application/zip' : 'text/markdown';
+  let file;
+  if (typeof window.showSaveFilePicker === 'function') {
+    try {
+      file = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ accept: { [mime]: [`.${extension}`] } }],
+      });
+    } catch (error) {
+      if (error.name !== 'SecurityError' && error.name !== 'NotSupportedError') throw error;
+    }
+  }
+  const blob = await (await request()).blob();
+  if (file) {
+    const stream = await file.createWritable();
+    try {
+      await stream.write(blob);
+      await stream.close();
+    } catch (error) {
+      await stream.abort().catch(() => {});
+      throw error;
+    }
+  } else {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+}
+
 function download(extension) {
   if (dirty()) {
     status.textContent = '请先保存编辑内容，再导出笔记';
     return;
   }
   const name = current.work.title.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').trim().slice(0, 100) || 'note';
-  const filename = `${name}.${extension}`;
-  const mime = extension === 'zip' ? 'application/zip' : 'text/markdown';
   void run(async () => {
-    let file;
-    if (typeof window.showSaveFilePicker === 'function') {
-      try {
-        file = await window.showSaveFilePicker({
-          suggestedName: filename,
-          types: [{ accept: { [mime]: [`.${extension}`] } }],
-        });
-      } catch (error) {
-        if (error.name !== 'SecurityError' && error.name !== 'NotSupportedError') throw error;
-      }
-    }
-    const blob = await (await api(`${current.url}/export.${extension}`)).blob();
-    if (file) {
-      const stream = await file.createWritable();
-      try {
-        await stream.write(blob);
-        await stream.close();
-      } catch (error) {
-        await stream.abort().catch(() => {});
-        throw error;
-      }
-    } else {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 30000);
-    }
+    await saveNoteDownload(`${name}.${extension}`, extension,
+      () => noteRequest(`${current.url}/export.${extension}`));
     status.textContent = '已导出笔记';
   });
 }

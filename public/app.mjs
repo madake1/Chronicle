@@ -1,5 +1,6 @@
 import { parseYear, formatYear, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
 import { openNote } from './notes.mjs';
+import { openBatchNotes } from './batch-notes.mjs';
 
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
@@ -269,6 +270,8 @@ function render() {
   $('sort-control').hidden = timeline;
   $('page-title').textContent = timeline ? '故事时间轴' : '作品库';
   $('add').disabled = !state.ready;
+  $('export-notes').hidden = timeline;
+  $('export-notes').disabled = !state.ready;
   for (const tab of document.querySelectorAll('[data-page]')) {
     if (tab.dataset.page === state.page) tab.setAttribute('aria-current', 'page');
     else tab.removeAttribute('aria-current');
@@ -363,6 +366,7 @@ for (const tab of document.querySelectorAll('[data-page]')) tab.addEventListener
   render();
 });
 $('add').onclick = () => openEditor();
+$('export-notes').onclick = () => openBatchNotes(state.works);
 $('add-segment').onclick = () => addSegment();
 for (const id of ['cancel', 'cancel-top']) $(id).onclick = () => {
   if (!saving) $('editor').close();
