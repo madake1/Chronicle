@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "1.1",
   "license": "CC0-1.0",
   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
   "sources": {
@@ -14,47 +14,155 @@
     "daiming-survey": {
       "title": "河北省文物考古研究院：大名府故城遗址考古勘探",
       "url": "https://www.hbswwkg.com/2022-03/14/content_8742436.html"
+    },
+    "yingtian-study": {
+      "title": "《宋代發祥地：南京應天府研究》",
+      "url": "https://irlib.pccu.edu.tw/handle/987654321/32316?locale=en-US"
     }
   },
   "places": [
     {
       "id": "song-kaifeng",
-      "name": "汴京（开封）",
       "type": "历史城市",
-      "coordinates": [114.34, 34.79],
+      "coordinates": [
+        114.34,
+        34.79
+      ],
       "minZoom": 3.7,
-      "fromYear": 960,
-      "toYear": 1127,
-      "sourceIds": ["four-capitals", "met-chronology"],
+      "sourceIds": [
+        "four-capitals",
+        "met-chronology"
+      ],
       "roles": [
-        { "label": "北宋首都 · 东京", "fromYear": 960, "toYear": 1126, "sourceId": "met-chronology" }
-      ]
+        {
+          "label": "北宋首都 · 东京",
+          "fromYear": 960,
+          "toYear": 1126,
+          "sourceId": "met-chronology"
+        }
+      ],
+      "attested": {
+        "fromYear": 960,
+        "toYear": 1127
+      },
+      "names": [
+        {
+          "name": "汴京（开封）",
+          "original": "Bianjing",
+          "fromYear": 960,
+          "toYear": 1126,
+          "sourceId": "four-capitals"
+        }
+      ],
+      "encyclopedia": "https://en.wikipedia.org/wiki/Bianjing",
+      "name": "开封"
     },
     {
       "id": "song-luoyang",
-      "name": "洛阳",
       "type": "历史城市",
-      "coordinates": [112.46, 34.68],
+      "coordinates": [
+        112.46,
+        34.68
+      ],
       "minZoom": 4.5,
-      "fromYear": 960,
-      "toYear": 1126,
-      "sourceIds": ["four-capitals"],
+      "sourceIds": [
+        "four-capitals"
+      ],
       "roles": [
-        { "label": "北宋陪都 · 西京", "fromYear": 960, "toYear": 1126, "sourceId": "four-capitals" }
-      ]
+        {
+          "label": "北宋陪都 · 西京",
+          "fromYear": 960,
+          "toYear": 1126,
+          "sourceId": "four-capitals"
+        }
+      ],
+      "attested": {
+        "fromYear": 960,
+        "toYear": 1126
+      },
+      "names": [
+        {
+          "name": "洛阳",
+          "original": "Luoyang",
+          "fromYear": 960,
+          "toYear": 1126,
+          "sourceId": "four-capitals"
+        }
+      ],
+      "encyclopedia": "https://en.wikipedia.org/wiki/Luoyang",
+      "name": "洛阳"
     },
     {
       "id": "song-daming",
-      "name": "大名府",
       "type": "历史城市",
-      "coordinates": [115.21, 36.31],
+      "coordinates": [
+        115.21,
+        36.31
+      ],
       "minZoom": 4.5,
-      "fromYear": 960,
-      "toYear": 1126,
-      "sourceIds": ["daiming-survey", "four-capitals"],
+      "sourceIds": [
+        "daiming-survey",
+        "four-capitals"
+      ],
       "roles": [
-        { "label": "北宋陪都 · 北京", "fromYear": 1042, "toYear": 1126, "sourceId": "four-capitals" }
-      ]
+        {
+          "label": "北宋陪都 · 北京",
+          "fromYear": 1042,
+          "toYear": 1126,
+          "sourceId": "four-capitals"
+        }
+      ],
+      "attested": {
+        "fromYear": 960,
+        "toYear": 1126
+      },
+      "names": [
+        {
+          "name": "大名府",
+          "original": "Daming Prefecture",
+          "fromYear": 1042,
+          "toYear": 1126,
+          "sourceId": "four-capitals"
+        }
+      ],
+      "name": "大名府故城"
+    },
+    {
+      "id": "song-yingtian",
+      "name": "商丘古城",
+      "type": "历史城市",
+      "coordinates": [
+        115.63,
+        34.39
+      ],
+      "minZoom": 4.5,
+      "attested": {
+        "fromYear": 1006,
+        "toYear": 1126
+      },
+      "names": [
+        {
+          "name": "应天府（商丘）",
+          "original": "Yingtian Prefecture",
+          "fromYear": 1006,
+          "toYear": 1126,
+          "sourceId": "yingtian-study"
+        }
+      ],
+      "sourceIds": [
+        "four-capitals",
+        "yingtian-study"
+      ],
+      "roles": [
+        {
+          "label": "北宋陪都 · 南京",
+          "fromYear": 1014,
+          "toYear": 1126,
+          "sourceId": "yingtian-study"
+        }
+      ],
+      "encyclopedia": "https://en.wikipedia.org/wiki/Shangqiu"
     }
-  ]
+  ],
+  "referencePlaces": []
 }

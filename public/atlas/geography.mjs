@@ -6,8 +6,12 @@ function includesYear(period, year) {
 }
 
 export function placesAt(places, year, zoom) {
-  return places.filter(place => zoom >= place.minZoom && includesYear(place, year))
-    .map(place => ({ place, role: place.roles.find(role => includesYear(role, year)) }));
+  return places.filter(place => zoom >= place.minZoom && place.attested && includesYear(place.attested, year))
+    .map(place => ({
+      place,
+      name: place.names.find(name => includesYear(name, year)),
+      role: place.roles.find(role => includesYear(role, year)),
+    }));
 }
 
 function periodLabel(period) {
@@ -16,14 +20,21 @@ function periodLabel(period) {
   return from === to ? from : `${from} 至 ${to}`;
 }
 
-function placePopup(place, role, sources) {
+function placePopup(place, name, role, sources) {
   const content = document.createElement('div');
   content.className = 'atlas-place-popup';
   const title = document.createElement('h2');
-  title.textContent = place.name;
+  title.textContent = name?.name ?? place.name;
   const period = document.createElement('p');
-  period.textContent = `${place.type} · 本图收录 ${periodLabel(place)}`;
+  period.textContent = place.attested
+    ? `${place.type} · 有资料支持的收录时段 ${periodLabel(place.attested)}`
+    : `${place.type} · 参考地点，年代待考`;
   content.append(title, period);
+  if (name) {
+    const historicalName = document.createElement('p');
+    historicalName.textContent = `${name.original} · 地名资料年代 ${periodLabel(name)}`;
+    content.append(historicalName);
+  }
   if (role) {
     const identity = document.createElement('p');
     identity.textContent = `${role.label} · ${periodLabel(role)}`;
@@ -33,7 +44,7 @@ function placePopup(place, role, sources) {
   position.textContent = '点位为历史城市所在区域的近似位置。';
   content.append(position);
   const references = document.createElement('ul');
-  for (const id of new Set([...place.sourceIds, ...(role ? [role.sourceId] : [])])) {
+  for (const id of new Set([...place.sourceIds, ...[name?.sourceId, role?.sourceId].filter(Boolean)])) {
     const entry = document.createElement('li');
     const link = document.createElement('a');
     link.href = sources[id].url;
@@ -42,6 +53,14 @@ function placePopup(place, role, sources) {
     references.append(entry);
   }
   content.append(references);
+  if (place.encyclopedia) {
+    const link = document.createElement('a');
+    link.href = place.encyclopedia;
+    link.textContent = '查看百科';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    content.append(link);
+  }
   return content;
 }
 
@@ -91,16 +110,21 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
       if (!markers.has(key)) markers.set(key, makeMarker().setLngLat(position).addTo(map));
     }
 
-    for (const { place, role } of placesAt(atlasPlaces.places, year, zoom)) {
-      if (!reserve(place.coordinates, place.name)) continue;
-      add(`place:${place.id}:${role?.label ?? ''}`, place.coordinates, () => {
+    const historical = placesAt(atlasPlaces.places, year, zoom);
+    const reference = document.querySelector('#atlas-reference-places')?.checked
+      ? (atlasPlaces.referencePlaces ?? []).filter(place => zoom >= place.minZoom).map(place => ({ place }))
+      : [];
+    for (const { place, name, role } of [...historical, ...reference]) {
+      const label = name?.name ?? place.name;
+      if (!reserve(place.coordinates, label)) continue;
+      add(`place:${place.id}:${label}:${role?.label ?? ''}`, place.coordinates, () => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = `atlas-place-label${role ? ' has-role' : ''}`;
-        button.textContent = place.name;
-        if (role) button.setAttribute('aria-label', `${place.name} · ${role.label}`);
+        button.textContent = label;
+        if (role) button.setAttribute('aria-label', `${label} · ${role.label}`);
         const popup = new Popup({ offset: 14, maxWidth: '260px' })
-          .setDOMContent(placePopup(place, role, atlasPlaces.sources));
+          .setDOMContent(placePopup(place, name, role, atlasPlaces.sources));
         const marker = new Marker({ element: button, anchor: 'left', offset: [-5, 0] }).setPopup(popup);
         button.addEventListener('click', event => {
           event.stopPropagation();
@@ -143,6 +167,9 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
   }
 
   map.on('moveend', render);
+  const referenceToggle = document.querySelector('#atlas-reference-places');
+  referenceToggle.closest('label').hidden = !atlasPlaces.referencePlaces?.length;
+  referenceToggle.addEventListener('change', render);
   function updateYear(selectedYear) {
     if (year === selectedYear) return;
     year = selectedYear;
