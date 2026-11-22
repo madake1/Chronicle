@@ -12,7 +12,9 @@ function coverageOf(place) {
 
 export function placeAt(place, year) {
   const coverage = coverageOf(place).find(period => includesYear(period, year));
-  return { place, coverage, name: place.names.find(period => includesYear(period, year)),
+  const names = place.names.filter(period => includesYear(period, year));
+  const name = names.find(item => /^zh(?:-|$)/i.test(item.language ?? '')) ?? names[0];
+  return { place, coverage, name,
     role: place.roles.find(period => includesYear(period, year)) };
 }
 
@@ -44,18 +46,30 @@ export function createPlaceSearch(places) {
   };
 }
 
-export function bindPlaceSearch(places, currentYear, locate) {
+export function bindPlaceSearch(search, currentYear, locate) {
   const input = document.querySelector('#atlas-place-input');
   const list = document.querySelector('#atlas-place-list');
   const results = document.querySelector('#atlas-place-results');
   const status = document.querySelector('#atlas-place-status');
-  const search = createPlaceSearch(places);
-  function render() {
+  let request = 0;
+  let timer;
+  async function render(focus = false) {
+    clearTimeout(timer);
+    const id = ++request;
     const query = input.value.trim();
     results.hidden = !query;
     list.replaceChildren();
-    const matches = search(query, currentYear());
-    status.textContent = matches.length ? (matches.length > 10 ? `显示前 10 项，共 ${matches.length} 项` : '')
+    if (!query) return;
+    status.textContent = '正在搜索地点…';
+    let matches, total;
+    try {
+      ({ items: matches, total } = await search(query, currentYear()));
+    } catch {
+      if (id === request) status.textContent = '地点搜索暂不可用，请重试';
+      return;
+    }
+    if (id !== request || results.hidden) return;
+    status.textContent = total ? (total > 10 ? `显示前 10 项，共 ${total} 项` : '')
       : '没有匹配的历史地点';
     for (const item of matches.slice(0, 10)) {
       const row = document.createElement('li');
@@ -82,9 +96,13 @@ export function bindPlaceSearch(places, currentYear, locate) {
         summary.textContent = `${label} · 查看有资料的年代`;
         details.append(summary);
         for (const period of item.dates) {
-          const year = Math.max(sourceYearToAxis(period.fromYear), Math.min(currentYear(), sourceYearToAxis(period.toYear)));
-          const historicalName = placeAt(item.place, year).name?.name ?? label;
-          details.append(action(historicalName, placePeriod(period), year));
+          if (period.available === false) {
+            const unavailable = document.createElement('small');
+            unavailable.textContent = `${placePeriod(period)} · 超出地图可选年份`;
+            details.append(unavailable);
+          } else {
+            details.append(action(period.label ?? label, placePeriod(period), period.targetYear));
+          }
         }
         row.append(details);
       } else {
@@ -92,16 +110,25 @@ export function bindPlaceSearch(places, currentYear, locate) {
       }
       list.append(row);
     }
+    if (focus) list.querySelector('button, summary')?.focus();
   }
   input.disabled = false;
-  input.addEventListener('input', render);
+  input.addEventListener('input', () => {
+    ++request;
+    clearTimeout(timer);
+    results.hidden = true;
+    timer = setTimeout(render, 120);
+  });
   input.addEventListener('keydown', event => {
-    if (event.key === 'Escape') results.hidden = true;
+    if (event.key === 'Escape') {
+      clearTimeout(timer);
+      ++request;
+      results.hidden = true;
+    }
   });
   document.querySelector('#atlas-place-search').onsubmit = event => {
     event.preventDefault();
-    render();
-    list.querySelector('button, summary')?.focus();
+    void render(true);
   };
   return () => { if (!results.hidden) render(); };
 }

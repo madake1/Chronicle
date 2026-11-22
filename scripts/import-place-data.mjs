@@ -24,6 +24,9 @@ function pleiadesPeriod(entry) {
   })) });
 }
 
+const historicalAttestation = entry => entry.confidence === 'confident' &&
+  !/^(modern|twentieth-ce|twenty-first-ce)$/.test(entry.timePeriod ?? 'modern');
+
 export function fromPleiades(record) {
   if (!/^\d+$/.test(record.id ?? '')) return null;
   const pointIds = new Set((record.features ?? []).filter(feature =>
@@ -32,8 +35,7 @@ export function fromPleiades(record) {
   const points = (record.locations ?? []).filter(location => pointIds.has(location.id) &&
     location.associationCertainty === 'certain' &&
     !/openstreetmap|geonames/i.test(JSON.stringify([location.provenance, location.accuracy, location.references])));
-  const point = points.find(location => (location.attestations ?? []).some(entry =>
-    entry.confidence === 'confident' && entry.timePeriod !== 'modern')) ?? points[0];
+  const point = points.find(location => (location.attestations ?? []).some(historicalAttestation)) ?? points[0];
   const coordinates = (record.features ?? []).find(feature => feature.id === point?.id)?.geometry.coordinates;
   const samePoint = points.filter(location => {
     const other = record.features.find(feature => feature.id === location.id)?.geometry.coordinates;
@@ -41,7 +43,7 @@ export function fromPleiades(record) {
       location.attestations?.length;
   });
   const dates = samePoint.filter(location => location.attestations.length === 1 &&
-    location.attestations[0].confidence === 'confident' && location.attestations[0].timePeriod !== 'modern')
+    historicalAttestation(location.attestations[0]))
     .map(pleiadesPeriod).filter(Boolean);
   const names = (record.names ?? []).flatMap(entry => {
     const label = entry.attested || entry.romanized;
@@ -105,7 +107,7 @@ export function normalizePlace(candidate, dataset) {
   const chinese = names.find(item => /^zh(?:-|$)/i.test(item.language ?? ''));
   return {
     source: { title: `${dataset.name} · ${candidate.name}`, url: candidate.url, license: dataset.license,
-      version: dataset.version, credits: [...new Set(candidate.credits ?? [])] },
+      version: dataset.version, credits: [...new Set(candidate.credits ?? [dataset.credits].filter(Boolean))] },
     place: { id: sourceId, originalId: candidate.originalId, name: chinese?.name ?? candidate.name,
       originalName: candidate.name, type: label, sourceTypes: candidate.types,
       coordinates: candidate.coordinates.slice(0, 2), minZoom, sourceIds: [sourceId],

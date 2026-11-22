@@ -17,6 +17,7 @@ const assets = new Map([
   ['/atlas', ['atlas/index.html', 'text/html']],
   ['/atlas/atlas.mjs', ['atlas/atlas.mjs', 'text/javascript']],
   ['/atlas/years.mjs', ['atlas/years.mjs', 'text/javascript']],
+  ['/atlas/place-api.mjs', ['atlas/place-api.mjs', 'text/javascript']],
   ['/atlas/places.mjs', ['atlas/places.mjs', 'text/javascript']],
   ['/atlas/data.mjs', ['atlas/data.mjs', 'text/javascript']],
   ['/atlas/comparison.mjs', ['atlas/comparison.mjs', 'text/javascript']],
@@ -167,6 +168,11 @@ createServer(async (request, response) => {
     if (request.method !== 'GET' && (request.headers['sec-fetch-site'] === 'cross-site' ||
         (request.headers.origin && !allowedOrigins.has(request.headers.origin)))) {
       return send(response, 403, { error: '请从 Chronicle 本机页面保存' });
+    }
+    if (request.method === 'GET' && /^\/api\/atlas\/places\/(meta|detail|search|viewport)(?:\?|$)/.test(request.url)) {
+      const { handlePlaceQuery } = await import('./atlas-place-index.mjs');
+      const [code, result] = await handlePlaceQuery(new URL(request.url, 'http://localhost'));
+      return send(response, code, result);
     }
     const noteRoute = /^\/api\/works\/([a-zA-Z0-9_-]{1,100})\/note(?:\/(assets|export\.md|export\.zip)(?:\/([a-zA-Z0-9.-]+))?)?$/.exec(request.url);
     if (noteRoute) return await handleNote(request, response, ...noteRoute.slice(1));

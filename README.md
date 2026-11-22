@@ -75,3 +75,5 @@ npm run atlas:import-places -- lpf "D:/downloads/medieval-swahili.json" atlas-pl
 ```
 
 导入生成版本校验值，并把原始数据包衍生结果存在 Git 忽略的 `atlas-data/place-packs/`。运行 `npm run atlas:places` 可离线重建查询索引。已核实的 18 个地点优先，明确对齐的外部条目保留原始来源和地名资料。地图使用有明确地点记载的时段，其他地点只参与搜索。地点记载、存在年代、地名和历史身份分别保存。
+
+新版页面通过 Node.js 按年份、地图视野和缩放请求地点。批量导入或重建索引后重启服务，载入新索引。地点搜索和详情也走本地 API。

@@ -1,6 +1,7 @@
 import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
 import { formatYear, parseYear } from '../chronology.mjs';
 import { createAtlasData, createPolitySearch, recordAtYear } from './data.mjs';
+import { readPlaceApi } from './place-api.mjs';
 import { bindPlaceSearch } from './places.mjs';
 import { bindMapSources } from './comparison.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
@@ -147,7 +148,7 @@ function renderSources(items) {
     license.href = item.licenseUrl;
     license.textContent = item.license;
     line.append(source, ' · ', license);
-    if (item.citation) line.append(` · ${item.citation}`);
+    if (item.citation || item.credits) line.append(` · ${item.citation ?? item.credits}`);
     sources.append(line);
   }
 }
@@ -156,12 +157,9 @@ async function initialize() {
   const [manifest, chronology, land, lakes, rivers, places] = await Promise.all([
     readData('manifest.json'), readData('chronology.json'), readData('land.geojson'), readData('lakes.geojson'),
     readData('rivers.geojson'),
-    fetch('/atlas/data/places.json').then(async response => {
-      if (response.ok) return response.json();
-      if (response.status !== 404) throw new Error('历史地点数据无法加载');
-      const legacy = await fetch('/atlas/northern-song-places.json');
-      if (!legacy.ok) throw new Error('北宋地点数据无法加载');
-      return legacy.json();
+    readPlaceApi('meta').catch(error => {
+      console.warn(error.message);
+      return { datasets: [] };
     }),
   ]);
   if (!chronology.names) throw new Error('政权名称索引需要更新，请运行 npm run atlas:prepare');
@@ -216,7 +214,7 @@ async function initialize() {
     },
   });
   map.addControl(new NavigationControl({ showCompass: false }));
-  const updateGeography = addGeographicLabels(map, rivers, places, Marker, Popup);
+  const updateGeography = addGeographicLabels(map, rivers, Marker, Popup);
   if (manifest.geography) addGeographicDetail(map, readData, { land, lakes, rivers }, updateGeography);
   let active = initial;
   let loaded = false;
@@ -299,17 +297,15 @@ async function initialize() {
     slider.disabled = yearInput.disabled = document.querySelector('#atlas-jump-submit').disabled = false;
     document.querySelector('#atlas-polity-input').disabled = false;
     mapSources = bindMapSources(map, readData, () => active, clearPolity, updateGeography, palette);
-    refreshPlaceSearch = bindPlaceSearch([...places.places, ...(places.referencePlaces ?? [])], () => active,
+    refreshPlaceSearch = bindPlaceSearch((q, year) => readPlaceApi('search', { q, year }), () => active,
       async (place, year) => {
         const expected = requestNumber + Number(year !== undefined);
         if (year !== undefined) await selectYear(year);
-        const reference = document.querySelector('#atlas-reference-places');
         const placesToggle = document.querySelector('#atlas-show-places');
         if (requestNumber !== expected || mapSources.comparing() || (year !== undefined && active !== year)) return;
-        const toggle = year === undefined ? reference : placesToggle;
-        if (!toggle.checked) {
-          toggle.checked = true;
-          toggle.dispatchEvent(new Event('change'));
+        if (year !== undefined && !placesToggle.checked) {
+          placesToggle.checked = true;
+          placesToggle.dispatchEvent(new Event('change'));
         }
         updateGeography.locate(place, year);
       });

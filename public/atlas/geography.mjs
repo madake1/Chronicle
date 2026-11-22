@@ -1,4 +1,5 @@
 import { placeAt, placePeriod, placesAt } from './places.mjs';
+import { readPlaceApi, readViewportPlaces } from './place-api.mjs';
 
 export { placesAt };
 
@@ -29,10 +30,17 @@ function placePopup({ place, name, role, coverage }, sources) {
     names.append(heading);
     for (const entry of place.names.filter(entry => entry !== name)) {
       const line = document.createElement('p');
-      line.textContent = `${entry.name} · ${entry.original} · ${placePeriod(entry)}`;
+      line.textContent = `${[entry.name, entry.original === entry.name ? null : entry.original,
+        entry.fromYear === undefined ? '名称年代待考' : placePeriod(entry)].filter(Boolean).join(' · ')}`;
       names.append(line);
     }
     content.append(names);
+  }
+  for (const observed of place.attestations ?? []) {
+    if (observed === coverage || observed.fromYear === coverage?.fromYear && observed.toYear === coverage?.toYear) continue;
+    const evidence = document.createElement('p');
+    evidence.textContent = `地点资料记载 · ${placePeriod(observed)}`;
+    content.append(evidence);
   }
   for (const observed of place.existence ?? []) {
     const existence = document.createElement('p');
@@ -49,6 +57,7 @@ function placePopup({ place, name, role, coverage }, sources) {
   content.append(position);
   const references = document.createElement('ul');
   for (const id of new Set([...place.sourceIds, ...[coverage, ...place.names, ...place.roles, ...(place.existence ?? [])].map(item => item?.sourceId).filter(Boolean)])) {
+    if (!sources[id]) continue;
     const entry = document.createElement('li');
     const link = document.createElement('a');
     link.href = sources[id].url;
@@ -90,13 +99,47 @@ function riverAnchors(rivers) {
   return anchors.sort((a, b) => a.rank - b.rank);
 }
 
-export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
+export function addGeographicLabels(map, rivers, Marker, Popup) {
   let anchors = riverAnchors(rivers);
   let mountains = [];
   const markers = new Map();
   const canvas = map.getCanvas();
   let year;
   let searchPopup;
+  let detailRequest = 0;
+  let viewportRequest = 0;
+  let historical = [];
+  const placesToggle = document.querySelector('#atlas-show-places');
+  const placeStatus = document.querySelector('#atlas-place-layer-status');
+
+  async function refreshPlaces() {
+    const request = ++viewportRequest;
+    if (year === undefined || !placesToggle.checked) return;
+    try {
+      const data = await readViewportPlaces(map, year);
+      if (request !== viewportRequest) return;
+      historical = data;
+      placeStatus.hidden = true;
+      render();
+    } catch {
+      if (request !== viewportRequest) return;
+      placeStatus.hidden = false;
+    }
+  }
+
+  async function openPlace(place, selectedYear) {
+    const request = ++detailRequest;
+    searchPopup?.remove();
+    try {
+      const detail = await readPlaceApi('detail', { id: place.id });
+      if (request !== detailRequest) return;
+      searchPopup = new Popup({ offset: 14, maxWidth: '280px' }).setLngLat(place.coordinates)
+        .setDOMContent(placePopup(placeAt(detail.place, selectedYear), detail.sources)).addTo(map);
+    } catch {
+      if (request === detailRequest) placeStatus.hidden = false;
+    }
+  }
+
 
   function render() {
     const zoom = map.getZoom();
@@ -122,13 +165,8 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
       if (!markers.has(key)) markers.set(key, makeMarker().setLngLat(position).addTo(map));
     }
 
-    const historical = document.querySelector('#atlas-show-places').checked
-      ? placesAt(atlasPlaces.places, year, zoom) : [];
-    const reference = document.querySelector('#atlas-reference-places')?.checked
-      ? (atlasPlaces.referencePlaces ?? []).filter(place => zoom >= place.minZoom).map(place => ({ place }))
-      : [];
     let historicalCount = 0;
-    for (const item of [...historical, ...reference]) {
+    for (const item of placesToggle.checked ? historical : []) {
       const { place, name, role, coverage } = item;
       const label = name?.name ?? place.name;
       if (coverage && zoom < 3 && historicalCount >= 6) continue;
@@ -140,12 +178,10 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
         button.className = `atlas-place-label${role ? ' has-role' : ''}`;
         button.textContent = label;
         if (role) button.setAttribute('aria-label', `${label} · ${role.label}`);
-        const popup = new Popup({ offset: 14, maxWidth: '260px' })
-          .setDOMContent(placePopup(item, atlasPlaces.sources));
-        const marker = new Marker({ element: button, anchor: 'left', offset: [-5, 0] }).setPopup(popup);
+        const marker = new Marker({ element: button, anchor: 'left', offset: [-5, 0] });
         button.addEventListener('click', event => {
           event.stopPropagation();
-          marker.togglePopup();
+          void openPlace(place, year);
         });
         return marker;
       });
@@ -183,18 +219,29 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
     }
   }
 
-  map.on('moveend', render);
-  const referenceToggle = document.querySelector('#atlas-reference-places');
-  referenceToggle.closest('label').hidden = !atlasPlaces.referencePlaces?.length;
-  referenceToggle.addEventListener('change', render);
-  for (const id of ['atlas-show-places', 'atlas-show-rivers', 'atlas-show-terrain']) {
+  map.on('moveend', () => { render(); void refreshPlaces(); });
+  placesToggle.addEventListener('change', () => {
+    if (!placesToggle.checked) {
+      ++detailRequest;
+      searchPopup?.remove();
+      historical = [];
+      placeStatus.hidden = true;
+    }
+    render();
+    void refreshPlaces();
+  });
+  for (const id of ['atlas-show-rivers', 'atlas-show-terrain']) {
     document.getElementById(id).addEventListener('change', render);
   }
   function updateYear(selectedYear) {
     if (year === selectedYear) return;
+    ++detailRequest;
     searchPopup?.remove();
     year = selectedYear;
+    historical = [];
+    placeStatus.hidden = true;
     render();
+    void refreshPlaces();
   }
   updateYear.updatePhysical = (riverData, mountainData) => {
     if (rivers !== riverData) {
@@ -205,11 +252,9 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
     render();
   };
   updateYear.locate = (place, selectedYear) => {
-    searchPopup?.remove();
     map.stop();
     map.jumpTo({ center: place.coordinates, zoom: Math.max(Math.min(map.getZoom(), 6), place.minZoom, 4.7) });
-    searchPopup = new Popup({ offset: 14, maxWidth: '280px' }).setLngLat(place.coordinates)
-      .setDOMContent(placePopup(placeAt(place, selectedYear), atlasPlaces.sources)).addTo(map);
+    void openPlace(place, selectedYear);
   };
   return updateYear;
 }
