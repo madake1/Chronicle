@@ -4,6 +4,7 @@ import { unzipSync } from 'fflate';
 import { atomicWrite } from '../note-storage.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
 import { buildEncyclopedia } from './atlas-encyclopedia.mjs';
+import { buildPolityHistory } from './atlas-history.mjs';
 
 const output = new URL('../atlas-data/', import.meta.url);
 const raw = new URL('raw/', output);
@@ -82,5 +83,6 @@ await save('manifest.json', {
   slices,
   sources: atlasSources,
   encyclopedia: { byRecord: encyclopedia.byRecord, entities: encyclopedia.entities },
+  polityHistory: buildPolityHistory(original.features, encyclopediaRecords),
   sha256: { cliopatriaArchive: digest(archive), naturalEarthLand: digest(land), naturalEarthLakes: digest(lakes) },
 });

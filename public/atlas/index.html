@@ -38,10 +38,18 @@
             <button id="atlas-polity-close" type="button" aria-label="关闭政权资料">×</button>
           </div>
           <p id="atlas-polity-original" class="meta" lang="en" hidden></p>
-          <p id="atlas-polity-year"></p>
-          <p id="atlas-polity-years"></p>
+          <div class="atlas-polity-dates">
+            <div><span class="meta">当前地图年份</span><p id="atlas-polity-year"></p></div>
+            <div><span class="meta">疆界资料年代</span><p id="atlas-polity-years"></p></div>
+          </div>
+          <p id="atlas-polity-area" hidden></p>
           <p><a id="atlas-polity-encyclopedia" target="_blank" rel="noopener noreferrer" hidden>查看百科</a>
             <span id="atlas-polity-no-encyclopedia" class="meta">暂无百科链接</span></p>
+          <details id="atlas-polity-history">
+            <summary>历史疆域演变</summary>
+            <p class="meta">以下是疆界资料适用年代。</p>
+            <ul id="atlas-history-list"></ul>
+          </details>
         </section>
       </div>
       <footer class="atlas-footer">
