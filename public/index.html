@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chronicle · 作品时间轴</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.mjs"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
+    <nav aria-label="页面">
+      <button data-page="timeline" aria-current="page">时间轴</button>
+      <button data-page="library">作品库</button>
+    </nav>
+    <button id="theme" class="quiet" aria-label="切换主题">切换主题</button>
+  </header>
+  <main>
+    <div class="heading">
+      <div><h1 id="page-title">故事时间轴</h1><p id="summary"></p></div>
+      <button id="add" class="primary">＋ 新增作品</button>
+    </div>
+    <div class="filters">
+      <input id="search" type="search" placeholder="搜索作品名称" aria-label="搜索作品名称">
+      <select id="type-filter" aria-label="作品类型"></select>
+      <select id="status-filter" aria-label="体验状态"></select>
+      <label id="sort-control" hidden>排序 <select id="sort"><option value="year">故事年代</option><option value="title">作品名称</option><option value="rating">个人评分</option></select></label>
+    </div>
+    <p id="notice" role="status" hidden></p>
+    <div class="workspace">
+      <section id="timeline" class="panel" aria-label="故事时间轴">
+        <div class="toolbar">
+          <form id="jump"><input name="year" placeholder="例如 公元前431" aria-label="定位年份" required><button>定位年份</button></form>
+          <div class="controls">
+            <button id="back">上一视图</button><button id="fit">适应全部</button>
+            <button id="out" aria-label="缩小">−</button><button id="in" aria-label="放大">＋</button>
+          </div>
+        </div>
+        <div class="timeline-scroll">
+          <div id="axis" class="timeline-row axis"><div>作品</div><div id="ruler" class="plot"></div></div>
+          <div id="rows"></div>
+        </div>
+        <footer class="legend"><span>━ 故事跨度</span><span>◆ 年份 / 短跨度</span><span>▱ 可能发生范围</span><span class="hint">滚轮缩放 · 拖动平移</span></footer>
+      </section>
+      <section id="library" class="panel" aria-label="作品库" hidden></section>
+      <aside id="details" class="panel" aria-label="作品详情" hidden></aside>
+    </div>
+  </main>
+  <dialog id="editor">
+    <form id="edit-form">
+      <div class="dialog-head"><h2 id="edit-title"></h2><button type="button" id="cancel-top" aria-label="关闭">×</button></div>
+      <div class="form-grid">
+        <label class="wide">作品名称<input name="title" required maxlength="180"></label>
+        <label>类型<select name="type"></select></label><label>状态<select name="status"></select></label>
+        <label>地区<input name="region"></label><label>历史时期<input name="period"></label>
+        <label>历史背景<select name="basis"><option value="">未填写</option><option>真实历史</option><option>历史架空</option><option>完全虚构</option></select></label>
+        <label>评分（0–10）<input name="rating" type="number" min="0" max="10" step="0.5"></label>
+        <fieldset class="wide"><legend>故事时间段</legend><p class="meta">留空表示年代未知。</p><div id="segment-fields"></div><button type="button" id="add-segment">＋ 添加时间段</button></fieldset>
+        <label class="wide">评价和笔记<textarea name="notes" rows="3"></textarea></label>
+        <label class="wide">参考链接（每行一个）<textarea name="links" rows="2"></textarea></label>
+      </div>
+      <p id="form-error" role="alert"></p>
+      <div class="form-actions"><button type="button" id="cancel">取消</button><button class="primary" id="save">保存作品</button></div>
+    </form>
+  </dialog>
+</body>
+</html>

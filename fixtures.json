@@ -1,0 +1,8 @@
+[
+  {"id":"odyssey","title":"刺客信条：奥德赛","type":"游戏","status":"未开始","region":"古希腊","period":"古典时代","segments":[{"kind":"point","start":-430,"confidence":"约略","source":"PRD 示例，待考据"}]},
+  {"id":"mirage","title":"刺客信条：幻景","type":"游戏","status":"未开始","region":"巴格达","period":"阿拔斯王朝","segments":[{"kind":"point","start":861,"confidence":"约略","source":"PRD 示例，待考据"}]},
+  {"id":"pillars","title":"圣殿春秋","type":"小说","status":"未开始","region":"英格兰","period":"中世纪","segments":[{"kind":"range","start":1135,"end":1154,"confidence":"约略","source":"PRD 示例，待考据"}]},
+  {"id":"ac","title":"刺客信条","type":"游戏","status":"未开始","region":"黎凡特","period":"第三次十字军东征","segments":[{"kind":"point","start":1191,"confidence":"确定","source":"PRD 示例，待考据"}]},
+  {"id":"kcd","title":"天国：拯救","type":"游戏","status":"未开始","region":"波希米亚","period":"中世纪晚期","segments":[{"kind":"point","start":1403,"confidence":"确定","source":"PRD 示例，待考据"}]},
+  {"id":"ac2","title":"刺客信条 2","type":"游戏","status":"未开始","region":"意大利","period":"文艺复兴","segments":[{"kind":"window","start":1475,"end":1500,"confidence":"约略","source":"PRD 示例区间，待考据"}]}
+]
