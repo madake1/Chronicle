@@ -1,0 +1,470 @@
+{
+  "dataset": {
+    "name": "Chronicle · 历史地点选编",
+    "version": "1.0.0",
+    "source": "https://whc.unesco.org/en/list/",
+    "license": "独立整理 CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "changes": "独立整理可核对的事实及近似点位。保留逐项出处。"
+  },
+  "sources": {
+    "yin-xu": {
+      "title": "UNESCO · 殷墟",
+      "url": "https://whc.unesco.org/en/list/1114/"
+    },
+    "silk-roads": {
+      "title": "UNESCO · 丝绸之路长安—天山廊道",
+      "url": "https://whc.unesco.org/en/list/1442/"
+    },
+    "silk-roads-maps": {
+      "title": "UNESCO · 丝绸之路遗址坐标",
+      "url": "https://whc.unesco.org/en/list/1442/maps/"
+    },
+    "tower-london": {
+      "title": "UNESCO · 伦敦塔",
+      "url": "https://whc.unesco.org/en/list/488/"
+    },
+    "paris-seine": {
+      "title": "UNESCO · 巴黎塞纳河岸",
+      "url": "https://whc.unesco.org/en/list/600/"
+    },
+    "prague": {
+      "title": "UNESCO · 布拉格历史中心",
+      "url": "https://whc.unesco.org/en/list/616/"
+    },
+    "istanbul": {
+      "title": "UNESCO · 伊斯坦布尔历史区",
+      "url": "https://whc.unesco.org/en/list/356/"
+    },
+    "byzantium": {
+      "title": "大都会艺术博物馆 · 1261 年以后的君士坦丁堡",
+      "url": "https://www.metmuseum.org/essays/constantinople-after-1261"
+    },
+    "istanbul-name": {
+      "title": "美国国会记录 · 1930 年报导的名称用法",
+      "url": "https://www.congress.gov/71/crecb/1930/02/11/GPO-CRECB-1930-pt4-v72-1-2.pdf"
+    },
+    "great-zimbabwe": {
+      "title": "UNESCO · 大津巴布韦国家纪念地",
+      "url": "https://whc.unesco.org/en/list/364/"
+    },
+    "mexico": {
+      "title": "UNESCO · 墨西哥城历史中心与霍奇米尔科",
+      "url": "https://whc.unesco.org/en/list/412/"
+    },
+    "kyoto": {
+      "title": "UNESCO · 古京都历史建筑",
+      "url": "https://whc.unesco.org/en/list/688/"
+    }
+  },
+  "places": [
+    {
+      "id": "yin-xu",
+      "name": "殷墟",
+      "originalName": "Yin Xu",
+      "type": "遗址",
+      "coordinates": [
+        114.31,
+        36.13
+      ],
+      "minZoom": 3.5,
+      "coverage": [
+        {
+          "fromYear": -1300,
+          "toYear": -1046,
+          "sourceId": "yin-xu"
+        }
+      ],
+      "aliases": [
+        "安阳殷墟",
+        "殷"
+      ],
+      "names": [],
+      "roles": [
+        {
+          "label": "晚商都城遗址",
+          "fromYear": -1300,
+          "toYear": -1046,
+          "sourceId": "yin-xu"
+        }
+      ],
+      "sourceIds": [
+        "yin-xu"
+      ],
+      "existence": [],
+      "confidence": "UNESCO 对晚商城址的约略年代。殷墟是遗址名称。"
+    },
+    {
+      "id": "han-changan",
+      "name": "长安（汉城）",
+      "originalName": "Chang’an",
+      "type": "历史城市",
+      "coordinates": [
+        108.86,
+        34.300000000000004
+      ],
+      "minZoom": 3.5,
+      "coverage": [
+        {
+          "fromYear": -200,
+          "toYear": 8,
+          "sourceId": "silk-roads"
+        }
+      ],
+      "aliases": [
+        "长安",
+        "西汉长安",
+        "汉长安城",
+        "Changan"
+      ],
+      "names": [
+        {
+          "name": "长安（汉城）",
+          "original": "長安",
+          "fromYear": -200,
+          "toYear": 8,
+          "sourceId": "silk-roads"
+        }
+      ],
+      "roles": [
+        {
+          "label": "西汉都城",
+          "fromYear": -200,
+          "toYear": 8,
+          "sourceId": "silk-roads"
+        }
+      ],
+      "sourceIds": [
+        "silk-roads",
+        "silk-roads-maps"
+      ],
+      "existence": [],
+      "confidence": "以西汉长安未央宫遗址附近为代表点，选取有资料支持的部分西汉时期。"
+    },
+    {
+      "id": "tang-changan",
+      "name": "长安（唐城）",
+      "originalName": "Chang’an",
+      "type": "历史城市",
+      "coordinates": [
+        108.95,
+        34.29
+      ],
+      "minZoom": 3.5,
+      "coverage": [
+        {
+          "fromYear": 618,
+          "toYear": 683,
+          "sourceId": "silk-roads"
+        }
+      ],
+      "aliases": [
+        "长安",
+        "唐长安城",
+        "Changan"
+      ],
+      "names": [
+        {
+          "name": "长安（唐城）",
+          "original": "長安",
+          "fromYear": 618,
+          "toYear": 683,
+          "sourceId": "silk-roads"
+        }
+      ],
+      "roles": [
+        {
+          "label": "唐朝都城",
+          "fromYear": 618,
+          "toYear": 683,
+          "sourceId": "silk-roads"
+        }
+      ],
+      "sourceIds": [
+        "silk-roads",
+        "silk-roads-maps"
+      ],
+      "existence": [],
+      "confidence": "以大明宫遗址附近为代表点。仅收录所选初唐窗口，和汉长安城为不同城址。"
+    },
+    {
+      "id": "london",
+      "name": "伦敦",
+      "originalName": "London",
+      "type": "历史城市",
+      "coordinates": [
+        -0.092,
+        51.51
+      ],
+      "minZoom": 2,
+      "coverage": [
+        {
+          "fromYear": 1100,
+          "toYear": 1200,
+          "sourceId": "tower-london"
+        }
+      ],
+      "aliases": [
+        "London"
+      ],
+      "names": [
+        {
+          "name": "伦敦",
+          "original": "London",
+          "fromYear": 1100,
+          "toYear": 1200,
+          "sourceId": "tower-london"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "tower-london"
+      ],
+      "existence": [],
+      "confidence": "地点年代为本图采用的资料窗口，点位为近似位置。"
+    },
+    {
+      "id": "paris",
+      "name": "巴黎",
+      "originalName": "Paris",
+      "type": "历史城市",
+      "coordinates": [
+        2.35,
+        48.856
+      ],
+      "minZoom": 2,
+      "coverage": [
+        {
+          "fromYear": 1163,
+          "toYear": 1250,
+          "sourceId": "paris-seine"
+        }
+      ],
+      "aliases": [
+        "Paris"
+      ],
+      "names": [
+        {
+          "name": "巴黎",
+          "original": "Paris",
+          "fromYear": 1163,
+          "toYear": 1250,
+          "sourceId": "paris-seine"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "paris-seine"
+      ],
+      "existence": [],
+      "confidence": "地点年代为本图采用的资料窗口，点位为近似位置。"
+    },
+    {
+      "id": "prague",
+      "name": "布拉格",
+      "originalName": "Praha",
+      "type": "历史城市",
+      "coordinates": [
+        14.42,
+        50.087
+      ],
+      "minZoom": 3.5,
+      "coverage": [
+        {
+          "fromYear": 1150,
+          "toYear": 1200,
+          "sourceId": "prague"
+        }
+      ],
+      "aliases": [
+        "Prague",
+        "Praha"
+      ],
+      "names": [
+        {
+          "name": "布拉格",
+          "original": "Praha",
+          "fromYear": 1150,
+          "toYear": 1200,
+          "sourceId": "prague"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "prague"
+      ],
+      "existence": [],
+      "confidence": "地点年代为本图采用的资料窗口，点位为近似位置。"
+    },
+    {
+      "id": "constantinople-istanbul",
+      "name": "伊斯坦布尔",
+      "originalName": "İstanbul",
+      "type": "历史城市",
+      "coordinates": [
+        28.98,
+        41.01
+      ],
+      "minZoom": 2,
+      "coverage": [
+        {
+          "fromYear": 1261,
+          "toYear": 1453,
+          "sourceId": "byzantium"
+        },
+        {
+          "fromYear": 1930,
+          "toYear": 2024,
+          "sourceId": "istanbul"
+        }
+      ],
+      "aliases": [
+        "Constantinople",
+        "Constantinopolis",
+        "Konstantinoupolis",
+        "Istanbul",
+        "君士坦丁堡"
+      ],
+      "names": [
+        {
+          "name": "君士坦丁堡",
+          "original": "Κωνσταντινούπολις",
+          "fromYear": 1261,
+          "toYear": 1453,
+          "sourceId": "byzantium"
+        },
+        {
+          "name": "伊斯坦布尔",
+          "original": "İstanbul",
+          "fromYear": 1930,
+          "toYear": 2024,
+          "sourceId": "istanbul-name"
+        }
+      ],
+      "roles": [
+        {
+          "label": "拜占庭帝国首都",
+          "fromYear": 1261,
+          "toYear": 1453,
+          "sourceId": "byzantium"
+        }
+      ],
+      "sourceIds": [
+        "byzantium",
+        "istanbul",
+        "istanbul-name"
+      ],
+      "existence": [],
+      "confidence": "仅收录晚期拜占庭和近现代两个窗口。1453 年为政权交替年，身份记录包含该年易手以前的时期。"
+    },
+    {
+      "id": "great-zimbabwe",
+      "name": "大津巴布韦",
+      "originalName": "Great Zimbabwe",
+      "type": "聚落遗址",
+      "coordinates": [
+        30.933,
+        -20.267
+      ],
+      "minZoom": 3.2,
+      "coverage": [
+        {
+          "fromYear": 1100,
+          "toYear": 1449,
+          "sourceId": "great-zimbabwe"
+        }
+      ],
+      "aliases": [
+        "Great Zimbabwe"
+      ],
+      "names": [],
+      "roles": [],
+      "sourceIds": [
+        "great-zimbabwe"
+      ],
+      "existence": [],
+      "confidence": "采用 UNESCO 约略聚落年代内的保守窗口，遗址名为通称。"
+    },
+    {
+      "id": "mexico-city",
+      "name": "墨西哥城",
+      "originalName": "Ciudad de México",
+      "type": "历史城市",
+      "coordinates": [
+        -99.1332,
+        19.4326
+      ],
+      "minZoom": 2,
+      "coverage": [
+        {
+          "fromYear": 1987,
+          "toYear": 2024,
+          "sourceId": "mexico"
+        }
+      ],
+      "aliases": [
+        "Ciudad de México",
+        "Mexico City"
+      ],
+      "names": [
+        {
+          "name": "墨西哥城",
+          "original": "Ciudad de México",
+          "fromYear": 1987,
+          "toYear": 2024,
+          "sourceId": "mexico"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "mexico"
+      ],
+      "existence": [],
+      "confidence": "收录从世界遗产列名至地图支持末年的近现代窗口。"
+    },
+    {
+      "id": "kyoto",
+      "name": "京都",
+      "originalName": "Kyōto",
+      "type": "历史城市",
+      "coordinates": [
+        135.758,
+        35.023
+      ],
+      "minZoom": 3.2,
+      "coverage": [
+        {
+          "fromYear": 794,
+          "toYear": 800,
+          "sourceId": "kyoto"
+        }
+      ],
+      "aliases": [
+        "Kyoto",
+        "平安京"
+      ],
+      "names": [
+        {
+          "name": "平安京",
+          "original": "Heian-kyō",
+          "fromYear": 794,
+          "toYear": 800,
+          "sourceId": "kyoto"
+        }
+      ],
+      "roles": [
+        {
+          "label": "日本都城",
+          "fromYear": 794,
+          "toYear": 800,
+          "sourceId": "kyoto"
+        }
+      ],
+      "sourceIds": [
+        "kyoto"
+      ],
+      "existence": [],
+      "confidence": "按 UNESCO 记载的建都年代收录建都初期。"
+    }
+  ]
+}

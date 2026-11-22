@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node server.mjs",
     "atlas:prepare": "node scripts/prepare-atlas.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "atlas:places": "node scripts/build-places.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",

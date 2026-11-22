@@ -1,0 +1,253 @@
+{
+  "dataset": {
+    "name": "Pleiades · 地中海精选",
+    "version": "2026-11-22 单条记录摘录",
+    "source": "https://pleiades.stoa.org/downloads",
+    "license": "CC BY 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "changes": "精选条目、坐标四舍五入、添加中文名称和缩放级别。"
+  },
+  "places": [
+    {
+      "id": "pleiades-579885",
+      "name": "雅典",
+      "type": "城邦",
+      "aliases": [
+        "Athens",
+        "Athenai"
+      ],
+      "coordinates": [
+        23.724,
+        37.9716
+      ],
+      "minZoom": 2,
+      "coverage": [
+        {
+          "fromYear": -550,
+          "toYear": -330,
+          "sourceId": "pleiades-579885"
+        }
+      ],
+      "names": [
+        {
+          "name": "雅典",
+          "original": "Ἀθῆναι",
+          "fromYear": -550,
+          "toYear": -330,
+          "sourceId": "pleiades-579885"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "pleiades-579885"
+      ],
+      "confidence": "年代采用 Pleiades 所列地名资料范围。点位为代表位置。"
+    },
+    {
+      "id": "pleiades-423025",
+      "name": "罗马",
+      "type": "历史城市",
+      "aliases": [
+        "Rome"
+      ],
+      "coordinates": [
+        12.4917,
+        41.8899
+      ],
+      "minZoom": 2,
+      "coverage": [
+        {
+          "fromYear": -750,
+          "toYear": 640,
+          "sourceId": "pleiades-423025"
+        }
+      ],
+      "names": [
+        {
+          "name": "罗马",
+          "original": "Roma",
+          "fromYear": -750,
+          "toYear": 640,
+          "sourceId": "pleiades-423025"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "pleiades-423025"
+      ],
+      "confidence": "年代采用 Pleiades 所列地名资料范围。点位为代表位置。"
+    },
+    {
+      "id": "pleiades-570182",
+      "name": "科林斯",
+      "type": "城邦",
+      "aliases": [
+        "Corinth",
+        "Korinthos"
+      ],
+      "coordinates": [
+        22.8786,
+        37.9056
+      ],
+      "minZoom": 4,
+      "coverage": [
+        {
+          "fromYear": -330,
+          "toYear": 300,
+          "sourceId": "pleiades-570182"
+        }
+      ],
+      "names": [
+        {
+          "name": "科林斯",
+          "original": "Κόρινθος",
+          "fromYear": -330,
+          "toYear": 300,
+          "sourceId": "pleiades-570182"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "pleiades-570182"
+      ],
+      "confidence": "年代采用 Pleiades 所列地名资料范围。点位为代表位置。"
+    },
+    {
+      "id": "pleiades-462503",
+      "name": "叙拉古",
+      "type": "城邦",
+      "aliases": [
+        "Syracuse",
+        "Syracusae"
+      ],
+      "coordinates": [
+        15.2833,
+        37.0701
+      ],
+      "minZoom": 3.5,
+      "coverage": [
+        {
+          "fromYear": -750,
+          "toYear": 640,
+          "sourceId": "pleiades-462503"
+        }
+      ],
+      "names": [
+        {
+          "name": "叙拉古",
+          "original": "Συράκουσαι",
+          "fromYear": -750,
+          "toYear": 640,
+          "sourceId": "pleiades-462503"
+        }
+      ],
+      "roles": [],
+      "sourceIds": [
+        "pleiades-462503"
+      ],
+      "confidence": "年代采用 Pleiades 所列地名资料范围。点位为代表位置。"
+    }
+  ],
+  "sources": {
+    "pleiades-579885": {
+      "title": "Pleiades · Athenae",
+      "url": "https://pleiades.stoa.org/places/579885",
+      "version": "2026-11-18T14:30:48Z",
+      "license": "CC BY 3.0",
+      "credits": [
+        "J.S. Traill",
+        "Brady Kiesling",
+        "Sean Gillies",
+        "Chelsea Lee",
+        "Jeffrey Becker",
+        "Rachaelle L Browning",
+        "Johan Åhlfeldt",
+        "Catherine Bouras",
+        "Greta Hawes",
+        "R. Talbert",
+        "Chris de Lisle",
+        "Alec Mitchell",
+        "Adam Rabinowitz",
+        "Tom Elliott",
+        "Pierre Motylewicz",
+        "April Kissinger",
+        "Eric Shea",
+        "R. Scott Smith",
+        "Sterling Wright",
+        "DARMC",
+        "Ryan Horne",
+        "Enes Yılandiloğlu"
+      ]
+    },
+    "pleiades-423025": {
+      "title": "Pleiades · Roma",
+      "url": "https://pleiades.stoa.org/places/423025",
+      "version": "2026-11-18T14:42:52Z",
+      "license": "CC BY 3.0",
+      "credits": [
+        "L. Quilici",
+        "S. Quilici Gigli",
+        "Brady Kiesling",
+        "Sean Gillies",
+        "Rosemary Selth",
+        "Jeffrey Becker",
+        "Tom Elliott",
+        "DARMC",
+        "R. Scott Smith",
+        "Sebastian Heath",
+        "Joe User",
+        "Maxime Guénette",
+        "R. Talbert",
+        "Greta Hawes",
+        "Enes Yılandiloğlu"
+      ]
+    },
+    "pleiades-570182": {
+      "title": "Pleiades · Corinthus/Korinthos",
+      "url": "https://pleiades.stoa.org/places/570182",
+      "version": "2026-02-09T03:04:08Z",
+      "license": "CC BY 3.0",
+      "credits": [
+        "G. Reger",
+        "J. McK. Camp II",
+        "Catherine Bouras",
+        "Brady Kiesling",
+        "R. Talbert",
+        "Chris de Lisle",
+        "Rosemary Selth",
+        "Jeffrey Becker",
+        "Sean Gillies",
+        "Tom Elliott",
+        "DARMC",
+        "James Herbst",
+        "R. Scott Smith",
+        "Greta Hawes"
+      ]
+    },
+    "pleiades-462503": {
+      "title": "Pleiades · Syracusae/Syrakousai",
+      "url": "https://pleiades.stoa.org/places/462503",
+      "version": "2026-05-11T14:30:51Z",
+      "license": "CC BY 3.0",
+      "credits": [
+        "R.J.A. Wilson",
+        "Brady Kiesling",
+        "Sean Gillies",
+        "Rajas Pradhan",
+        "Jeffrey Becker",
+        "Faith Lubeck",
+        "Kali Kocian",
+        "Jonathan Prag",
+        "Jeffrey Mayfield",
+        "David Mimno",
+        "R. Talbert",
+        "Valeria Vitale",
+        "Adam Rabinowitz",
+        "Tom Elliott",
+        "DARMC",
+        "R. Scott Smith",
+        "Greta Hawes"
+      ]
+    }
+  }
+}
