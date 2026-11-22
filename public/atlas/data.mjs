@@ -1,34 +1,29 @@
 import { changeIndex, sourceYearToAxis } from './years.mjs';
 
-function searchKey(value) {
+export function searchKey(value) {
   return value.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
-export const polityNameOverrides = new Map([['cn_northern_song_dyn', '北宋'], ['cn_southern_song_dyn', '南宋']]);
+export function recordAtYear(records, year) {
+  return records.find(record => sourceYearToAxis(record.fromYear) <= year &&
+    year <= sourceYearToAxis(record.toYear));
+}
 
-export function createPolitySearch({ history, encyclopedia }) {
-  const entries = Object.values(history.groups).map(records => {
-    const first = records[0];
-    const names = new Set(records.map(record => record.name));
-    const chineseNames = records.map(record => encyclopedia.entities[encyclopedia.byRecord[record.sourceIndex]]?.zh)
-      .filter(Boolean);
-    const specificName = polityNameOverrides.get(first.seshatId);
-    if (specificName) chineseNames.unshift(specificName);
-    for (const name of chineseNames) names.add(name);
-    return {
-      name: chineseNames[0] ?? first.name, original: first.name, first,
-      aliases: [...names].map(searchKey),
-    };
-  });
-  return query => {
+export function createPolitySearch({ history, names }) {
+  const entries = Object.entries(history.groups).map(([key, records]) => ({
+    ...names[key], original: records[0].name, records,
+  }));
+  return (query, year) => {
     const key = searchKey(query);
     if (!key) return [];
     return entries.flatMap(entry => {
       const rank = Math.min(...entry.aliases.map(alias =>
         alias === key ? 0 : alias.startsWith(key) ? 1 : alias.includes(key) ? 2 : Infinity));
-      return Number.isFinite(rank) ? [{ entry, rank }] : [];
-    }).sort((a, b) => a.rank - b.rank || a.entry.first.fromYear - b.entry.first.fromYear ||
-      a.entry.name.localeCompare(b.entry.name, 'zh-CN')).map(({ entry }) => entry);
+      if (!Number.isFinite(rank)) return [];
+      return [{ ...entry, rank, current: recordAtYear(entry.records, year) }];
+    }).sort((a, b) => a.rank - b.rank || Number(Boolean(b.current)) - Number(Boolean(a.current)) ||
+      Number(a.composite) - Number(b.composite) || a.records[0].fromYear - b.records[0].fromYear ||
+      a.name.localeCompare(b.name, 'zh-CN'));
   };
 }
 

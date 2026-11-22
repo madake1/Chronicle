@@ -1,6 +1,6 @@
 import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
 import { formatYear, parseYear } from '../chronology.mjs';
-import { createAtlasData, createPolitySearch, polityNameOverrides } from './data.mjs';
+import { createAtlasData, createPolitySearch, recordAtYear } from './data.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
 import { addGeographicLabels } from './geography.mjs';
 
@@ -91,24 +91,22 @@ function colorBorders(data) {
   return data;
 }
 
-function showPolity(properties, encyclopedia, year, record) {
-  const entity = encyclopedia?.entities[encyclopedia.byRecord[properties.sourceIndex]];
-  const chineseName = polityNameOverrides.get(record.seshatId) ?? entity?.zh;
+function showPolity(properties, identity, year) {
   const heading = document.querySelector('#atlas-polity-name');
-  heading.textContent = chineseName || properties.name;
-  heading.lang = chineseName ? 'zh-CN' : 'en';
+  heading.textContent = identity.name;
+  heading.lang = identity.chinese ? 'zh-CN' : 'en';
   const original = document.querySelector('#atlas-polity-original');
   original.textContent = properties.name;
-  original.hidden = !chineseName || chineseName === properties.name;
+  original.hidden = identity.name === properties.name;
   document.querySelector('#atlas-polity-year').textContent = formatYear(year);
   document.querySelector('#atlas-polity-years').textContent = recordYears(properties);
   const area = document.querySelector('#atlas-polity-area');
-  const estimate = areaLabel(record.areaKm2);
+  const estimate = areaLabel(properties.areaKm2);
   area.hidden = !estimate;
   area.textContent = estimate ? `估算疆域面积 · ${estimate}` : '';
   const link = document.querySelector('#atlas-polity-encyclopedia');
-  link.hidden = !entity?.url;
-  if (entity?.url) link.href = entity.url;
+  link.hidden = !identity.url;
+  if (identity.url) link.href = identity.url;
   else link.removeAttribute('href');
   document.querySelector('#atlas-polity-no-encyclopedia').hidden = !link.hidden;
   sourceRecord.textContent = `当前所选疆界：Cliopatria 原始记录第 ${properties.sourceIndex + 1} 条`;
@@ -161,6 +159,7 @@ async function initialize() {
       return response.json();
     }),
   ]);
+  if (!chronology.names) throw new Error('政权名称索引需要更新，请运行 npm run atlas:prepare');
   renderSources({ ...manifest.sources, places: {
     name: '北宋历史地点（近似点位）', version: `v${places.version}`, source: '/atlas/northern-song-places.json',
     license: places.license, licenseUrl: places.licenseUrl,
@@ -234,11 +233,12 @@ async function initialize() {
 
   function selectPolity(item, keepOpen = false) {
     const { record } = item;
-    const { history, encyclopedia } = chronology;
-    const group = history.groups[history.byRecord[record.sourceIndex]];
+    const { history, names } = chronology;
+    const key = history.byRecord[record.sourceIndex];
+    const group = history.groups[key];
     if (selection !== item.visual) map.setFilter('polity-highlight', ['==', ['get', 'visual'], item.visual]);
     selection = item.visual;
-    showPolity(record, encyclopedia, active, record);
+    showPolity(record, names[key], active);
     renderHistory(group, record, active, selectYear, keepOpen);
   }
 
@@ -294,28 +294,64 @@ async function initialize() {
   const searchList = document.querySelector('#atlas-search-list');
   const searchStatus = document.querySelector('#atlas-search-status');
   const resultLimit = 12;
+  function jumpFromSearch(entry, record, year) {
+    searchInput.value = entry.name;
+    searchResults.hidden = true;
+    searchInput.focus();
+    selectYear(year, record.sourceIndex);
+  }
+
   function showMatches() {
     const query = searchInput.value.trim();
     searchResults.hidden = !query;
     searchList.replaceChildren();
-    const matches = search(query);
+    const matches = search(query, active);
     searchStatus.textContent = !matches.length ? '没有匹配的政权' :
       matches.length > resultLimit ? `找到 ${matches.length} 项，显示前 ${resultLimit} 项` : '';
-    for (const { name, original, first } of matches.slice(0, resultLimit)) {
+    for (const entry of matches.slice(0, resultLimit)) {
+      const { name, original, records, current, composite } = entry;
       const row = document.createElement('li');
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = name;
       const detail = document.createElement('small');
-      detail.textContent = `${name !== original ? `${original} · ` : ''}最早疆界记录 ${yearLabel(first.fromYear)}`;
+      const recordType = composite ? '组合疆界' : '政权';
+      const availability = current ? `当前年份可定位（${recordYears(current)}）` : '查看可用年代';
+      detail.textContent = [name !== original && original, recordType, availability].filter(Boolean).join(' · ');
       button.append(detail);
       button.onclick = () => {
-        searchInput.value = name;
-        searchResults.hidden = true;
-        searchInput.focus();
-        selectYear(sourceYearToAxis(first.fromYear), first.sourceIndex);
+        const currentRecord = recordAtYear(records, active);
+        if (currentRecord) {
+          jumpFromSearch(entry, currentRecord, active);
+          return;
+        }
+        const periods = row.querySelector('.atlas-search-periods');
+        periods.hidden = !periods.hidden;
+        button.setAttribute('aria-expanded', String(!periods.hidden));
+        if (!periods.hidden) periods.querySelector('button')?.focus();
       };
       row.append(button);
+      if (!current) {
+        button.setAttribute('aria-expanded', 'false');
+        const periods = document.createElement('ul');
+        periods.className = 'atlas-search-periods';
+        periods.setAttribute('aria-label', `${name}可用的疆界资料年代`);
+        periods.hidden = true;
+        for (const record of records) {
+          const item = document.createElement('li');
+          const option = document.createElement('button');
+          const year = sourceYearToAxis(record.fromYear);
+          option.type = 'button';
+          option.textContent = `疆界资料 · ${recordYears(record)}`;
+          const hint = document.createElement('small');
+          hint.textContent = `查看 ${formatYear(year)}的地图`;
+          option.append(hint);
+          option.onclick = () => jumpFromSearch(entry, record, year);
+          item.append(option);
+          periods.append(item);
+        }
+        row.append(periods);
+      }
       searchList.append(row);
     }
   }
@@ -362,6 +398,7 @@ async function initialize() {
           }
           active = year;
           activeFrame = target;
+          if (!searchResults.hidden) showMatches();
           updateGeography(active);
           if (sourceIndex !== undefined && request === requestNumber) focusRecord(sourceIndex);
           else clearPolity();

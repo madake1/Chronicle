@@ -1,0 +1,34 @@
+[
+  {
+    "seshatId": "cn_chinese_peoples_rep",
+    "originalNames": ["People's Republic of China"],
+    "wikidata": "Q148",
+    "displayName": "中华人民共和国",
+    "aliases": ["中国", "中华人民共和国", "中華人民共和國", "China", "PRC"],
+    "wikipedia": {
+      "zh": "https://zh.wikipedia.org/wiki/%E4%B8%AD%E5%8D%8E%E4%BA%BA%E6%B0%91%E5%85%B1%E5%92%8C%E5%9B%BD",
+      "en": "https://en.wikipedia.org/wiki/China"
+    }
+  },
+  {
+    "seshatId": "ru_russian_federation",
+    "originalNames": ["Russian Federation", "(Russian Federation)"],
+    "wikidata": "Q159",
+    "displayName": "俄罗斯联邦",
+    "aliases": ["俄罗斯", "俄羅斯", "俄罗斯联邦", "俄羅斯聯邦", "Russia"],
+    "wikipedia": {
+      "zh": "https://zh.wikipedia.org/wiki/%E4%BF%84%E7%BD%97%E6%96%AF",
+      "en": "https://en.wikipedia.org/wiki/Russia"
+    }
+  },
+  {
+    "seshatId": "cn_northern_song_dyn",
+    "originalNames": ["Northern Song"],
+    "displayName": "北宋"
+  },
+  {
+    "seshatId": "cn_southern_song_dyn",
+    "originalNames": ["Southern Song"],
+    "displayName": "南宋"
+  }
+]

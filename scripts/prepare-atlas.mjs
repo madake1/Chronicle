@@ -81,7 +81,8 @@ if (process.argv.includes('--refresh-encyclopedia')) {
 }
 const encyclopedia = JSON.parse(await readFile(encyclopediaFile, 'utf8'));
 if (encyclopedia.archiveSha256 !== digest(archive)) throw new Error('百科索引与 Cliopatria 原始包版本不匹配');
-const chronology = await buildAtlasChronology(original.features, encyclopedia, save);
+const overrides = JSON.parse(await readFile(new URL('../atlas-polity-aliases.json', import.meta.url), 'utf8'));
+const chronology = await buildAtlasChronology(original.features, encyclopedia, save, overrides);
 console.log(`${chronology.polityRecords} records, ${chronology.geometries} unique geometries, ${chronology.shards} shards`);
 await save('manifest.json', {
   schemaVersion: 1,

@@ -23,6 +23,7 @@
 .atlas-search-results li + li { margin-top: .25rem; }
 .atlas-search-results button { width: 100%; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .atlas-search-results small { display: block; color: var(--muted); }
+.atlas-search-results .atlas-search-periods { margin: .25rem 0 .35rem .65rem; padding-left: .35rem; max-height: 9rem; }
 #atlas-years { margin-bottom: .4rem; }
 
 .atlas-time input {

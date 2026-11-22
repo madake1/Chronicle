@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildAtlasChronology } from './scripts/atlas-chronology.mjs';
+import { buildPolityNames } from './scripts/atlas-names.mjs';
 import { createAtlasData, createPolitySearch } from './public/atlas/data.mjs';
 import { formatYear, parseYear } from './public/chronology.mjs';
 import { zoomYears } from './public/atlas/years.mjs';
@@ -40,15 +41,40 @@ test('时间轴缩放保留当前年份且不越过数据范围', () => {
   assert.deepEqual(zoomYears([2000, 2024], 2024, 0.4, bounds), [2004, 2024]);
 });
 
-test('中英文搜索跳到已确认实体的最早记录，共用百科的北宋和南宋分开', () => {
+test('中文别名保留当前年份，普通疆界优先且共用百科的实体保持分开', () => {
   const north = { name: 'Northern Song', seshatId: 'cn_northern_song_dyn', fromYear: 960, sourceIndex: 1 };
   const south = { name: 'Southern Song', seshatId: 'cn_southern_song_dyn', fromYear: 1127, sourceIndex: 2 };
-  const search = createPolitySearch({
-    history: { groups: { north: [north, { ...north, fromYear: 1056, sourceIndex: 3 }], south: [south] } },
-    encyclopedia: { byRecord: { 1: 'Q7462', 2: 'Q7462' }, entities: { Q7462: { zh: '宋朝' } } },
-  });
-  assert.deepEqual(search('北宋').map(result => result.first), [north]);
-  assert.deepEqual(search('SOUTHERN SONG').map(result => result.first), [south]);
-  assert.deepEqual(search('宋朝').map(result => result.first), [north, south]);
+  const normal = { name: 'Russian Federation', seshatId: 'ru', fromYear: 2014, toYear: 2023, sourceIndex: 4 };
+  const aggregate = { ...normal, name: '(Russian Federation)', sourceIndex: 5 };
+  const prc = { name: "People's Republic of China", seshatId: 'cn', fromYear: 2000, toYear: 2023, sourceIndex: 6 };
+  const roc = { name: 'Republic of China', fromYear: 1950, toYear: 2023, sourceIndex: 7 };
+  const history = { groups: {
+    north: [{ ...north, toYear: 1055 }, { ...north, fromYear: 1056, toYear: 1125, sourceIndex: 3 }],
+    south: [{ ...south, toYear: 1279 }], normal: [normal], aggregate: [aggregate], prc: [prc], roc: [roc],
+  } };
+  const features = [];
+  for (const [key, records] of Object.entries(history.groups)) for (const record of records) {
+    features[record.sourceIndex] = { properties: { Name: record.name, SeshatID: record.seshatId,
+      Wikidata: key === 'prc' || key === 'roc' ? 'Q148' : undefined,
+      Wikipedia: key === 'normal' || key === 'aggregate' ? 'Russia' : record.name,
+      Components: key === 'aggregate' ? 'A;B' : '' } };
+  }
+  const names = buildPolityNames(history, features,
+    { byRecord: { 1: 'Q7462', 2: 'Q7462' }, entities: { Q7462: { zh: '宋朝', url: 'https://www.wikidata.org/wiki/Q7462' } } },
+    [
+      { seshatId: north.seshatId, originalNames: [north.name], displayName: '北宋' },
+      { seshatId: south.seshatId, originalNames: [south.name], displayName: '南宋' },
+      { seshatId: 'ru', originalNames: [normal.name, aggregate.name], displayName: '俄罗斯联邦', aliases: ['俄罗斯'] },
+      { seshatId: 'cn', originalNames: [prc.name], wikidata: 'Q148', displayName: '中华人民共和国', aliases: ['中国'] },
+    ]);
+  const search = createPolitySearch({ history, names });
+  assert.equal(search('北宋', 1066)[0].current.sourceIndex, 3);
+  assert.equal(search('SOUTHERN SONG', 1066)[0].current, undefined);
+  assert.deepEqual(search('宋朝', 1066).map(result => result.name), ['北宋', '南宋']);
+  assert.deepEqual(search('俄罗斯', 2022).map(result => result.current), [normal, aggregate]);
+  assert.deepEqual(search('Russia', 2022).map(result => result.current), [normal, aggregate]);
+  assert.deepEqual(search('中国', 2022).map(result => result.current), [prc]);
+  assert.equal(search('Republic of China', 2022)[0].current, roc);
+  assert.equal(names.north.url, undefined);
   assert.deepEqual(search('不存在'), []);
 });

@@ -1,10 +1,11 @@
 import { createHash } from 'node:crypto';
 import { sourceYearToAxis } from '../public/atlas/years.mjs';
 import { buildPolityHistory } from './atlas-history.mjs';
+import { buildPolityNames } from './atlas-names.mjs';
 
 const shardLimit = 1024 * 1024;
 
-export async function buildAtlasChronology(features, encyclopedia, save) {
+export async function buildAtlasChronology(features, encyclopedia, save, overrides = []) {
   const indices = features.flatMap((feature, index) => feature.properties.Type === 'POLITY' ? [index] : []);
   const history = buildPolityHistory(features, new Set(indices));
   const geometryByRecord = {};
@@ -53,9 +54,10 @@ export async function buildAtlasChronology(features, encyclopedia, save) {
     if (encyclopediaKey && !byRecord[index]) byRecord[index] = encyclopediaKey;
   }
   if (shardSize) await flush();
+  const resolvedEncyclopedia = { byRecord, entities: encyclopedia.entities };
   await save('chronology.json', {
     bounds, changes: [...changes].sort((a, b) => a - b), geometryByRecord, history,
-    encyclopedia: { byRecord, entities: encyclopedia.entities },
+    names: buildPolityNames(history, features, resolvedEncyclopedia, overrides),
   });
   return { polityRecords: indices.length, geometries: known.size, shards: shardNumber };
 }
