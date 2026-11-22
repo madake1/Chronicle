@@ -59,3 +59,19 @@ V3.6 补齐北宋四京试验地点。地点卡片分别显示有资料支持的
 V3.7 提供 Historical Basemaps 对照模式。可选运行 `npm run atlas:prepare -- --with-comparison`，将固定上游版本的公元前 2000 年、前 500 年和公元 1200 年快照及许可证保存到本地 `atlas-data/`。重启后在「地图资料来源」选择对照快照，地图保持原视角。快照只代表标注的年份，前 2000 年的夏朝为上游历史重建示意。快照由用户直接从上游下载，项目仓库不分发这些文件。下载完成后可离线使用。
 
 V3.8 增加全球历史地点试点和独立的「搜索地点」。升级时运行 `npm run atlas:places` 并重启服务。此命令只读取仓库的小型来源文件并生成本地索引，也会随 `npm run atlas:prepare` 执行。试点包括 Pleiades 地中海城市、北宋四京、先秦与汉唐城址、中世纪欧洲、大津巴布韦、平安京和近现代城市。索引使用来源明确的收录窗口，窗口外不会自动显示。地点卡片可查看其他历史名称及其适用年代。WHG 本轮未导入。
+
+### 批量导入历史地点
+
+先从 Pleiades 官方下载完整 JSON 压缩文件。导入读取本地文件，不会联网：
+
+```powershell
+npm run atlas:import-places -- pleiades "D:/downloads/pleiades-places-latest.json.gz"
+```
+
+WHG 使用发布者原始的 LPF JSON，不导入 WHG 另行许可的对齐链接或编辑文本。确认子集许可后，将其元数据和本地文件交给同一导入命令。下面以 Medieval Swahili Coast 为例：
+
+```powershell
+npm run atlas:import-places -- lpf "D:/downloads/medieval-swahili.json" atlas-places/whg-swahili.example.json
+```
+
+导入生成版本校验值，并把原始数据包衍生结果存在 Git 忽略的 `atlas-data/place-packs/`。运行 `npm run atlas:places` 可离线重建查询索引。已核实的 18 个地点优先，明确对齐的外部条目保留原始来源和地名资料。地图使用有明确地点记载的时段，其他地点只参与搜索。地点记载、存在年代、地名和历史身份分别保存。

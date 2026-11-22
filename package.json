@@ -9,11 +9,16 @@
     "start": "node server.mjs",
     "atlas:prepare": "node scripts/prepare-atlas.mjs",
     "test": "node --test",
-    "atlas:places": "node scripts/build-places.mjs"
+    "atlas:places": "node scripts/build-places.mjs",
+    "atlas:import-places": "node scripts/import-places.mjs"
   },
   "dependencies": {
     "fflate": "^0.8.3",
     "maplibre-gl": "6.19.0",
     "markdown-it": "^15.0.3"
+  },
+  "devDependencies": {
+    "stream-chain": "^4.4.2",
+    "stream-json": "^3.9.0"
   }
 }
