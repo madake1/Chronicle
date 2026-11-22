@@ -13,6 +13,17 @@
 .atlas-time {
   width: min(100%, 31rem);
 }
+.atlas-year-controls { display: grid; gap: .35rem; }
+.atlas-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; }
+.atlas-controls button { padding: .25rem .55rem; font-size: .85rem; }
+#atlas-jump input { width: 11rem; max-width: 100%; }
+#atlas-polity-search input { width: 13rem; max-width: 100%; }
+.atlas-search-results { border: 1px solid var(--line); border-radius: 7px; padding: .4rem; }
+.atlas-search-results ul { list-style: none; padding: 0; margin: 0; max-height: 13rem; overflow: auto; }
+.atlas-search-results li + li { margin-top: .25rem; }
+.atlas-search-results button { width: 100%; text-align: left; white-space: normal; overflow-wrap: anywhere; }
+.atlas-search-results small { display: block; color: var(--muted); }
+#atlas-years { margin-bottom: .4rem; }
 
 .atlas-time input {
   display: block;

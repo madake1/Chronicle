@@ -4,7 +4,7 @@ import { unzipSync } from 'fflate';
 import { atomicWrite } from '../note-storage.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
 import { buildEncyclopedia } from './atlas-encyclopedia.mjs';
-import { buildPolityHistory } from './atlas-history.mjs';
+import { buildAtlasChronology } from './atlas-chronology.mjs';
 
 const output = new URL('../atlas-data/', import.meta.url);
 const raw = new URL('raw/', output);
@@ -78,11 +78,12 @@ if (process.argv.includes('--refresh-encyclopedia')) {
 }
 const encyclopedia = JSON.parse(await readFile(encyclopediaFile, 'utf8'));
 if (encyclopedia.archiveSha256 !== digest(archive)) throw new Error('百科索引与 Cliopatria 原始包版本不匹配');
+const chronology = await buildAtlasChronology(original.features, encyclopedia, save);
+console.log(`${chronology.polityRecords} records, ${chronology.geometries} unique geometries, ${chronology.shards} shards`);
 await save('manifest.json', {
   schemaVersion: 1,
   slices,
   sources: atlasSources,
-  encyclopedia: { byRecord: encyclopedia.byRecord, entities: encyclopedia.entities },
-  polityHistory: buildPolityHistory(original.features, encyclopediaRecords),
+  chronology,
   sha256: { cliopatriaArchive: digest(archive), naturalEarthLand: digest(land), naturalEarthLakes: digest(lakes) },
 });

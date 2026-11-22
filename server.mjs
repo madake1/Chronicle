@@ -16,13 +16,15 @@ const assets = new Map([
   ['/chronology.mjs', ['chronology.mjs', 'text/javascript']],
   ['/atlas', ['atlas/index.html', 'text/html']],
   ['/atlas/atlas.mjs', ['atlas/atlas.mjs', 'text/javascript']],
+  ['/atlas/years.mjs', ['atlas/years.mjs', 'text/javascript']],
+  ['/atlas/data.mjs', ['atlas/data.mjs', 'text/javascript']],
   ['/atlas/atlas.css', ['atlas/atlas.css', 'text/css']],
 ]);
 for (const name of ['maplibre-gl.mjs', 'maplibre-gl-worker.mjs', 'maplibre-gl-shared.mjs', 'maplibre-gl.css']) {
   assets.set(`/atlas/vendor/${name}`, [`../node_modules/maplibre-gl/dist/${name}`,
     name.endsWith('.css') ? 'text/css' : 'text/javascript']);
 }
-for (const name of ['manifest.json', 'land.geojson', 'lakes.geojson', ...atlasYears.map(year => `year-${year}.geojson`)]) {
+for (const name of ['manifest.json', 'chronology.json', 'land.geojson', 'lakes.geojson', ...atlasYears.map(year => `year-${year}.geojson`)]) {
   assets.set(`/atlas/data/${name}`, [`../atlas-data/${name}`, 'application/json']);
 }
 let pendingWrite = Promise.resolve();
@@ -196,7 +198,9 @@ createServer(async (request, response) => {
       });
       return send(response, 200, { saved: true });
     }
-    const asset = request.method === 'GET' && assets.get(request.url);
+    const shard = /^\/atlas\/data\/(geometry-\d{1,4}\.json)$/.exec(request.url);
+    const asset = request.method === 'GET' && (assets.get(request.url) ??
+      (shard && [`../atlas-data/${shard[1]}`, 'application/json']));
     if (!asset) return send(response, 404, { error: '页面不存在' });
     const content = await readFile(new URL(`./public/${asset[0]}`, import.meta.url)).catch(error => {
       if (error.code !== 'ENOENT') throw error;

@@ -1,8 +1,15 @@
 import { Map, NavigationControl, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
+import { formatYear, parseYear } from '../chronology.mjs';
+import { createAtlasData, createPolitySearch, polityNameOverrides } from './data.mjs';
+import { sourceYearToAxis, zoomYears } from './years.mjs';
 
 const status = document.querySelector('#atlas-status');
 const years = document.querySelector('#atlas-years');
 const slider = document.querySelector('#atlas-year');
+const yearInput = document.querySelector('#atlas-year-input');
+const timeIn = document.querySelector('#atlas-time-in');
+const timeOut = document.querySelector('#atlas-time-out');
+const timeFit = document.querySelector('#atlas-time-fit');
 const container = document.querySelector('#atlas-map');
 const sources = document.querySelector('#atlas-sources');
 const sourceRecord = document.querySelector('#atlas-source-record');
@@ -40,7 +47,7 @@ function recordYears(record) {
     `${yearLabel(record.fromYear)} 至 ${yearLabel(record.toYear)}`;
 }
 
-function renderHistory(records, selected, slice, slices, jump, keepOpen) {
+function renderHistory(records, selected, year, jump, keepOpen) {
   historyPanel.open = keepOpen && historyPanel.open;
   const scrollTop = keepOpen ? historyList.scrollTop : 0;
   historyList.replaceChildren();
@@ -56,19 +63,17 @@ function renderHistory(records, selected, slice, slices, jump, keepOpen) {
     const description = document.createElement('p');
     description.textContent = [recordYears(record), areaLabel(record.areaKm2)].filter(Boolean).join(' · ');
     row.append(description);
-    const available = slices.filter(({ year }) => record.fromYear <= year && year <= record.toYear);
-    const target = available.reduce((best, item) =>
-      !best || Math.abs(item.year - slice.year) < Math.abs(best.year - slice.year) ? item : best, null);
-    if (target && (!active || target !== slice)) {
+    const target = Math.max(sourceYearToAxis(record.fromYear), Math.min(sourceYearToAxis(record.toYear), year));
+    if (!active) {
       const action = document.createElement('button');
       action.type = 'button';
-      action.textContent = `查看该时期地图 · ${yearLabel(target.year)}`;
+      action.textContent = `查看该时期地图 · ${formatYear(target)}`;
       action.onclick = () => jump(target, record.sourceIndex);
       row.append(action);
     } else {
       const message = document.createElement('p');
       message.className = 'meta';
-      message.textContent = active ? '当前显示' : '暂不可查看 · 此期间没有已生成的地图切片';
+      message.textContent = '当前显示';
       row.append(message);
     }
     historyList.append(row);
@@ -87,13 +92,14 @@ function colorBorders(data) {
 
 function showPolity(properties, encyclopedia, year, record) {
   const entity = encyclopedia?.entities[encyclopedia.byRecord[properties.sourceIndex]];
+  const chineseName = polityNameOverrides.get(record.seshatId) ?? entity?.zh;
   const heading = document.querySelector('#atlas-polity-name');
-  heading.textContent = entity?.zh || properties.name;
-  heading.lang = entity?.zh ? 'zh-CN' : 'en';
+  heading.textContent = chineseName || properties.name;
+  heading.lang = chineseName ? 'zh-CN' : 'en';
   const original = document.querySelector('#atlas-polity-original');
   original.textContent = properties.name;
-  original.hidden = !entity?.zh || entity.zh === properties.name;
-  document.querySelector('#atlas-polity-year').textContent = yearLabel(year);
+  original.hidden = !chineseName || chineseName === properties.name;
+  document.querySelector('#atlas-polity-year').textContent = formatYear(year);
   document.querySelector('#atlas-polity-years').textContent = recordYears(properties);
   const area = document.querySelector('#atlas-polity-area');
   const estimate = areaLabel(record.areaKm2);
@@ -146,12 +152,14 @@ function renderSources(items) {
 }
 
 async function initialize() {
-  const manifest = await readData('manifest.json');
-  renderSources(manifest.sources);
-  const initial = manifest.slices[0];
-  const [land, lakes, borders] = await Promise.all([
-    readData('land.geojson'), readData('lakes.geojson'), readData(initial.file),
+  const [manifest, chronology, land, lakes] = await Promise.all([
+    readData('manifest.json'), readData('chronology.json'), readData('land.geojson'), readData('lakes.geojson'),
   ]);
+  renderSources(manifest.sources);
+  const data = createAtlasData(chronology, readData);
+  const initial = sourceYearToAxis(manifest.slices[0].year);
+  let activeFrame = data.frame(initial);
+  let activeData = colorBorders(await data.features(activeFrame));
   setWorkerUrl(new URL('/atlas/vendor/maplibre-gl-worker.mjs', location.href).href);
   const map = new Map({
     container,
@@ -168,7 +176,7 @@ async function initialize() {
       sources: {
         land: { type: 'geojson', data: land },
         lakes: { type: 'geojson', data: lakes },
-        polities: { type: 'geojson', data: colorBorders(borders) },
+        polities: { type: 'geojson', data: activeData },
       },
       layers: [
         { id: 'ocean', type: 'background', paint: { 'background-color': ocean } },
@@ -176,7 +184,7 @@ async function initialize() {
         { id: 'polity-fill', type: 'fill', source: 'polities', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.79 } },
         { id: 'polity-line', type: 'line', source: 'polities', paint: { 'line-color': '#755236', 'line-width': 0.8 } },
         { id: 'polity-highlight', type: 'line', source: 'polities',
-          filter: ['==', ['get', 'sourceIndex'], -1],
+          filter: ['==', ['get', 'visual'], ''],
           paint: { 'line-color': '#152b25', 'line-width': 3 } },
         { id: 'lakes', type: 'fill', source: 'lakes', paint: { 'fill-color': ocean } },
       ],
@@ -184,108 +192,202 @@ async function initialize() {
   });
   map.addControl(new NavigationControl({ showCompass: false }));
   let active = initial;
-  let activeData = borders;
   let loaded = false;
   let requested = initial;
-  let requestController;
+  let window = chronology.bounds;
+  let selection;
+  let changeTimer;
+  let prefetchTimer;
+  let requestNumber = 0;
   let rendering = Promise.resolve();
-  let renderingSlice;
+  let drawing = false;
 
   function showStatus(error) {
-    const current = `当前切片 · ${yearLabel(active.year)}`;
+    const missing = activeFrame.byRecord.size ? '' : ' · 该年无疆界资料';
+    const current = `当前地图 · ${formatYear(active)}${missing}`;
     status.textContent = error ? `${current}；切换失败：${error.message}` :
-      requested === active ? current : `${current}；正在加载 ${yearLabel(requested.year)}`;
+      requested === active ? current : `${current}；正在加载 ${formatYear(requested)}`;
   }
 
   function clearPolity() {
     polityPanel.hidden = true;
     sourceRecord.hidden = true;
-    map.setFilter('polity-highlight', ['==', ['get', 'sourceIndex'], -1]);
+    if (selection !== undefined) map.setFilter('polity-highlight', ['==', ['get', 'visual'], '']);
+    selection = undefined;
   }
 
-  function selectPolity(properties, keepOpen = false) {
-    const history = manifest.polityHistory;
-    const group = history?.groups[history.byRecord[properties.sourceIndex]] ?? [properties];
-    const record = group.find(item => item.sourceIndex === properties.sourceIndex) ?? properties;
-    map.setFilter('polity-highlight', ['==', ['get', 'sourceIndex'], properties.sourceIndex]);
-    showPolity(properties, manifest.encyclopedia, active.year, record);
-    renderHistory(group, record, active, manifest.slices, selectSlice, keepOpen);
+  function selectPolity(item, keepOpen = false) {
+    const { record } = item;
+    const { history, encyclopedia } = chronology;
+    const group = history.groups[history.byRecord[record.sourceIndex]];
+    if (selection !== item.visual) map.setFilter('polity-highlight', ['==', ['get', 'visual'], item.visual]);
+    selection = item.visual;
+    showPolity(record, encyclopedia, active, record);
+    renderHistory(group, record, active, selectYear, keepOpen);
   }
 
   function focusRecord(sourceIndex) {
-    const feature = activeData.features.find(item => item.properties.sourceIndex === sourceIndex);
-    if (!feature) throw new Error('此切片未收录所选疆界');
-    selectPolity(feature.properties, true);
-    revealGeometry(map, feature.geometry);
+    const item = activeFrame.byRecord.get(sourceIndex);
+    selectPolity(item, true);
+    const feature = activeData.features.find(candidate => candidate.properties.visual === item.visual);
+    if (feature) revealGeometry(map, feature.geometry);
   }
 
   document.querySelector('#atlas-polity-close').onclick = clearPolity;
+
+  function syncControls(year) {
+    if (year < window[0] || year > window[1]) {
+      window = zoomYears(window, year, 1, chronology.bounds);
+    }
+    slider.min = String(window[0]);
+    slider.max = String(window[1]);
+    slider.value = String(year);
+    slider.setAttribute('aria-valuetext', formatYear(year));
+    yearInput.value = formatYear(year);
+    timeIn.disabled = !loaded || window[1] - window[0] <= 20;
+    timeOut.disabled = timeFit.disabled = !loaded ||
+      (window[0] === chronology.bounds[0] && window[1] === chronology.bounds[1]);
+    years.replaceChildren(...window.map(value => {
+      const label = document.createElement('span');
+      label.textContent = formatYear(value);
+      return label;
+    }));
+  }
+
+  function prefetch() {
+    clearTimeout(prefetchTimer);
+    prefetchTimer = setTimeout(() => data.prefetch(activeFrame), 180);
+  }
 
   map.on('error', event => {
     if (!loaded) status.textContent = `地图加载失败：${event.error.message}`;
   });
   map.once('load', () => {
     loaded = true;
-    slider.disabled = false;
+    slider.disabled = yearInput.disabled = document.querySelector('#atlas-jump-submit').disabled = false;
+    document.querySelector('#atlas-polity-input').disabled = false;
+    syncControls(active);
     showStatus();
+    prefetch();
   });
-  slider.max = String(manifest.slices.length - 1);
-  slider.setAttribute('aria-valuetext', yearLabel(initial.year));
-  for (const { year } of manifest.slices) {
-    const label = document.createElement('span');
-    label.textContent = yearLabel(year);
-    years.append(label);
-  }
-  async function selectSlice(slice, sourceIndex) {
-    requested = slice;
-    slider.value = String(manifest.slices.indexOf(slice));
-    slider.setAttribute('aria-valuetext', yearLabel(slice.year));
-    requestController?.abort();
-    const { signal } = (requestController = new AbortController());
-    showStatus();
-    try {
-      if (slice === active && !renderingSlice) {
-        if (sourceIndex !== undefined) focusRecord(sourceIndex);
-        return;
-      }
-      const data = await readData(slice.file, signal);
-      const update = rendering.then(async () => {
-        if (signal.aborted) return;
-        if (slice === active) {
-          if (sourceIndex !== undefined) focusRecord(sourceIndex);
-          return;
-        }
-        if (sourceIndex !== undefined && !data.features.some(item => item.properties.sourceIndex === sourceIndex)) {
-          throw new Error('此切片未收录所选疆界');
-        }
-        renderingSlice = slice;
-        try {
-          await map.getSource('polities').setData(colorBorders(data));
-          active = slice;
-          activeData = data;
-          showStatus();
-          if (sourceIndex !== undefined && !signal.aborted) focusRecord(sourceIndex);
-          else clearPolity();
-        } finally {
-          renderingSlice = undefined;
-        }
-      });
-      rendering = update.catch(() => {});
-      await update;
-    } catch (error) {
-      if (signal.aborted) return;
-      requested = active;
-      slider.value = String(manifest.slices.indexOf(active));
-      slider.setAttribute('aria-valuetext', yearLabel(active.year));
-      showStatus(error);
+
+  const search = createPolitySearch(chronology);
+  const searchInput = document.querySelector('#atlas-polity-input');
+  const searchResults = document.querySelector('#atlas-search-results');
+  const searchList = document.querySelector('#atlas-search-list');
+  const searchStatus = document.querySelector('#atlas-search-status');
+  const resultLimit = 12;
+  function showMatches() {
+    const query = searchInput.value.trim();
+    searchResults.hidden = !query;
+    searchList.replaceChildren();
+    const matches = search(query);
+    searchStatus.textContent = !matches.length ? '没有匹配的政权' :
+      matches.length > resultLimit ? `找到 ${matches.length} 项，显示前 ${resultLimit} 项` : '';
+    for (const { name, original, first } of matches.slice(0, resultLimit)) {
+      const row = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = name;
+      const detail = document.createElement('small');
+      detail.textContent = `${name !== original ? `${original} · ` : ''}最早疆界记录 ${yearLabel(first.fromYear)}`;
+      button.append(detail);
+      button.onclick = () => {
+        searchInput.value = name;
+        searchResults.hidden = true;
+        searchInput.focus();
+        selectYear(sourceYearToAxis(first.fromYear), first.sourceIndex);
+      };
+      row.append(button);
+      searchList.append(row);
     }
   }
-  slider.addEventListener('input', () => selectSlice(manifest.slices[Number(slider.value)]));
+  searchInput.addEventListener('input', showMatches);
+  searchInput.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !searchResults.hidden) {
+      event.preventDefault();
+      searchResults.hidden = true;
+    }
+  });
+  document.querySelector('#atlas-polity-search').onsubmit = event => {
+    event.preventDefault();
+    showMatches();
+    const first = searchList.querySelector('button');
+    if (searchList.children.length === 1) first.click();
+    else first?.focus();
+  };
+
+  function selectYear(year, sourceIndex, delay = 0) {
+    clearTimeout(changeTimer);
+    clearTimeout(prefetchTimer);
+    const request = ++requestNumber;
+    requested = year;
+    syncControls(year);
+    showStatus();
+
+    async function apply() {
+      const target = data.frame(year);
+      try {
+        if (sourceIndex !== undefined && !target.byRecord.has(sourceIndex)) throw new Error('该年未收录所选疆界');
+        const features = target.key === activeFrame.key && !drawing ? null : await data.features(target);
+        const update = rendering.then(async () => {
+          if (request !== requestNumber) return;
+          if (target.key !== activeFrame.key) {
+            drawing = true;
+            try {
+              const next = colorBorders(features ?? await data.features(target));
+              if (request !== requestNumber) return;
+              await map.getSource('polities').setData(next);
+              activeData = next;
+            } finally {
+              drawing = false;
+            }
+          }
+          active = year;
+          activeFrame = target;
+          if (sourceIndex !== undefined && request === requestNumber) focusRecord(sourceIndex);
+          else clearPolity();
+          showStatus();
+          if (request === requestNumber) prefetch();
+        });
+        rendering = update.catch(() => {});
+        await update;
+      } catch (error) {
+        if (request !== requestNumber) return;
+        requested = active;
+        syncControls(active);
+        showStatus(error);
+      }
+    }
+    if (delay) changeTimer = setTimeout(apply, delay);
+    else void apply();
+  }
+
+  slider.addEventListener('input', () => selectYear(Number(slider.value), undefined, 70));
+  document.querySelector('#atlas-jump').onsubmit = event => {
+    event.preventDefault();
+    try {
+      const year = parseYear(yearInput.value);
+      if (year < chronology.bounds[0] || year > chronology.bounds[1]) {
+        throw new Error(`请选择 ${formatYear(chronology.bounds[0])}至${formatYear(chronology.bounds[1])}`);
+      }
+      selectYear(year);
+    } catch (error) { showStatus(error); }
+  };
+  function zoomTime(factor) {
+    window = zoomYears(window, requested, factor, chronology.bounds);
+    syncControls(requested);
+  }
+  timeIn.onclick = () => zoomTime(0.4);
+  timeOut.onclick = () => zoomTime(2.5);
+  timeFit.onclick = () => { window = chronology.bounds; syncControls(requested); };
+  syncControls(initial);
   map.on('mouseenter', 'polity-fill', () => { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'polity-fill', () => { map.getCanvas().style.cursor = ''; });
   map.on('click', 'polity-fill', event => {
-    if (!renderingSlice && event.features?.length) {
-      selectPolity(event.features[0].properties);
+    if (!drawing && event.features?.length) {
+      const item = activeFrame.byVisual.get(event.features[0].properties.visual);
+      if (item) selectPolity(item);
     }
   });
 }

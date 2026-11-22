@@ -19,7 +19,7 @@
   </header>
   <main>
     <div class="heading">
-      <div><h1>历史时空</h1><p class="meta">世界政权疆界 · 年代切片</p></div>
+      <div><h1>历史时空</h1><p class="meta">根据所选年份显示当时适用的疆界记录。</p></div>
     </div>
     <section class="panel atlas-panel" aria-label="历史世界地图">
       <div class="atlas-toolbar">
@@ -27,8 +27,28 @@
           <label for="atlas-year">地图年代</label>
           <input id="atlas-year" type="range" min="0" max="3" step="1" value="0" disabled>
           <div id="atlas-years" aria-hidden="true"></div>
+          <div class="atlas-controls">
+            <button id="atlas-time-in" type="button" disabled>放大时间轴</button>
+            <button id="atlas-time-out" type="button" disabled>缩小时间轴</button>
+            <button id="atlas-time-fit" type="button" disabled>全时段</button>
+          </div>
         </div>
-        <p id="atlas-status" role="status">正在加载地图…</p>
+        <div class="atlas-year-controls">
+          <form id="atlas-jump" class="atlas-controls">
+            <label for="atlas-year-input">跳到年份</label>
+            <input id="atlas-year-input" type="text" placeholder="如 1150 或 公元前431" required disabled>
+            <button id="atlas-jump-submit" disabled>查看</button>
+          </form>
+          <form id="atlas-polity-search" class="atlas-controls" role="search">
+            <label for="atlas-polity-input">搜索政权</label>
+            <input id="atlas-polity-input" type="search" placeholder="输入中文或英文名称" autocomplete="off" disabled>
+          </form>
+          <div id="atlas-search-results" class="atlas-search-results" hidden>
+            <p id="atlas-search-status" class="meta" role="status"></p>
+            <ul id="atlas-search-list" aria-label="政权搜索结果"></ul>
+          </div>
+          <p id="atlas-status" role="status">正在加载地图…</p>
+        </div>
       </div>
       <div class="atlas-map-stage">
         <div id="atlas-map" aria-label="可平移和缩放的世界地图"></div>

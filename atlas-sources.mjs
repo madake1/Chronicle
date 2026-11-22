@@ -13,7 +13,7 @@ export const atlasSources = {
     license: 'CC BY 4.0',
     licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
     download: 'https://raw.githubusercontent.com/Seshat-Global-History-Databank/cliopatria/v0.2.1/cliopatria.geojson.zip',
-    changes: 'Selected POLITY features by inclusive source years; geometry preserved.',
+    changes: 'Indexed POLITY records by inclusive source years; identical geometries are stored once.',
   },
   naturalEarth: {
     name: 'Natural Earth',
