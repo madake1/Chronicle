@@ -1,0 +1,11 @@
+{
+  "id": "codh-japan-poi",
+  "name": "CODH · 日本历史地名大系设施与地点",
+  "source": "https://geoshape.ex.nii.ac.jp/nrct-poi/",
+  "licenseSource": "https://geoshape.ex.nii.ac.jp/nrct-poi/",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "version": "2026-11-18",
+  "credits": "『日本歴史地名大系』施設・地点項目データセット（CODH作成） doi:10.20676/00000456",
+  "searchOnly": true
+}

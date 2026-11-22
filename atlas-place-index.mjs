@@ -104,7 +104,7 @@ export function createPlaceIndex(index) {
       ].map(period => period.sourceId).filter(Boolean)]);
       return { place, sources: Object.fromEntries([...sourceIds].map(key => [key, index.sources[key]])) };
     },
-    meta: { datasets: index.datasets ?? [] },
+    meta: { datasets: (index.datasets ?? []).filter(dataset => dataset.listed !== false) },
   };
 }
 

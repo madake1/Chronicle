@@ -1,3 +1,4 @@
+import { decodeHTML } from 'entities';
 import { createReadStream } from 'node:fs';
 import { createGunzip } from 'node:zlib';
 import { chain } from 'stream-chain';
@@ -7,7 +8,9 @@ import { streamArray } from 'stream-json/streamers/stream-array.js';
 
 const types = [
   [/settlement|inhabited place|city|cities|town|village|hamlet|polis|port/i, '历史聚落', 3.5],
-  [/archaeolog|ruin|tumulus|burial|cemetery|sanctuary|temple|site|fort|castle/i, '历史遗址', 5],
+  [/monaster|religious complex|archaeolog|ruin|tumulus|burial|cemetery|sanctuary|temple|site|fort|castle/i, '历史遗址', 5],
+  [/^province$/, '历史行政区参考点', 5],
+  [/^historical place$|^施設$/, '历史地点', 5],
 ];
 const safePoint = point => Array.isArray(point) && point.length >= 2 &&
   point.slice(0, 2).every(Number.isFinite) && Math.abs(point[0]) <= 180 && Math.abs(point[1]) <= 90;
@@ -59,12 +62,14 @@ export function fromPleiades(record) {
       citation: https(location.uri), periods: location.attestations.map(item => ({
         label: item.timePeriod, confidence: item.confidence,
       })) })),
+    details: pleiadesDetails(record, point),
     credits: [...record.creators ?? [], ...record.contributors ?? []].map(person => person.name).filter(Boolean),
     externalIds: [`https://pleiades.stoa.org/places/${record.id}`] };
 }
 
 // LPF uses ISO year numbering. Keep only explicitly bounded assertions on the map.
 function isoYear(value) {
+  if (Number.isSafeInteger(value)) value = String(value);
   if (typeof value !== 'string' || !/^-?\d{1,6}(?:-\d{2}(?:-\d{2})?)?$/.test(value)) return undefined;
   const year = Number(value.match(/^-?\d+/)[0]);
   return year <= 0 ? year - 1 : year;
@@ -72,7 +77,84 @@ function isoYear(value) {
 
 function lpfPeriods(when) {
   return (when?.timespans ?? []).map(({ start, end }) =>
-    period(isoYear(start?.in), isoYear(end ? end.in : start?.in))).filter(Boolean);
+    period(isoYear(start?.in ?? start?.earliest), isoYear(end ? end.in ?? end.latest : start?.in),
+      start?.in && (!end || end.in) ? {} : { approximate: true })).filter(Boolean);
+}
+
+function lpfReference(value) {
+  if (typeof value !== 'string') return undefined;
+  const wikidata = /^wd:(Q[1-9]\d*)$/.exec(value);
+  if (wikidata) return `https://www.wikidata.org/wiki/${wikidata[1]}`;
+  const geonames = /^gn:([1-9]\d*)$/.exec(value);
+  if (geonames) return `https://www.geonames.org/${geonames[1]}/`;
+  return https(value);
+}
+
+function readableText(value) {
+  if (typeof value !== 'string') return '';
+  return decodeHTML(value.replace(/<br\s*\/?>|<\/p>/gi, ' ').replace(/<[^>]+>/g, ''))
+    .replace(/\s+/g, ' ').trim();
+}
+
+function sourceUrl(...values) {
+  return values.find(value => typeof value === 'string' && /^https?:\/\/[^\s]+$/i.test(value));
+}
+
+function uniqueReferences(values) {
+  return [...new Map(values.map(item => [JSON.stringify(item), item])).values()];
+}
+
+function pleiadesDetails(record, point) {
+  const notes = [record.description, record.details].map(readableText).filter(Boolean);
+  const citations = [record, ...(record.names ?? []), ...(record.locations ?? [])].flatMap(item =>
+    (item.references ?? []).flatMap(ref => {
+      const url = sourceUrl(ref.accessURI, ref.bibliographicURI, ref.alternateURI);
+      const label = readableText(ref.formattedCitation || ref.shortTitle);
+      return label || url ? [{ label: label || url, url }] : [];
+    }));
+  const relations = (record.connections ?? []).flatMap(item => {
+    const url = sourceUrl(item.connectsTo);
+    const label = readableText(item.title || item.description) || url;
+    const date = pleiadesPeriod(item);
+    return label ? [{ label, url, type: item.connectionType, dates: date ? [date] : [] }] : [];
+  });
+  const date = point && pleiadesPeriod(point);
+  const location = point ? [{ label: readableText(point.description) || readableText(point.title),
+    url: sourceUrl(point.uri), dates: date ? [date] : [] }].filter(item => item.label || item.url) : [];
+  const links = (record.references ?? []).filter(ref => ['Wikidata', 'MANTO', 'TM', 'nomisma.org']
+    .includes(ref.shortTitle) || ref.shortTitle?.startsWith('Wikipedia')).flatMap(ref => {
+    const url = sourceUrl(ref.accessURI, ref.bibliographicURI);
+    return url ? [{ label: ref.shortTitle, url }] : [];
+  });
+  return { notes: [...new Set(notes)], citations: uniqueReferences(citations), relations, location, links };
+}
+
+function lpfDetails(record, feature, point, names) {
+  const list = (key, exportKey = key) => record[key] ?? feature[exportKey] ?? [];
+  const notes = list('descriptions').map(item => readableText(item.value)).filter(Boolean);
+  const relations = list('relations', 'related').flatMap(item => {
+    if (typeof item.label !== 'string' || !item.label.trim()) return [];
+    return [{ label: item.label, type: item.relationType ?? item.relation_type,
+      url: lpfReference(item.relationTo ?? item.relation_to), dates: lpfPeriods(item.when) }];
+  });
+  const citations = [...list('citations'), ...names.flatMap(item => item.citations ?? []),
+    ...[point?.citation].filter(Boolean)].flatMap(item => {
+    const url = lpfReference(item['@id'] ?? item.id);
+    const label = typeof item.label === 'string' ? item.label.trim() : '';
+    return label || url ? [{ label: label || url, url }] : [];
+  });
+  const links = list('links').flatMap(item => {
+    const identifier = item.identifier ?? item['@id'];
+    const url = lpfReference(identifier);
+    return url ? [{ label: identifier, url, type: item.type, augmented: item.aug === true }] : [];
+  });
+  const depictions = list('depictions').flatMap(item => {
+    const url = sourceUrl(item['@id'], item.id, item.url);
+    if (!url) return [];
+    return [{ label: [readableText(item.title ?? item.label) || '原始图像', readableText(item.license)].filter(Boolean).join(' · '), url }];
+  });
+  return { notes: [...new Set(notes)], relations, citations: uniqueReferences(citations), links, depictions };
+
 }
 
 export function fromLinkedPlaces(record, dataset) {
@@ -81,17 +163,24 @@ export function fromLinkedPlaces(record, dataset) {
   if (originalId == null) return null;
   const points = record.geometry?.type === 'GeometryCollection' ? record.geometry.geometries : [record.geometry];
   const point = points.filter(Boolean).find(item => item.type === 'Point' && safePoint(item.coordinates) &&
-    (item.certainty === undefined || item.certainty === 'certain'));
-  const names = (record.names ?? []).flatMap(entry => {
+    (item.certainty === undefined || item.certainty === 'certain')) ??
+    points.filter(Boolean).find(item => item.type === 'MultiPoint' && item.coordinates?.length === 1 &&
+      safePoint(item.coordinates[0]) && (item.certainty === undefined || item.certainty === 'certain'));
+  const names = (record.names ?? feature.names ?? []).flatMap(entry => {
     const name = { name: entry.toponym, original: entry.toponym, language: entry.lang, sourceDates: entry.when, citations: entry.citations };
     const dates = lpfPeriods(entry.when);
     return dates.length ? dates.map(date => ({ ...name, ...date })) : [name];
   });
-  return { originalId: String(originalId), name: feature.title, coordinates: point?.coordinates,
-    types: (record.types ?? []).map(type => type.label ?? type.sourceLabel),
-    url: https(originalId) ?? dataset.source, names,
-    attestations: lpfPeriods(point?.when ?? record.when),
-    sourceAttestations: [point?.when ?? record.when].filter(Boolean),
+  const whens = point?.when ? [point.when] : record.when ? [record.when] : feature.whens ?? [];
+  const labels = (record.types ?? feature.types ?? []).map(type => type.label || type.sourceLabel).filter(Boolean);
+  const source = /^\/api\/place\/\d+\/$/.test(feature.url) ? 'https://whgazetteer.org' + feature.url : https(feature.url);
+  return { originalId: String(originalId), name: feature.title, coordinates: point?.type === 'MultiPoint'
+      ? point.coordinates[0] : point?.coordinates,
+    types: labels.length ? labels : dataset.allowUntyped ? ['historical place'] : [],
+    url: https(originalId) ?? source ?? dataset.source, names,
+    attestations: dataset.searchOnly ? [] : whens.flatMap(lpfPeriods),
+    sourceAttestations: whens,
+    details: lpfDetails(record, feature, point, names),
     externalIds: https(originalId) ? [originalId] : [] };
 }
 
@@ -113,7 +202,8 @@ export function normalizePlace(candidate, dataset) {
       coordinates: candidate.coordinates.slice(0, 2), minZoom, sourceIds: [sourceId],
       names, attestations, coverage: attestations, existence: [], roles: [],
       sourceAttestations: candidate.sourceAttestations,
-      externalIds: candidate.externalIds, confidence: '地图时段采用来源对地点或点位的记载，名称与存在年代分开记录。' },
+      datasetName: dataset.name, sourceDetails: candidate.details,
+      externalIds: candidate.externalIds },
   };
 }
 

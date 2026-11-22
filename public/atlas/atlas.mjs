@@ -166,12 +166,12 @@ async function initialize() {
   renderSources({ ...manifest.sources, ...Object.fromEntries((places.datasets ?? []).map((source, index) =>
     [`place-dataset-${index}`, source])), places: {
     name: '北宋历史地点（近似点位）', version: 'v1.1', source: '/atlas/northern-song-places.json',
-    license: places.license, licenseUrl: places.licenseUrl,
+    license: 'CC0-1.0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
   } });
   const riverPaint = { 'line-color': '#438498', 'line-opacity': 0.72,
     'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.65, 6, 1.25] };
   const data = createAtlasData(chronology, readData);
-  const initial = sourceYearToAxis(manifest.slices[0].year);
+  const initial = 1;
   let activeFrame = data.frame(initial);
   let activeData = colorBorders(await data.features(activeFrame));
   setWorkerUrl(new URL('/atlas/vendor/maplibre-gl-worker.mjs', location.href).href);

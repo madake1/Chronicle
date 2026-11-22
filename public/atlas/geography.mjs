@@ -10,9 +10,15 @@ function placePopup({ place, name, role, coverage }, sources) {
   title.textContent = name?.name ?? place.name;
   const period = document.createElement('p');
   period.textContent = coverage
-    ? `${place.type} · 有资料支持的收录时段 ${placePeriod(coverage)}`
+    ? `${place.type} · 资料记载：${placePeriod(coverage)}`
     : `${place.type} · 参考地点，年代待考`;
   content.append(title, period);
+  if (place.datasetName) {
+    const dataset = document.createElement('p');
+    dataset.className = 'meta';
+    dataset.textContent = `地点资料来源 · ${place.datasetName}`;
+    content.append(dataset);
+  }
   if (name) {
     const historicalName = document.createElement('p');
     historicalName.textContent = `${name.original} · 地名资料年代 ${placePeriod(name)}`;
@@ -23,17 +29,38 @@ function placePopup({ place, name, role, coverage }, sources) {
     original.textContent = place.originalName;
     content.append(original);
   }
-  if (place.names.length > 1) {
+  const otherNames = place.names.filter(entry => entry !== name);
+  if (otherNames.length && (name || place.names.length > 1 || otherNames[0].name !== place.name)) {
     const names = document.createElement('details');
     const heading = document.createElement('summary');
-    heading.textContent = '其他历史名称';
+    const dated = otherNames.filter(entry => entry.fromYear !== undefined);
+    const undated = otherNames.filter(entry => entry.fromYear === undefined);
+    heading.textContent = dated.length ? '其他名称' : '其他名称（年代待考）';
     names.append(heading);
-    for (const entry of place.names.filter(entry => entry !== name)) {
+    const appendName = (entry, date) => {
       const line = document.createElement('p');
-      line.textContent = `${[entry.name, entry.original === entry.name ? null : entry.original,
-        entry.fromYear === undefined ? '名称年代待考' : placePeriod(entry)].filter(Boolean).join(' · ')}`;
+      line.textContent = [entry.name, entry.original === entry.name ? null : entry.original, date]
+        .filter(Boolean).join(' · ');
+      const variants = (entry.aliases ?? []).filter(alias => alias !== entry.name && alias !== entry.original);
+      if (variants.length) line.append(`（${[...new Set(variants)].join('、')}）`);
+      if (entry.citation?.startsWith('https://')) {
+        const link = document.createElement('a');
+        link.href = entry.citation;
+        link.textContent = '出处';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        line.append(' · ', link);
+      }
       names.append(line);
+    };
+    for (const entry of dated) appendName(entry, placePeriod(entry));
+    if (dated.length && undated.length) {
+      const label = document.createElement('p');
+      label.className = 'meta';
+      label.textContent = '年代待考';
+      names.append(label);
     }
+    for (const entry of undated) appendName(entry);
     content.append(names);
   }
   for (const observed of place.attestations ?? []) {
@@ -52,9 +79,12 @@ function placePopup({ place, name, role, coverage }, sources) {
     identity.textContent = `${role.label} · ${placePeriod(role)}`;
     content.append(identity);
   }
-  const position = document.createElement('p');
-  position.textContent = place.confidence ?? '点位为历史城市所在区域的近似位置。';
-  content.append(position);
+  if (place.confidence && place.confidence !== '地图时段采用来源对地点或点位的记载，名称与存在年代分开记录。') {
+    const note = document.createElement('p');
+    note.textContent = place.confidence;
+    content.append(note);
+  }
+  appendPlaceSources(content, place, role);
   const references = document.createElement('ul');
   for (const id of new Set([...place.sourceIds, ...[coverage, ...place.names, ...place.roles, ...(place.existence ?? [])].map(item => item?.sourceId).filter(Boolean)])) {
     if (!sources[id]) continue;
@@ -82,6 +112,55 @@ function placePopup({ place, name, role, coverage }, sources) {
     content.append(link);
   }
   return content;
+}
+
+function appendPlaceSources(content, place, currentRole) {
+  const details = place.sourceDetails ?? {};
+  const withDates = item => ({
+    ...item, label: [item.label ?? item.url, item.type, ...(item.dates ?? []).map(placePeriod)]
+      .filter(Boolean).join(' · '),
+  });
+  const catalog = [];
+  if (place.sourceTypes?.length) catalog.push({ label: `原始分类 · ${place.sourceTypes.join('、')}` });
+  if (place.originalId) catalog.push({ label: `来源编号 · ${place.originalId}` });
+  if (place.coordinates?.length === 2) {
+    catalog.push({ label: `地图点位（经度、纬度）· ${place.coordinates.map(value => value.toFixed(5)).join(', ')}` });
+  }
+  const groups = [
+    ['史料备注', (details.notes ?? []).map(label => ({ label }))],
+    ['归属与关联（按来源记载）', (details.relations ?? []).map(withDates)],
+    ['其他身份记录', (place.roles ?? []).filter(role => role !== currentRole)
+      .map(role => withDates({ label: role.label, dates: [role] }))],
+    ['点位依据', (details.location ?? []).map(withDates)],
+    ['逐条引文', details.citations ?? []],
+    ['原始图像资料', details.depictions ?? []],
+    ['外部资料关联', (details.links ?? []).map(item => ({
+      ...item, label: [item.label, item.type === 'closeMatch' && '近似匹配',
+        item.augmented && 'WHG 补充'].filter(Boolean).join(' · '),
+    }))],
+    ['记录信息', catalog],
+  ];
+  for (const [title, items] of groups) {
+    if (!items.length) continue;
+    const group = document.createElement('details');
+    const summary = document.createElement('summary');
+    summary.textContent = title;
+    const list = document.createElement('ul');
+    for (const { label, url } of items) {
+      const row = document.createElement('li');
+      if (url && /^https?:\/\//i.test(url)) {
+        const link = document.createElement('a');
+        link.href = url;
+        link.textContent = label;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        row.append(link);
+      } else row.textContent = label;
+      list.append(row);
+    }
+    group.append(summary, list);
+    content.append(group);
+  }
 }
 
 function riverAnchors(rivers) {
@@ -133,7 +212,7 @@ export function addGeographicLabels(map, rivers, Marker, Popup) {
     try {
       const detail = await readPlaceApi('detail', { id: place.id });
       if (request !== detailRequest) return;
-      searchPopup = new Popup({ offset: 14, maxWidth: '280px' }).setLngLat(place.coordinates)
+      searchPopup = new Popup({ offset: 14, maxWidth: 'min(23rem, calc(100vw - 2rem))' }).setLngLat(place.coordinates)
         .setDOMContent(placePopup(placeAt(detail.place, selectedYear), detail.sources)).addTo(map);
     } catch {
       if (request === detailRequest) placeStatus.hidden = false;

@@ -1,6 +1,7 @@
 {
   "dataset": {
-    "name": "Chronicle · 历史地点选编",
+    "name": "馆藏与学术资料补充",
+    "listed": false,
     "version": "1.0.0",
     "source": "https://whc.unesco.org/en/list/",
     "license": "独立整理 CC0 1.0",

@@ -103,9 +103,9 @@
 #atlas-history-list button { margin-top: .25rem; padding: .2rem .45rem; white-space: normal; }
 
 #atlas-map .atlas-river-label, #atlas-map .atlas-place-label {
-  font: 600 .76rem/1.2 system-ui, sans-serif;
+  font: 600 .83rem/1.25 system-ui, sans-serif;
   white-space: nowrap;
-  text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 5px #fff;
+  text-shadow: -1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff;
 }
 #atlas-map .atlas-river-label { color: #1f6177; pointer-events: none; }
 #atlas-map .atlas-place-label {
@@ -127,8 +127,16 @@
 }
 #atlas-map .atlas-place-label.has-role::before { background: #9e2f26; }
 #atlas-map .atlas-place-label.has-role { color: #73241e; }
-.atlas-place-popup { color: #242d27; font: 14px/1.5 system-ui, sans-serif; padding-right: .35rem; }
-.atlas-place-popup h2 { font-size: 1rem; }
+.atlas-place-popup {
+  color: #1d2822;
+  font: 15px/1.55 system-ui, sans-serif;
+  padding-right: .5rem;
+  max-height: min(23rem, 55vh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+}
+.atlas-place-popup h2 { font-size: 1.125rem; }
 .atlas-place-popup p { margin-top: .2rem; }
 .atlas-place-popup ul { margin: .3rem 0 0; padding-left: 1.2rem; }
 .atlas-place-popup a { color: #245743; }
@@ -143,5 +151,4 @@
 .atlas-source-controls p { flex-basis: 100%; margin: 0; }
 .atlas-layers { border: 0; margin: 0; padding: 0; }
 
-.atlas-place-popup { max-height: min(17rem, 50vh); overflow: auto; }
 .atlas-search-results summary { cursor: pointer; }

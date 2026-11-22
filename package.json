@@ -13,6 +13,7 @@
     "atlas:import-places": "node scripts/import-places.mjs"
   },
   "dependencies": {
+    "entities": "^8.1.0",
     "fflate": "^0.8.3",
     "maplibre-gl": "6.19.0",
     "markdown-it": "^15.0.3"

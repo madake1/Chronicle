@@ -1,3 +1,9 @@
 /data/
 /node_modules/
 /atlas-data/
+
+# 本地认证配置
+.env
+.env.*
+!.env.example
+/credentials/

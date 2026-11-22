@@ -27,7 +27,8 @@ export function placesAt(places, year, zoom) {
 export function placePeriod(period) {
   const from = formatYear(sourceYearToAxis(period.fromYear));
   const to = formatYear(sourceYearToAxis(period.toYear));
-  return from === to ? from : `${from} 至 ${to}`;
+  const label = from === to ? from : `${from} 至 ${to}`;
+  return period.approximate ? `约 ${label}` : label;
 }
 
 export function createPlaceSearch(places) {

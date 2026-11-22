@@ -72,12 +72,10 @@ const geojson = unpacked['cliopatria_polities_only_v021.geojson'];
 if (!geojson) throw new Error('Missing Cliopatria GeoJSON');
 const original = JSON.parse(Buffer.from(geojson.buffer, geojson.byteOffset, geojson.byteLength));
 const slices = [];
-const encyclopediaRecords = new Map();
 for (const year of atlasYears) {
   const features = original.features.flatMap((feature, sourceIndex) => {
-    const { Name, Type, FromYear, ToYear, Wikipedia, Wikidata } = feature.properties;
+    const { Name, Type, FromYear, ToYear } = feature.properties;
     if (Type !== 'POLITY' || FromYear > year || ToYear < year) return [];
-    encyclopediaRecords.set(sourceIndex, { sourceIndex, Wikipedia, Wikidata });
     return [{ type: 'Feature', geometry: feature.geometry, properties: {
       name: Name, fromYear: FromYear, toYear: ToYear, sourceIndex,
     } }];
@@ -103,7 +101,10 @@ await preparePlaces();
 const encyclopediaFile = new URL('../atlas-encyclopedia.json', import.meta.url);
 if (process.argv.includes('--refresh-encyclopedia')) {
   console.log('Resolving Wikipedia and Wikidata links…');
-  const index = await buildEncyclopedia([...encyclopediaRecords.values()]);
+  const records = original.features.flatMap(({ properties }, sourceIndex) =>
+    properties.Type === 'POLITY' ? [{ sourceIndex, Wikipedia: properties.Wikipedia, Wikidata: properties.Wikidata }] : []);
+  const index = await buildEncyclopedia(records);
+  console.log(`Resolved encyclopedia entries for ${Object.keys(index.byRecord).length} of ${records.length} records`);
   await atomicWrite(encyclopediaFile, JSON.stringify({
     archiveSha256: digest(archive), ...index,
   }, null, 2) + '\n');

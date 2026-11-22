@@ -18,6 +18,7 @@ const allowedLicenses = new Map([
   ['CC0 1.0', 'https://creativecommons.org/publicdomain/zero/1.0/'],
   ['CC BY 3.0', 'https://creativecommons.org/licenses/by/3.0/'],
   ['CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'],
+  ['CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/'],
 ]);
 if (!/^[a-z][a-z0-9-]{2,48}$/.test(dataset.id ?? '') || !dataset.name?.trim() ||
     new URL(dataset.source).protocol !== 'https:' ||
