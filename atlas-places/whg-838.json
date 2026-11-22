@@ -1,0 +1,11 @@
+{
+  "id": "whg-dataset-838",
+  "name": "WHG · 中亚历史图集",
+  "version": "2025-09-18",
+  "credits": "Yuri Bregel and WHG staff",
+  "source": "https://whgazetteer.org/datasets/838/places",
+  "licenseSource": "https://whgazetteer.org/datasets/838/places",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "includeUncertainPoints": true
+}

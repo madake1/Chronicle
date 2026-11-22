@@ -2,7 +2,7 @@
 
 核验日期：2026-11-22。数字来自本机原始包、生成索引和导入统计。
 
-当前地点索引 **70,612 条**，有年代依据 **23,469 条**（其中 **23,459 条**与地图年份相交），仅可搜索 **47,143 条**。以下「有效」指导入后可搜索且有可用坐标；「按年」指有年代依据。源数据量和导入数不能相互替代。
+当前地点索引 **123,199 条**，有年代依据 **39,263 条**（其中 **39,253 条**与地图年份相交），仅可搜索 **83,936 条**。「有效」指导入后可搜索且有可用坐标，「按年」指有年代依据。不同来源的记录可能指同一地点。
 
 ## 地点数据
 
@@ -10,6 +10,15 @@
 
 | 数据源 / 主要覆盖 | 下载 / 导入 | 原始记录 / 有效 / 按年 | 本机原始文件 | 版本或目录日期 / 许可 |
 |---|---|---:|---|---|
+| [GeoNames cities15000](https://download.geonames.org/export/dump/readme.txt)，全球现代城市 | 已下载 / 已导入 | 34,249 / 34,249 / 0 | `geonames-cities15000.zip` | SHA-256 a15729cf9954，CC BY 4.0 |
+| [Reba 等，全球历史城市](https://doi.org/10.1038/sdata.2016.34)，Chandler 与 Modelski 古代集 | 已下载 / 部分导入 | 1,751 / 1,520 / 1,520 | `chandlerV2.csv`、`modelskiAncientV2.csv` | 两份 V2 CSV，CC BY 4.0 |
+| [WHG · 中亚历史图集](https://whgazetteer.org/datasets/838/places) | 已下载 / 部分导入 | 759 / 482 / 4 | `whg_dataset_838.lpf` | 2025-09-18，CC BY 4.0 |
+| [WHG · Dati 的《球体》地名](https://whgazetteer.org/datasets/1760/places)，晚期中世纪欧洲、地中海及周边 | 已下载 / 部分导入 | 369 / 298 / 298 | `whg_dataset_1760.lpf` | 2026-04-17，CC BY 4.0 |
+| [WHG · 蒙塞拉特的莫卧儿印度旅行](https://whgazetteer.org/datasets/1575/places) | 已下载 / 部分导入 | 138 / 67 / 0 | `whg_dataset_1575.lpf` | 2025-05-22，CC BY 4.0 |
+| [WHG · 西属美洲聚落](https://whgazetteer.org/datasets/14/places)，1701–1808 年来源 | 已下载 / 部分导入 | 13,259 / 12,174 / 11,795 | `whg_dataset_14.lpf` | 2025-09-03，CC BY-NC-SA 4.0 |
+| [WHG · 旧大陆贸易地名](https://whgazetteer.org/datasets/12/places)，欧亚和非洲 | 已下载 / 部分导入 | 4,117 / 3,777 / 2,167 | `whg_dataset_12.lpf` | 2025-10-15，CC BY-NC 2.5 |
+| [WHG · 忏悔者狄奥法内斯的保加利亚地名](https://whgazetteer.org/datasets/1361/places) | 已下载 / 部分导入 | 35 / 10 / 0 | `whg_dataset_1361.lpf` | 2025-09-18，CC BY 4.0 |
+| [WHG · 佛罗里达原住民地名](https://whgazetteer.org/datasets/1076/places) | 已下载 / 部分导入 | 100 / 10 / 10 | `whg_dataset_1076.lpf` | Simpson 1956 / WHG 2022，原记录 Public Domain，WHG 补充 CC BY 4.0 |
 | [Pleiades 完整快照](https://pleiades.stoa.org/downloads)，古典地中海、近东和周边 | 已下载 / 部分导入 | 42,439 / 13,725 / 4,211 | `pleiades-places-latest.json.gz` | 本地获取于 2026-11-22，`SHA-256 67e022bae17b`；CC BY 3.0 |
 | [CODH 日本历史设施与地点](https://geoshape.ex.nii.ac.jp/nrct-poi/)，日本寺社、城址与遗迹等 | 已下载 / 已导入 | 32,038 / 32,038 / 0 | `nrct-poi-20261118.csv` | 2026-11-18；CC BY 4.0 |
 | [Viabundus v2](https://zenodo.org/records/16611998)，晚期中世纪与近代早期北欧及周边 | 部分下载 / 部分导入 | 18,839 节点 / 3,112 / 3,108 | `viabundus-2-nodes.csv`、`viabundus-2-alternativenames.csv` | v2，2025-04-25；CC BY-SA 4.0 |
@@ -29,7 +38,10 @@
 | [WHG · Belgian Historical Gazetteer](https://whgazetteer.org/datasets/1756/places)，比利时安特卫普、东弗兰德斯，1847–1855 年左右 | 已下载 / 已导入 | 3,548 / 3,548 / 3,547 | `whg_dataset_1756.lpf` | 2026；CC BY 4.0 |
 
 - Pleiades 使用官方完整 gzip JSON。筛掉缺少可靠点位、受支持类型或其他入库条件的记录；留下原始 ID、名称、史料和出处。请先检查现存原包及哈希，再考虑更新。库内另有 4 条 Pleiades 小型摘录。
-- WHG 通过官网登录后逐套导出。截至核验，本机 14 份 LPF 均已尝试，11 套产生有效地点。每套的本地导入参数见 `atlas-data/raw/whg-<编号>.json`。筛选还会排除无坐标、多点含义不明或类型不适配的记录。台湾村落与罗马尼亚聚落导出无点，法显包未达到当前点位和类型条件。UNESCO 名录日期是收录语境，作为仅搜索来源。
+- GeoNames 保留原名、别名、坐标和稳定编号。快照含 244 个国家或地区代码以及 241 条上游标为 `PPLC` 的首都记录，全部可搜索定位。快照分类不赋予历史身份时段。
+- Reba 等两份原始 CSV 按 Figshare 发布 MD5 核对。仅选坐标置信等级 1、2 且有正数人口样本的记录。每个有观测的年份单独显示，中间年份不插值。来源中的城市名称可能是现代拼法。
+- WHG 通过官网登录后逐套导出。本机共 21 份 LPF，18 套产生有效地点。导入参数见 `atlas-places/whg-<编号>.json` 或旧包所在的 `atlas-data/raw/whg-<编号>.json`。筛选排除无坐标、多点含义不明或类型不适配的记录。中亚图集标为较不确定的单点只供搜索定位。文献和地图的年代视为来源记载，不能推断聚落持续存在。台湾村落与罗马尼亚聚落导出无点，法显包未达到当前点位和类型条件。UNESCO 名录日期是收录语境，作为仅搜索来源。
+- CC BY-NC 和 CC BY-NC-SA 数据仅用于本机非商业用途，原始包和归一化包均在 Git 忽略目录。WHG 对比对链接等补充内容的 CC BY 4.0 许可单独适用。
 - CODH 原表无地点年代。代表坐标有的按现代地址或行政区推定。导入保留编号、日文原名、假名读音、原分类和来源中的现址，不推断年代。署名：『日本歴史地名大系』施設・地点項目データセット（CODH作成），doi:10.20676/00000456。
 - Viabundus 的节点和别名表从官方 Zenodo 下载，两个文件均通过发布方 MD5 核对；别名表 30,624 行。仅取上游标记完备的聚落与城镇节点，单个年代端点只作该年记载，双端点保留资料范围。改编产物单独存放，分发时保留署名与 CC BY-SA 4.0。路线和其他要素本轮未导入。
 - 另有 14 条带逐项出处的研究补充（含北宋四京），以及上述 4 条 Pleiades 摘录。文件为 `public/atlas/northern-song-places.json`、`atlas-places/curated.json`、`atlas-places/pleiades.json`，随 `atlas:places` 导入。保留人工核实名称和身份；不同来源只在有明确的对应关系时合并。
@@ -46,7 +58,7 @@
 
 ## 尚未完成的数据
 
-- WHG 新查询：`https://whgazetteer.org/entity/dataset:1245/api` 未认证的命令行请求返回 403。随后核对现有 ORCID 登录会话，Viabundus 页面可见 LPF 导出，但版本为 v1.2，本机已从发布者处导入 v2，故未重复下载。中国 1911 年城镇在登录后仍显示下载不可用；县、府此前也未出现可用导出。本轮没有新增 WHG 包。直接从 [WHG 目录](https://whgazetteer.org/public_data/) 核查逐套许可及可用性。
+- WHG 的 Viabundus 下载为 v1.2，本机使用发布者 v2。中国 1911 年城镇此前在登录后仍显示下载不可用，县、府此前也未出现可用导出。[WHG 目录](https://whgazetteer.org/public_data/)
 - Viabundus 的发布者整包传输未完成；已从同一版本的 Zenodo 取得并使用校验通过的节点与别名。整包、路线和城镇轮廓未检验或导入。
 - [CODH 行政地名变迁](https://geoshape.ex.nii.ac.jp/gch/index.html.ja)：江户至 1889 年，2023-10-18 版，CC BY 4.0。本轮未下载或导入，需检查可匹配的坐标 ID。
 - [CHGIS V6](https://chgis.fas.harvard.edu/data/chgis/v6/)：中国历史行政地理，版本 2016。原版未下载或导入，官网限制商业使用和再分发；WHG 的获准省份子集单独计算。
@@ -55,6 +67,7 @@
 ## WHG 认证和凭据
 
 - 当前仓库没有可用的 WHG 认证配置，导入器只读取本地 LPF。先在 [WHG](https://whgazetteer.org/) 使用 ORCID 官方登录，再进入数据集的 Download options → Download LPF。遵守站点显示的条款与请求频率限制。
+- 用户已授权本项目按页面显示的许可和 WHG 下载政策下载公开数据，用于个人非商业使用。后续仅使用 Codex 内置浏览器，优先复用该浏览器的现有登录会话。
 - 若未来使用官方 API，请按 [WHG API 文档](https://docs.whgazetteer.org/content/technical/apis.html) 在账户配置页创建令牌。约定放在项目根目录私有 `.env.local` 的 `WHG_API_TOKEN`，可在调用 API 前读取到进程环境。现有 Chronicle 脚本不读取这个变量，也没有创建令牌。不要把 ORCID 密码加入项目。
 - 已用 `git check-ignore` 检查 `.env`、`.env.local` 和 `credentials/`。它们均被忽略。禁止把凭据值或会话 Cookie 写入日志、源码、文档或 Git。
 
@@ -62,6 +75,15 @@
 
 ```powershell
 npm run atlas:places
+curl.exe -fL https://download.geonames.org/export/dump/cities15000.zip -o atlas-data/raw/geonames-cities15000.zip
+node scripts/import-geonames.mjs
+curl.exe -fL https://ndownloader.figshare.com/files/5407640 -o atlas-data/raw/chandlerV2.csv
+curl.exe -fL https://ndownloader.figshare.com/files/5356132 -o atlas-data/raw/modelskiAncientV2.csv
+python scripts/prepare-historical-cities.py
+npm run atlas:import-places -- lpf atlas-data/raw/historical-cities.lpf atlas-places/historical-cities.json
+foreach ($id in 838,1760,1575,14,12,1361,1076) {
+  npm run atlas:import-places -- lpf "atlas-data/raw/whg_dataset_$id.lpf" "atlas-places/whg-$id.json"
+}
 npm run atlas:import-places -- pleiades atlas-data/raw/pleiades-places-latest.json.gz
 npm run atlas:import-places -- lpf atlas-data/raw/whg_dataset_1618.lpf atlas-data/raw/whg-1618.json
 python scripts/prepare-codh-poi.py atlas-data/raw/nrct-poi-20261118.csv atlas-data/raw/codh-japan-poi.lpf

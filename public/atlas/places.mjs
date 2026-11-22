@@ -71,7 +71,7 @@ export function bindPlaceSearch(search, currentYear, locate) {
     }
     if (id !== request || results.hidden) return;
     status.textContent = total ? (total > 10 ? `显示前 10 项，共 ${total} 项` : '')
-      : '没有匹配的历史地点';
+      : '没有匹配的地点';
     for (const item of matches.slice(0, 10)) {
       const row = document.createElement('li');
       const label = item.name?.name ?? item.place.name;
@@ -107,7 +107,7 @@ export function bindPlaceSearch(search, currentYear, locate) {
         }
         row.append(details);
       } else {
-        row.append(action(label, '参考地点 · 年代未核实', undefined));
+        row.append(action(label, `${item.place.type} · 参考地点`, undefined));
       }
       list.append(row);
     }

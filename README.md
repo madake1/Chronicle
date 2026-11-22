@@ -37,6 +37,6 @@ Node.js HTTP 服务 + 原生 HTML、CSS 和 ES Modules + MapLibre GL JS。作品
 
 ## 数据与维护
 
-已接入 Cliopatria、Natural Earth、Historical Basemaps、Pleiades、WHG、日本 CODH、Viabundus，以及 Wikipedia/Wikidata 名称关联。覆盖随地区和年代变化，中国古代地名仍稀疏。现代底图、历史疆界、地名使用年代及地点存在年代分别处理。
+已接入 Cliopatria、Natural Earth、Historical Basemaps、Pleiades、WHG、日本 CODH、Viabundus、Reba 等的全球历史城市，以及 Wikipedia/Wikidata 名称关联。可搜索 GeoNames 全球现代城市和首都作为地理参照。历史覆盖随地区和年代变化，中国古代地名仍稀疏。
 
 下一阶段优先扩充、清洗和整合外部历史数据，改善年代覆盖、搜索和出处追溯。开发接手请先读 [数据源清单](docs/DATA_SOURCES.md) 和 [交接说明](docs/HANDOFF.md)，再检查实际工作区。测试运行 `npm test`。

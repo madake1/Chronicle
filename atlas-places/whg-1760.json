@@ -1,0 +1,11 @@
+{
+  "id": "whg-dataset-1760",
+  "name": "WHG · Dati 的《球体》地名",
+  "version": "2026-04-17",
+  "credits": "Sunjay Hopkins, Carrie Beneš and Daniela Elena Brizio",
+  "source": "https://whgazetteer.org/datasets/1760/places",
+  "licenseSource": "https://whgazetteer.org/datasets/1760/places",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "allowUntyped": true
+}

@@ -1,4 +1,4 @@
-import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
+import { Map, Marker, NavigationControl, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
 import { formatYear, parseYear } from '../chronology.mjs';
 import { createAtlasData, createPolitySearch, recordAtYear } from './data.mjs';
 import { readPlaceApi } from './place-api.mjs';
@@ -214,7 +214,7 @@ async function initialize() {
     },
   });
   map.addControl(new NavigationControl({ showCompass: false }));
-  const updateGeography = addGeographicLabels(map, rivers, Marker, Popup);
+  const updateGeography = addGeographicLabels(map, rivers, Marker);
   if (manifest.geography) addGeographicDetail(map, readData, { land, lakes, rivers }, updateGeography);
   let active = initial;
   let loaded = false;

@@ -162,25 +162,33 @@ export function fromLinkedPlaces(record, dataset) {
   const feature = record.properties ?? {};
   if (originalId == null) return null;
   const points = record.geometry?.type === 'GeometryCollection' ? record.geometry.geometries : [record.geometry];
-  const point = points.filter(Boolean).find(item => item.type === 'Point' && safePoint(item.coordinates) &&
-    (item.certainty === undefined || item.certainty === 'certain')) ??
-    points.filter(Boolean).find(item => item.type === 'MultiPoint' && item.coordinates?.length === 1 &&
-      safePoint(item.coordinates[0]) && (item.certainty === undefined || item.certainty === 'certain'));
+  const singlePoints = points.filter(item =>
+    item?.type === 'Point' && safePoint(item.coordinates) ||
+    item?.type === 'MultiPoint' && item.coordinates?.length === 1 && safePoint(item.coordinates[0]));
+  const certain = item => item.certainty === undefined || item.certainty === 'certain';
+  const point = singlePoints.find(item => item.type === 'Point' && certain(item)) ??
+    singlePoints.find(certain) ??
+    (dataset.includeUncertainPoints && singlePoints.length === 1 &&
+      singlePoints[0].certainty === 'less-certain' ? singlePoints[0] : undefined);
   const names = (record.names ?? feature.names ?? []).flatMap(entry => {
     const name = { name: entry.toponym, original: entry.toponym, language: entry.lang, sourceDates: entry.when, citations: entry.citations };
     const dates = lpfPeriods(entry.when);
     return dates.length ? dates.map(date => ({ ...name, ...date })) : [name];
   });
-  const whens = point?.when ? [point.when] : record.when ? [record.when] : feature.whens ?? [];
+  const whens = point?.when?.timespans?.length ? [point.when]
+    : record.when?.timespans?.length ? [record.when] : feature.whens ?? [];
   const labels = (record.types ?? feature.types ?? []).map(type => type.label || type.sourceLabel).filter(Boolean);
   const source = /^\/api\/place\/\d+\/$/.test(feature.url) ? 'https://whgazetteer.org' + feature.url : https(feature.url);
+  const details = lpfDetails(record, feature, point, names);
+  const uncertain = point?.certainty === 'less-certain';
+  if (uncertain) details.notes.push('来源将该点位标为较不确定，仅供搜索和定位参照。');
   return { originalId: String(originalId), name: feature.title, coordinates: point?.type === 'MultiPoint'
       ? point.coordinates[0] : point?.coordinates,
     types: labels.length ? labels : dataset.allowUntyped ? ['historical place'] : [],
     url: https(originalId) ?? source ?? dataset.source, names,
-    attestations: dataset.searchOnly ? [] : whens.flatMap(lpfPeriods),
+    attestations: dataset.searchOnly || uncertain ? [] : whens.flatMap(lpfPeriods),
     sourceAttestations: whens,
-    details: lpfDetails(record, feature, point, names),
+    details,
     externalIds: https(originalId) ? [originalId] : [] };
 }
 

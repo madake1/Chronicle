@@ -19,10 +19,16 @@ const allowedLicenses = new Map([
   ['CC BY 3.0', 'https://creativecommons.org/licenses/by/3.0/'],
   ['CC BY 4.0', 'https://creativecommons.org/licenses/by/4.0/'],
   ['CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/'],
+  ['CC BY-NC-SA 4.0', 'https://creativecommons.org/licenses/by-nc-sa/4.0/'],
+  ['CC BY-NC 2.5', 'https://creativecommons.org/licenses/by-nc/2.5/'],
 ]);
+const validLicense = (allowedLicenses.has(dataset.license) &&
+  allowedLicenses.get(dataset.license) === dataset.licenseUrl) ||
+  (dataset.license === 'Public Domain' && dataset.licenseUrl === dataset.licenseSource &&
+    new URL(dataset.licenseUrl).protocol === 'https:');
 if (!/^[a-z][a-z0-9-]{2,48}$/.test(dataset.id ?? '') || !dataset.name?.trim() ||
     new URL(dataset.source).protocol !== 'https:' ||
-    allowedLicenses.get(dataset.license) !== dataset.licenseUrl ||
+    !validLicense ||
     (format === 'lpf' && (dataset.id === 'pleiades-full' || !dataset.version || !dataset.credits || !dataset.licenseSource ||
       new URL(dataset.licenseSource).protocol !== 'https:'))) {
   throw new Error('Dataset metadata requires a source URL and a supported verified license; LPF also needs credits, version and license source.');

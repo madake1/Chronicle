@@ -178,18 +178,31 @@ function riverAnchors(rivers) {
   return anchors.sort((a, b) => a.rank - b.rank);
 }
 
-export function addGeographicLabels(map, rivers, Marker, Popup) {
+export function addGeographicLabels(map, rivers, Marker) {
   let anchors = riverAnchors(rivers);
   let mountains = [];
   const markers = new Map();
   const canvas = map.getCanvas();
   let year;
-  let searchPopup;
   let detailRequest = 0;
   let viewportRequest = 0;
   let historical = [];
   const placesToggle = document.querySelector('#atlas-show-places');
   const placeStatus = document.querySelector('#atlas-place-layer-status');
+  const panel = document.querySelector('#atlas-place-panel');
+  const detailContent = document.querySelector('#atlas-place-content');
+
+  function closePlace() {
+    ++detailRequest;
+    panel.hidden = true;
+    detailContent.replaceChildren();
+  }
+
+  document.querySelector('#atlas-place-close').addEventListener('click', closePlace);
+  panel.addEventListener('dblclick', event => event.stopPropagation());
+  panel.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closePlace();
+  });
 
   async function refreshPlaces() {
     const request = ++viewportRequest;
@@ -207,13 +220,13 @@ export function addGeographicLabels(map, rivers, Marker, Popup) {
   }
 
   async function openPlace(place, selectedYear) {
-    const request = ++detailRequest;
-    searchPopup?.remove();
+    closePlace();
+    const request = detailRequest;
     try {
       const detail = await readPlaceApi('detail', { id: place.id });
       if (request !== detailRequest) return;
-      searchPopup = new Popup({ offset: 14, maxWidth: 'min(23rem, calc(100vw - 2rem))' }).setLngLat(place.coordinates)
-        .setDOMContent(placePopup(placeAt(detail.place, selectedYear), detail.sources)).addTo(map);
+      detailContent.replaceChildren(placePopup(placeAt(detail.place, selectedYear), detail.sources));
+      panel.hidden = false;
     } catch {
       if (request === detailRequest) placeStatus.hidden = false;
     }
@@ -262,6 +275,7 @@ export function addGeographicLabels(map, rivers, Marker, Popup) {
           event.stopPropagation();
           void openPlace(place, year);
         });
+        button.addEventListener('dblclick', event => event.stopPropagation());
         return marker;
       });
     }
@@ -301,8 +315,7 @@ export function addGeographicLabels(map, rivers, Marker, Popup) {
   map.on('moveend', () => { render(); void refreshPlaces(); });
   placesToggle.addEventListener('change', () => {
     if (!placesToggle.checked) {
-      ++detailRequest;
-      searchPopup?.remove();
+      closePlace();
       historical = [];
       placeStatus.hidden = true;
     }
@@ -314,8 +327,7 @@ export function addGeographicLabels(map, rivers, Marker, Popup) {
   }
   function updateYear(selectedYear) {
     if (year === selectedYear) return;
-    ++detailRequest;
-    searchPopup?.remove();
+    closePlace();
     year = selectedYear;
     historical = [];
     placeStatus.hidden = true;
@@ -332,7 +344,7 @@ export function addGeographicLabels(map, rivers, Marker, Popup) {
   };
   updateYear.locate = (place, selectedYear) => {
     map.stop();
-    map.jumpTo({ center: place.coordinates, zoom: Math.max(Math.min(map.getZoom(), 6), place.minZoom, 4.7) });
+    map.jumpTo({ center: place.coordinates });
     void openPlace(place, selectedYear);
   };
   return updateYear;

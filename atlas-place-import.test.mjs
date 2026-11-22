@@ -3,8 +3,25 @@ import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
-import { importPlacePack } from './scripts/import-place-data.mjs';
+import { fromLinkedPlaces, importPlacePack } from './scripts/import-place-data.mjs';
 import { prepareQueryIndex } from './scripts/prepare-places.mjs';
+
+test('WHG 的空点位年代回退到地点年代，较不确定的单点仅供定位', () => {
+  const feature = {
+    id: 'test-whg',
+    properties: { title: 'Test city', whens: [{ timespans: [{ start: { in: '1300' } }] }] },
+    geometry: { type: 'MultiPoint', coordinates: [[23, 38]], when: {} },
+  };
+  const dataset = { source: 'https://example.org/places' };
+  assert.equal(fromLinkedPlaces(feature, dataset).attestations[0].fromYear, 1300);
+
+  feature.geometry.certainty = 'less-certain';
+  assert.equal(fromLinkedPlaces(feature, dataset).coordinates, undefined);
+  const approximate = fromLinkedPlaces(feature, { ...dataset, includeUncertainPoints: true });
+  assert.deepEqual(approximate.coordinates, [23, 38]);
+  assert.deepEqual(approximate.attestations, []);
+  assert.equal(approximate.sourceAttestations.length, 1);
+});
 
 test('Pleiades 与 WHG LPF 共用标准化流程，地名年代不产生地图记录', async () => {
   const dir = await mkdtemp(join(tmpdir(), 'chronicle-gazetteer-'));

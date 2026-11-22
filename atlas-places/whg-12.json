@@ -1,0 +1,10 @@
+{
+  "id": "whg-dataset-12",
+  "name": "WHG · 旧大陆贸易地名",
+  "version": "2025-10-15",
+  "credits": "T. Matthew Ciolek and Karl Grossner",
+  "source": "https://whgazetteer.org/datasets/12/places",
+  "licenseSource": "https://whgazetteer.org/datasets/12/places",
+  "license": "CC BY-NC 2.5",
+  "licenseUrl": "https://creativecommons.org/licenses/by-nc/2.5/"
+}
