@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { describe, formatYear, parseYear, ticks, zoomView } from './public/chronology.mjs';
+import { describe, formatYear, parseYear, ticks, zoomView, constrainView, timelineBounds } from './public/chronology.mjs';
 
 test('缩放改变可见跨度并保留指针下的年份', () => {
   assert.deepEqual(zoomView([-500, 1500], 0.5, 0.75), [250, 1250]);
@@ -13,6 +13,16 @@ test('公元前 1 年与公元 1 年相邻，拒绝公元 0 年', () => {
   assert.equal(parseYear('-431'), parseYear('公元前431'));
   assert.equal(formatYear(0), '公元前 1 年');
   assert.throws(() => parseYear('公元0年'));
+});
+
+test('日常浏览受历史窗口约束，旧作品可延伸窗口', () => {
+  const bounds = [parseYear('公元前3000'), 2100];
+  assert.deepEqual(zoomView([-500, 1550], 100, 0.5), bounds);
+  assert.deepEqual(constrainView([2090, 2110], bounds), [2080, 2100]);
+  const early = parseYear('公元前50000');
+  const extended = timelineBounds([{ start: early }]);
+  assert.deepEqual(extended, [early, 2100]);
+  assert.deepEqual(constrainView([early - 5, early + 5], extended), [early, early + 10]);
 });
 
 test('按视口密度切换刻度', () => {

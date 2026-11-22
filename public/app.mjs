@@ -1,4 +1,4 @@
-import { parseYear, formatYear, ticks, describe, zoomView } from './chronology.mjs';
+import { parseYear, formatYear, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
 
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
@@ -6,6 +6,7 @@ const statuses = ['未开始', '进行中', '已完成', '已放弃'];
 const confidences = ['确定', '推测', '约略'];
 const series = ['--game', '--novel', '--film', '--tv', '--muted'];
 const state = { works: [], page: 'timeline', selected: null, view: [-500, 1550], history: [], ready: false };
+let bounds = timelineBounds();
 const scroll = document.querySelector('.timeline-scroll');
 const form = $('edit-form');
 let editing;
@@ -78,13 +79,13 @@ function finishWheel() {
 function setView(view, record = true) {
   if (record) finishWheel();
   const previous = state.view;
-  state.view = view;
+  state.view = constrainView(view, bounds);
   if (record) remember(previous);
   drawTimeline();
 }
 
 function zoom(factor, fraction, record = true) {
-  setView(zoomView(state.view, factor, fraction), record);
+  setView(zoomView(state.view, factor, fraction, bounds), record);
 }
 
 function select(work) {
@@ -97,7 +98,7 @@ function locate(segment) {
   state.page = 'timeline';
   finishWheel();
   const previous = state.view;
-  state.view = fitRange([segment]);
+  state.view = constrainView(fitRange([segment]), bounds);
   remember(previous);
   render();
   document.querySelector('#rows .selected')?.scrollIntoView({ block: 'nearest' });
@@ -241,6 +242,8 @@ function renderDetails(work) {
 }
 
 function render() {
+  bounds = timelineBounds(state.works.flatMap(work => work.segments));
+  state.view = constrainView(state.view, bounds);
   const timeline = state.page === 'timeline';
   $('timeline').hidden = !timeline;
   $('library').hidden = timeline;
@@ -382,6 +385,9 @@ $('jump').onsubmit = event => {
   event.preventDefault();
   try {
     const center = parseYear(new FormData(event.currentTarget).get('year'));
+    if (center < bounds[0] || center > bounds[1]) {
+      throw new Error(`当前时间轴范围为 ${formatYear(bounds[0])}至${formatYear(bounds[1])}`);
+    }
     const radius = (state.view[1] - state.view[0]) / 2;
     setView([center - radius, center + radius]);
     notify();
@@ -412,8 +418,7 @@ scroll.addEventListener('pointermove', event => {
   const [left, right] = dragging.start;
   const width = right - left;
   const offset = (dragging.x - event.clientX) / dragging.width * width;
-  const nextLeft = Math.max(-115000, Math.min(115000 - width, left + offset));
-  setView([nextLeft, nextLeft + width], false);
+  setView([left + offset, right + offset], false);
 });
 scroll.addEventListener('lostpointercapture', event => {
   if (dragging?.id !== event.pointerId) return;

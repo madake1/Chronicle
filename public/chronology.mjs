@@ -12,12 +12,28 @@ export function formatYear(year) {
   return year < 1 ? `公元前 ${1 - year} 年` : `${year} 年`;
 }
 
-export function zoomView([left, right], factor, fraction) {
-  const span = right - left;
-  const width = Math.min(230000, Math.max(2, span * factor));
-  const anchor = left + span * fraction;
-  const nextLeft = Math.max(-115000, Math.min(115000 - width, anchor - width * fraction));
+export function timelineBounds(segments = []) {
+  let left = parseYear('公元前3000');
+  let right = 2100;
+  for (const { start, end = start } of segments) {
+    if (start < left) left = start;
+    if (end > right) right = end;
+  }
+  return [left, right];
+}
+
+export function constrainView([left, right], [minimum, maximum]) {
+  const width = Math.min(maximum - minimum, right - left);
+  const nextLeft = Math.max(minimum, Math.min(maximum - width, left));
   return [nextLeft, nextLeft + width];
+}
+
+export function zoomView([left, right], factor, fraction, bounds = timelineBounds()) {
+  const span = right - left;
+  const width = Math.min(bounds[1] - bounds[0], Math.max(2, span * factor));
+  const anchor = left + span * fraction;
+  const nextLeft = anchor - width * fraction;
+  return constrainView([nextLeft, nextLeft + width], bounds);
 }
 
 export function ticks(left, right, width) {
