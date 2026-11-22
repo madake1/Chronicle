@@ -5,6 +5,7 @@ import { atomicWrite } from '../note-storage.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
 import { buildEncyclopedia } from './atlas-encyclopedia.mjs';
 import { buildAtlasChronology } from './atlas-chronology.mjs';
+import { prepareRivers } from './atlas-rivers.mjs';
 
 const output = new URL('../atlas-data/', import.meta.url);
 const raw = new URL('raw/', output);
@@ -33,10 +34,11 @@ function collection(features) {
   return { type: 'FeatureCollection', features };
 }
 
-const [archive, land, lakes] = await Promise.all([
+const [archive, land, lakes, rivers] = await Promise.all([
   sourceFile('cliopatria-v0.2.1.zip', atlasSources.cliopatria.download),
   sourceFile('natural-earth-v5.1.2-land.geojson', atlasSources.naturalEarth.downloads.land),
   sourceFile('natural-earth-v5.1.2-lakes.geojson', atlasSources.naturalEarth.downloads.lakes),
+  sourceFile('natural-earth-v5.1.2-rivers.geojson', atlasSources.naturalEarth.downloads.rivers),
 ]);
 const unpacked = unzipSync(archive);
 const geojson = unpacked['cliopatria_polities_only_v021.geojson'];
@@ -68,6 +70,7 @@ for (const [name, bytes] of Object.entries({ land, lakes })) {
   }))));
 }
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+await save('rivers.geojson', prepareRivers(JSON.parse(rivers)));
 const encyclopediaFile = new URL('../atlas-encyclopedia.json', import.meta.url);
 if (process.argv.includes('--refresh-encyclopedia')) {
   console.log('Resolving Wikipedia and Wikidata links…');
@@ -85,5 +88,6 @@ await save('manifest.json', {
   slices,
   sources: atlasSources,
   chronology,
-  sha256: { cliopatriaArchive: digest(archive), naturalEarthLand: digest(land), naturalEarthLakes: digest(lakes) },
+  sha256: { cliopatriaArchive: digest(archive), naturalEarthLand: digest(land),
+    naturalEarthLakes: digest(lakes), naturalEarthRivers: digest(rivers) },
 });

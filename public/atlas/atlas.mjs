@@ -1,7 +1,8 @@
-import { Map, NavigationControl, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
+import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
 import { formatYear, parseYear } from '../chronology.mjs';
 import { createAtlasData, createPolitySearch, polityNameOverrides } from './data.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
+import { addGeographicLabels } from './geography.mjs';
 
 const status = document.querySelector('#atlas-status');
 const years = document.querySelector('#atlas-years');
@@ -152,10 +153,20 @@ function renderSources(items) {
 }
 
 async function initialize() {
-  const [manifest, chronology, land, lakes] = await Promise.all([
+  const [manifest, chronology, land, lakes, rivers, places] = await Promise.all([
     readData('manifest.json'), readData('chronology.json'), readData('land.geojson'), readData('lakes.geojson'),
+    readData('rivers.geojson'),
+    fetch('/atlas/northern-song-places.json').then(response => {
+      if (!response.ok) throw new Error('北宋地点数据无法加载');
+      return response.json();
+    }),
   ]);
-  renderSources(manifest.sources);
+  renderSources({ ...manifest.sources, places: {
+    name: '北宋历史地点（近似点位）', version: `v${places.version}`, source: '/atlas/northern-song-places.json',
+    license: places.license, licenseUrl: places.licenseUrl,
+  } });
+  const riverPaint = { 'line-color': '#438498', 'line-opacity': 0.72,
+    'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.65, 6, 1.25] };
   const data = createAtlasData(chronology, readData);
   const initial = sourceYearToAxis(manifest.slices[0].year);
   let activeFrame = data.frame(initial);
@@ -176,12 +187,16 @@ async function initialize() {
       sources: {
         land: { type: 'geojson', data: land },
         lakes: { type: 'geojson', data: lakes },
+        rivers: { type: 'geojson', data: rivers },
         polities: { type: 'geojson', data: activeData },
       },
       layers: [
         { id: 'ocean', type: 'background', paint: { 'background-color': ocean } },
         { id: 'land', type: 'fill', source: 'land', paint: { 'fill-color': '#f6f2e5' } },
         { id: 'polity-fill', type: 'fill', source: 'polities', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.79 } },
+        { id: 'major-rivers', type: 'line', source: 'rivers', minzoom: 2, maxzoom: 4,
+          filter: ['<=', ['get', 'rank'], 3], paint: riverPaint },
+        { id: 'detail-rivers', type: 'line', source: 'rivers', minzoom: 4, paint: riverPaint },
         { id: 'polity-line', type: 'line', source: 'polities', paint: { 'line-color': '#755236', 'line-width': 0.8 } },
         { id: 'polity-highlight', type: 'line', source: 'polities',
           filter: ['==', ['get', 'visual'], ''],
@@ -191,6 +206,7 @@ async function initialize() {
     },
   });
   map.addControl(new NavigationControl({ showCompass: false }));
+  const updateGeography = addGeographicLabels(map, rivers, places, Marker, Popup);
   let active = initial;
   let loaded = false;
   let requested = initial;
@@ -268,6 +284,7 @@ async function initialize() {
     document.querySelector('#atlas-polity-input').disabled = false;
     syncControls(active);
     showStatus();
+    updateGeography(active);
     prefetch();
   });
 
@@ -345,6 +362,7 @@ async function initialize() {
           }
           active = year;
           activeFrame = target;
+          updateGeography(active);
           if (sourceIndex !== undefined && request === requestNumber) focusRecord(sourceIndex);
           else clearPolity();
           showStatus();

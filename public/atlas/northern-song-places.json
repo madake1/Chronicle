@@ -1,0 +1,60 @@
+{
+  "version": "1.0",
+  "license": "CC0-1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "sources": {
+    "four-capitals": {
+      "title": "北宋四京防御空间研究（2026）",
+      "url": "https://doi.org/10.1080/13467581.2026.2664275"
+    },
+    "met-chronology": {
+      "title": "大都会艺术博物馆：中国 1000–1400 年年表",
+      "url": "https://www.metmuseum.org/zh/toah/ht/07/eac"
+    },
+    "daiming-survey": {
+      "title": "河北省文物考古研究院：大名府故城遗址考古勘探",
+      "url": "https://www.hbswwkg.com/2022-03/14/content_8742436.html"
+    }
+  },
+  "places": [
+    {
+      "id": "song-kaifeng",
+      "name": "汴京（开封）",
+      "type": "历史城市",
+      "coordinates": [114.34, 34.79],
+      "minZoom": 3.7,
+      "fromYear": 960,
+      "toYear": 1127,
+      "sourceIds": ["four-capitals", "met-chronology"],
+      "roles": [
+        { "label": "北宋首都 · 东京", "fromYear": 960, "toYear": 1126, "sourceId": "met-chronology" }
+      ]
+    },
+    {
+      "id": "song-luoyang",
+      "name": "洛阳",
+      "type": "历史城市",
+      "coordinates": [112.46, 34.68],
+      "minZoom": 4.5,
+      "fromYear": 960,
+      "toYear": 1126,
+      "sourceIds": ["four-capitals"],
+      "roles": [
+        { "label": "北宋陪都 · 西京", "fromYear": 960, "toYear": 1126, "sourceId": "four-capitals" }
+      ]
+    },
+    {
+      "id": "song-daming",
+      "name": "大名府",
+      "type": "历史城市",
+      "coordinates": [115.21, 36.31],
+      "minZoom": 4.5,
+      "fromYear": 960,
+      "toYear": 1126,
+      "sourceIds": ["daiming-survey", "four-capitals"],
+      "roles": [
+        { "label": "北宋陪都 · 北京", "fromYear": 1042, "toYear": 1126, "sourceId": "four-capitals" }
+      ]
+    }
+  ]
+}

@@ -17,14 +17,15 @@ export const atlasSources = {
   },
   naturalEarth: {
     name: 'Natural Earth',
-    version: 'v5.1.2 · 1:110m',
+    version: 'v5.1.2 · 陆地和湖泊 1:110m · 河流 1:50m',
     source: `${naturalEarth}/tree/v5.1.2`,
     license: 'Public domain',
     licenseUrl: 'https://www.naturalearthdata.com/about/terms-of-use/',
     downloads: {
       land: `${naturalEarthRaw}ne_110m_land.geojson`,
       lakes: `${naturalEarthRaw}ne_110m_lakes.geojson`,
+      rivers: `${naturalEarthRaw}ne_50m_rivers_lake_centerlines.geojson`,
     },
-    changes: 'Selected physical land and lake layers only; geometry preserved.',
+    changes: 'Selected land, lakes and named river lines; geometry preserved.',
   },
 };
