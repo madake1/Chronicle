@@ -5,6 +5,7 @@ import { atomicWrite } from '../note-storage.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
 import { buildEncyclopedia } from './atlas-encyclopedia.mjs';
 import { buildAtlasChronology } from './atlas-chronology.mjs';
+import { prepareGeography } from './prepare-geography.mjs';
 import { prepareRivers } from './atlas-rivers.mjs';
 
 const output = new URL('../atlas-data/', import.meta.url);
@@ -71,6 +72,7 @@ for (const [name, bytes] of Object.entries({ land, lakes })) {
 }
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 await save('rivers.geojson', prepareRivers(JSON.parse(rivers)));
+const geography = await prepareGeography(sourceFile, save, atlasSources.naturalEarth.detailBase, digest);
 const encyclopediaFile = new URL('../atlas-encyclopedia.json', import.meta.url);
 if (process.argv.includes('--refresh-encyclopedia')) {
   console.log('Resolving Wikipedia and Wikidata links…');
@@ -89,6 +91,7 @@ await save('manifest.json', {
   slices,
   sources: atlasSources,
   chronology,
+  geography,
   sha256: { cliopatriaArchive: digest(archive), naturalEarthLand: digest(land),
     naturalEarthLakes: digest(lakes), naturalEarthRivers: digest(rivers) },
 });

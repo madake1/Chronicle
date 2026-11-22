@@ -26,7 +26,7 @@ for (const name of ['maplibre-gl.mjs', 'maplibre-gl-worker.mjs', 'maplibre-gl-sh
   assets.set(`/atlas/vendor/${name}`, [`../node_modules/maplibre-gl/dist/${name}`,
     name.endsWith('.css') ? 'text/css' : 'text/javascript']);
 }
-for (const name of ['manifest.json', 'chronology.json', 'land.geojson', 'lakes.geojson', 'rivers.geojson', ...atlasYears.map(year => `year-${year}.geojson`)]) {
+for (const name of ['manifest.json', 'chronology.json', 'land.geojson', 'lakes.geojson', 'rivers.geojson', 'geography-50.json', 'geography-10.json', 'mountains.json', ...atlasYears.map(year => `year-${year}.geojson`)]) {
   assets.set(`/atlas/data/${name}`, [`../atlas-data/${name}`, 'application/json']);
 }
 let pendingWrite = Promise.resolve();

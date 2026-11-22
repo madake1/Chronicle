@@ -132,3 +132,5 @@
 .atlas-place-popup p { margin-top: .2rem; }
 .atlas-place-popup ul { margin: .3rem 0 0; padding-left: 1.2rem; }
 .atlas-place-popup a { color: #245743; }
+
+.atlas-mountain-label { color: #674d3b; letter-spacing: 0.08em; }

@@ -1,5 +1,6 @@
 const names = new Map([
   ['Yangtze', '长江'], ['Jinsha', '金沙江'], ['Yellow', '黄河'], ['Huang', '黄河'],
+  ['Rhine', '莱茵河'], ['Rhein', '莱茵河'], ['Nile', '尼罗河'], ['Danube', '多瑙河'], ['Chang Jiang', '长江'], ['Huang He', '黄河'],
   ['Mekong', '湄公河'], ['Hongshui', '红水河'], ['Han', '汉江'], ['Dadu', '大渡河'],
 ]);
 

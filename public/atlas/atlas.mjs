@@ -2,7 +2,7 @@ import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vend
 import { formatYear, parseYear } from '../chronology.mjs';
 import { createAtlasData, createPolitySearch, recordAtYear } from './data.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
-import { addGeographicLabels } from './geography.mjs';
+import { addGeographicLabels, addGeographicDetail } from './geography.mjs';
 
 const status = document.querySelector('#atlas-status');
 const years = document.querySelector('#atlas-years');
@@ -206,6 +206,7 @@ async function initialize() {
   });
   map.addControl(new NavigationControl({ showCompass: false }));
   const updateGeography = addGeographicLabels(map, rivers, places, Marker, Popup);
+  if (manifest.geography) addGeographicDetail(map, readData, { land, lakes, rivers }, updateGeography);
   let active = initial;
   let loaded = false;
   let requested = initial;

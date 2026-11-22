@@ -61,7 +61,8 @@ function riverAnchors(rivers) {
 }
 
 export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
-  const anchors = riverAnchors(rivers);
+  let anchors = riverAnchors(rivers);
+  let mountains = [];
   const markers = new Map();
   const canvas = map.getCanvas();
   let year;
@@ -109,6 +110,16 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
       });
     }
 
+    for (const { name, position, minZoom } of mountains) {
+      if (zoom < minZoom || !reserve(position, name)) continue;
+      add(`mountain:${name}`, position, () => {
+        const label = document.createElement('span');
+        label.className = 'atlas-river-label atlas-mountain-label';
+        label.textContent = name;
+        label.setAttribute('aria-hidden', 'true');
+        return new Marker({ element: label, anchor: 'left' });
+      });
+    }
     const seen = new Set();
     for (const river of anchors) {
       if (seen.size === 14) break;
@@ -132,9 +143,62 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
   }
 
   map.on('moveend', render);
-  return selectedYear => {
+  function updateYear(selectedYear) {
     if (year === selectedYear) return;
     year = selectedYear;
     render();
+  }
+  updateYear.updatePhysical = (riverData, mountainData) => {
+    anchors = riverAnchors(riverData);
+    mountains = mountainData;
+    render();
   };
+  return updateYear;
+}
+
+export function geographyScale(zoom) {
+  return zoom >= 4.5 ? 10 : zoom >= 2.5 ? 50 : 110;
+}
+
+export function addGeographicDetail(map, readData, initial, labels) {
+  const cache = new Map([[110, Promise.resolve(initial)]]);
+  let applied = 110;
+  let request = 0;
+  let mountainRequest;
+
+  async function update() {
+    const scale = geographyScale(map.getZoom());
+    const current = ++request;
+    if (!cache.has(scale)) {
+      cache.set(scale, readData(`geography-${scale}.json`).catch(error => {
+        cache.delete(scale);
+        throw error;
+      }));
+    }
+    if (scale !== 110 && !mountainRequest) {
+      mountainRequest = readData('mountains.json').catch(error => {
+        mountainRequest = undefined;
+        console.warn('山脉参考图层加载失败', error);
+        return null;
+      });
+    }
+    try {
+      const [layers, mountains] = await Promise.all([cache.get(scale), mountainRequest]);
+      if (current !== request) return;
+      if (scale !== applied) {
+        for (const name of ['land', 'lakes', 'rivers']) map.getSource(name).setData(layers[name]);
+        applied = scale;
+      }
+      if (mountains && !map.getSource('mountains')) {
+        map.addSource('mountains', { type: 'geojson', data: mountains.areas });
+        map.addLayer({ id: 'mountains', type: 'fill', source: 'mountains', minzoom: 3,
+          paint: { 'fill-color': '#8a785b', 'fill-opacity': 0.20 } }, 'major-rivers');
+      }
+      labels.updatePhysical(layers.rivers, mountains?.labels ?? []);
+    } catch (error) {
+      console.warn('自然地理参考图层加载失败', error);
+    }
+  }
+  map.on('load', update);
+  map.on('zoomend', update);
 }

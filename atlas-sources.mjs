@@ -17,7 +17,7 @@ export const atlasSources = {
   },
   naturalEarth: {
     name: 'Natural Earth',
-    version: 'v5.1.2 · 陆地和湖泊 1:110m · 河流 1:50m',
+    version: 'v5.1.2 · 1:110m / 1:50m / 1:10m · 自然地理',
     source: `${naturalEarth}/tree/v5.1.2`,
     license: 'Public domain',
     licenseUrl: 'https://www.naturalearthdata.com/about/terms-of-use/',
@@ -26,6 +26,7 @@ export const atlasSources = {
       lakes: `${naturalEarthRaw}ne_110m_lakes.geojson`,
       rivers: `${naturalEarthRaw}ne_50m_rivers_lake_centerlines.geojson`,
     },
-    changes: 'Selected land, lakes and named river lines; geometry preserved.',
+    detailBase: naturalEarthRaw,
+    changes: 'Selected physical layers; coordinates rounded to four decimal places.',
   },
 };
