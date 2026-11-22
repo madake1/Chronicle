@@ -17,7 +17,7 @@
 .atlas-controls { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem; }
 .atlas-controls button { padding: .25rem .55rem; font-size: .85rem; }
 #atlas-jump input { width: 11rem; max-width: 100%; }
-#atlas-polity-search input { width: 13rem; max-width: 100%; }
+#atlas-polity-search input, #atlas-place-search input { width: 13rem; max-width: 100%; }
 .atlas-search-results { border: 1px solid var(--line); border-radius: 7px; padding: .4rem; }
 .atlas-search-results ul { list-style: none; padding: 0; margin: 0; max-height: 13rem; overflow: auto; }
 .atlas-search-results li + li { margin-top: .25rem; }
@@ -142,3 +142,6 @@
 .atlas-source-controls label, .atlas-layers label { display: inline-flex; align-items: center; gap: 0.35rem; }
 .atlas-source-controls p { flex-basis: 100%; margin: 0; }
 .atlas-layers { border: 0; margin: 0; padding: 0; }
+
+.atlas-place-popup { max-height: min(17rem, 50vh); overflow: auto; }
+.atlas-search-results summary { cursor: pointer; }

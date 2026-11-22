@@ -20,7 +20,7 @@
         23.724,
         37.9716
       ],
-      "minZoom": 2,
+      "minZoom": 0,
       "coverage": [
         {
           "fromYear": -550,
@@ -54,7 +54,7 @@
         12.4917,
         41.8899
       ],
-      "minZoom": 2,
+      "minZoom": 0,
       "coverage": [
         {
           "fromYear": -750,

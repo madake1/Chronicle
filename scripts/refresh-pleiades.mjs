@@ -1,8 +1,8 @@
 import { atomicWrite } from '../note-storage.mjs';
 
 const selected = [
-  { id: '579885', name: '雅典', types: '城邦', aliases: ['Athens', 'Athenai'], original: 'Ἀθῆναι', minZoom: 2 },
-  { id: '423025', name: '罗马', types: '历史城市', aliases: ['Rome'], original: 'Roma', minZoom: 2 },
+  { id: '579885', name: '雅典', types: '城邦', aliases: ['Athens', 'Athenai'], original: 'Ἀθῆναι', minZoom: 0 },
+  { id: '423025', name: '罗马', types: '历史城市', aliases: ['Rome'], original: 'Roma', minZoom: 0 },
   { id: '570182', name: '科林斯', types: '城邦', aliases: ['Corinth', 'Korinthos'], original: 'Κόρινθος', minZoom: 4 },
   { id: '462503', name: '叙拉古', types: '城邦', aliases: ['Syracuse', 'Syracusae'], original: 'Συράκουσαι', minZoom: 3.5 },
 ];

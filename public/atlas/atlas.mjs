@@ -1,6 +1,7 @@
 import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
 import { formatYear, parseYear } from '../chronology.mjs';
 import { createAtlasData, createPolitySearch, recordAtYear } from './data.mjs';
+import { bindPlaceSearch } from './places.mjs';
 import { bindMapSources } from './comparison.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
 import { addGeographicLabels, addGeographicDetail } from './geography.mjs';
@@ -155,14 +156,18 @@ async function initialize() {
   const [manifest, chronology, land, lakes, rivers, places] = await Promise.all([
     readData('manifest.json'), readData('chronology.json'), readData('land.geojson'), readData('lakes.geojson'),
     readData('rivers.geojson'),
-    fetch('/atlas/northern-song-places.json').then(response => {
-      if (!response.ok) throw new Error('北宋地点数据无法加载');
-      return response.json();
+    fetch('/atlas/data/places.json').then(async response => {
+      if (response.ok) return response.json();
+      if (response.status !== 404) throw new Error('历史地点数据无法加载');
+      const legacy = await fetch('/atlas/northern-song-places.json');
+      if (!legacy.ok) throw new Error('北宋地点数据无法加载');
+      return legacy.json();
     }),
   ]);
   if (!chronology.names) throw new Error('政权名称索引需要更新，请运行 npm run atlas:prepare');
-  renderSources({ ...manifest.sources, places: {
-    name: '北宋历史地点（近似点位）', version: `v${places.version}`, source: '/atlas/northern-song-places.json',
+  renderSources({ ...manifest.sources, ...Object.fromEntries((places.datasets ?? []).map((source, index) =>
+    [`place-dataset-${index}`, source])), places: {
+    name: '北宋历史地点（近似点位）', version: 'v1.1', source: '/atlas/northern-song-places.json',
     license: places.license, licenseUrl: places.licenseUrl,
   } });
   const riverPaint = { 'line-color': '#438498', 'line-opacity': 0.72,
@@ -225,6 +230,7 @@ async function initialize() {
   let drawing = false;
 
   let mapSources;
+  let refreshPlaceSearch;
 
   function showStatus(error) {
     document.querySelector('#atlas-map-source').disabled = !loaded || requested !== active;
@@ -293,6 +299,20 @@ async function initialize() {
     slider.disabled = yearInput.disabled = document.querySelector('#atlas-jump-submit').disabled = false;
     document.querySelector('#atlas-polity-input').disabled = false;
     mapSources = bindMapSources(map, readData, () => active, clearPolity, updateGeography, palette);
+    refreshPlaceSearch = bindPlaceSearch([...places.places, ...(places.referencePlaces ?? [])], () => active,
+      async (place, year) => {
+        const expected = requestNumber + Number(year !== undefined);
+        if (year !== undefined) await selectYear(year);
+        const reference = document.querySelector('#atlas-reference-places');
+        const placesToggle = document.querySelector('#atlas-show-places');
+        if (requestNumber !== expected || mapSources.comparing() || (year !== undefined && active !== year)) return;
+        const toggle = year === undefined ? reference : placesToggle;
+        if (!toggle.checked) {
+          toggle.checked = true;
+          toggle.dispatchEvent(new Event('change'));
+        }
+        updateGeography.locate(place, year);
+      });
     syncControls(active);
     showStatus();
     updateGeography(active);
@@ -411,6 +431,7 @@ async function initialize() {
           activeFrame = target;
           if (!searchResults.hidden) showMatches();
           mapSources.updateYear();
+          refreshPlaceSearch();
           if (sourceIndex !== undefined && request === requestNumber) focusRecord(sourceIndex);
           else clearPolity();
           showStatus();
@@ -426,7 +447,7 @@ async function initialize() {
       }
     }
     if (delay) changeTimer = setTimeout(apply, delay);
-    else void apply();
+    else return apply();
   }
 
   slider.addEventListener('input', () => selectYear(Number(slider.value), undefined, 70));
