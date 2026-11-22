@@ -22,6 +22,17 @@
       <div><h1>历史时空</h1><p class="meta">根据所选年份显示当时适用的疆界记录。</p></div>
     </div>
     <section class="panel atlas-panel" aria-label="历史世界地图">
+      <div class="atlas-source-controls">
+        <label>地图资料来源
+          <select id="atlas-map-source" disabled>
+            <option value="cliopatria">Cliopatria · 任意年份</option>
+            <option value="comparison">Historical Basemaps · 对照快照</option>
+          </select>
+        </label>
+        <label id="atlas-snapshot-control" hidden>对照快照 <select id="atlas-snapshot"></select></label>
+        <p id="atlas-comparison-status" role="status" hidden></p>
+        <a id="atlas-snapshot-source" hidden target="_blank" rel="noopener noreferrer">查看快照出处</a>
+      </div>
       <div class="atlas-toolbar">
         <div class="atlas-time">
           <label for="atlas-year">地图年代</label>
@@ -73,7 +84,14 @@
         </section>
       </div>
       <footer class="atlas-footer">
-        <span><i aria-hidden="true"></i> Cliopatria 收录的历史疆界</span>
+        <span id="atlas-border-legend"><i aria-hidden="true"></i> Cliopatria 收录的历史疆界</span>
+        <fieldset class="atlas-layers">
+          <legend>图层</legend>
+          <label><input id="atlas-show-borders" type="checkbox" checked> 历史疆界</label>
+          <label><input id="atlas-show-rivers" type="checkbox" checked> 河流</label>
+          <label><input id="atlas-show-terrain" type="checkbox" checked> 山地</label>
+          <label><input id="atlas-show-places" type="checkbox" checked> 历史地点</label>
+        </fieldset>
         <span>海岸线、湖泊、河流和山脉名称为现代地理参考。</span>
         <label hidden><input id="atlas-reference-places" type="checkbox"> 参考地点（年代待考）</label>
         <span>红色标记为选定年份的北宋都城或陪都。</span>
@@ -84,6 +102,10 @@
       <summary>地图数据来源</summary>
       <ul id="atlas-sources"></ul>
       <p id="atlas-source-record" hidden></p>
+      <p id="atlas-comparison-attribution" hidden>
+        <a href="https://github.com/aourednik/historical-basemaps/tree/4b5039e50d8d2464b065bd76ad6086cd4597108d">Historical Basemaps · 4b5039e</a> ·
+        <a href="/atlas/data/historical-basemaps-LICENSE.txt">上游 GPL-3.0 许可证</a>
+      </p>
     </details>
   </main>
 </body>

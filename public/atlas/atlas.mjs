@@ -1,6 +1,7 @@
 import { Map, Marker, NavigationControl, Popup, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
 import { formatYear, parseYear } from '../chronology.mjs';
 import { createAtlasData, createPolitySearch, recordAtYear } from './data.mjs';
+import { bindMapSources } from './comparison.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
 import { addGeographicLabels, addGeographicDetail } from './geography.mjs';
 
@@ -188,14 +189,19 @@ async function initialize() {
         lakes: { type: 'geojson', data: lakes },
         rivers: { type: 'geojson', data: rivers },
         polities: { type: 'geojson', data: activeData },
+        comparison: { type: 'geojson', data: { type: 'FeatureCollection', features: [] } },
       },
       layers: [
         { id: 'ocean', type: 'background', paint: { 'background-color': ocean } },
         { id: 'land', type: 'fill', source: 'land', paint: { 'fill-color': '#f6f2e5' } },
         { id: 'polity-fill', type: 'fill', source: 'polities', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.79 } },
+        { id: 'comparison-fill', type: 'fill', source: 'comparison', layout: { visibility: 'none' },
+          paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.66 } },
         { id: 'major-rivers', type: 'line', source: 'rivers', minzoom: 2, maxzoom: 4,
           filter: ['<=', ['get', 'rank'], 3], paint: riverPaint },
         { id: 'detail-rivers', type: 'line', source: 'rivers', minzoom: 4, paint: riverPaint },
+        { id: 'comparison-line', type: 'line', source: 'comparison', layout: { visibility: 'none' },
+          paint: { 'line-color': '#675342', 'line-width': 0.8 } },
         { id: 'polity-line', type: 'line', source: 'polities', paint: { 'line-color': '#755236', 'line-width': 0.8 } },
         { id: 'polity-highlight', type: 'line', source: 'polities',
           filter: ['==', ['get', 'visual'], ''],
@@ -218,7 +224,10 @@ async function initialize() {
   let rendering = Promise.resolve();
   let drawing = false;
 
+  let mapSources;
+
   function showStatus(error) {
+    document.querySelector('#atlas-map-source').disabled = !loaded || requested !== active;
     const missing = activeFrame.byRecord.size ? '' : ' · 该年无疆界资料';
     const current = `当前地图 · ${formatYear(active)}${missing}`;
     status.textContent = error ? `${current}；切换失败：${error.message}` :
@@ -283,6 +292,7 @@ async function initialize() {
     loaded = true;
     slider.disabled = yearInput.disabled = document.querySelector('#atlas-jump-submit').disabled = false;
     document.querySelector('#atlas-polity-input').disabled = false;
+    mapSources = bindMapSources(map, readData, () => active, clearPolity, updateGeography, palette);
     syncControls(active);
     showStatus();
     updateGeography(active);
@@ -400,7 +410,7 @@ async function initialize() {
           active = year;
           activeFrame = target;
           if (!searchResults.hidden) showMatches();
-          updateGeography(active);
+          mapSources.updateYear();
           if (sourceIndex !== undefined && request === requestNumber) focusRecord(sourceIndex);
           else clearPolity();
           showStatus();
@@ -441,7 +451,7 @@ async function initialize() {
   map.on('mouseenter', 'polity-fill', () => { map.getCanvas().style.cursor = 'pointer'; });
   map.on('mouseleave', 'polity-fill', () => { map.getCanvas().style.cursor = ''; });
   map.on('click', 'polity-fill', event => {
-    if (!drawing && event.features?.length) {
+    if (!drawing && !mapSources?.comparing() && event.features?.length) {
       const item = activeFrame.byVisual.get(event.features[0].properties.visual);
       if (item) selectPolity(item);
     }

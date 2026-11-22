@@ -18,6 +18,8 @@ const assets = new Map([
   ['/atlas/atlas.mjs', ['atlas/atlas.mjs', 'text/javascript']],
   ['/atlas/years.mjs', ['atlas/years.mjs', 'text/javascript']],
   ['/atlas/data.mjs', ['atlas/data.mjs', 'text/javascript']],
+  ['/atlas/comparison.mjs', ['atlas/comparison.mjs', 'text/javascript']],
+  ['/atlas/data/historical-basemaps-LICENSE.txt', ['../atlas-data/historical-basemaps-LICENSE.txt', 'text/plain']],
   ['/atlas/geography.mjs', ['atlas/geography.mjs', 'text/javascript']],
   ['/atlas/northern-song-places.json', ['atlas/northern-song-places.json', 'application/json']],
   ['/atlas/atlas.css', ['atlas/atlas.css', 'text/css']],
@@ -26,7 +28,8 @@ for (const name of ['maplibre-gl.mjs', 'maplibre-gl-worker.mjs', 'maplibre-gl-sh
   assets.set(`/atlas/vendor/${name}`, [`../node_modules/maplibre-gl/dist/${name}`,
     name.endsWith('.css') ? 'text/css' : 'text/javascript']);
 }
-for (const name of ['manifest.json', 'chronology.json', 'land.geojson', 'lakes.geojson', 'rivers.geojson', 'geography-50.json', 'geography-10.json', 'mountains.json', ...atlasYears.map(year => `year-${year}.geojson`)]) {
+for (const name of ['manifest.json', 'chronology.json', 'land.geojson', 'lakes.geojson', 'rivers.geojson', 'geography-50.json', 'geography-10.json', 'mountains.json', 'comparison.json', 'comparison--2000.geojson',
+  'comparison--500.geojson', 'comparison-1200.geojson', ...atlasYears.map(year => `year-${year}.geojson`)]) {
   assets.set(`/atlas/data/${name}`, [`../atlas-data/${name}`, 'application/json']);
 }
 let pendingWrite = Promise.resolve();

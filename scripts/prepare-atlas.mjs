@@ -35,6 +35,26 @@ function collection(features) {
   return { type: 'FeatureCollection', features };
 }
 
+if (process.argv.includes('--with-comparison')) {
+  const revision = '4b5039e50d8d2464b065bd76ad6086cd4597108d';
+  const source = `https://github.com/aourednik/historical-basemaps/tree/${revision}`;
+  const download = `https://raw.githubusercontent.com/aourednik/historical-basemaps/${revision}`;
+  const license = await sourceFile('historical-basemaps-LICENSE.txt', `${download}/LICENSE`);
+  if (!license.includes('GNU GENERAL PUBLIC LICENSE')) throw new Error('Historical Basemaps license is missing');
+  await atomicWrite(new URL('historical-basemaps-LICENSE.txt', output), license);
+  const snapshots = [];
+  for (const [year, upstream] of [[-2000, 'world_bc2000'], [-500, 'world_bc500'], [1200, 'world_1200']]) {
+    const bytes = await sourceFile(`${revision}-${upstream}.geojson`, `${download}/geojson/${upstream}.geojson`);
+    const data = JSON.parse(bytes);
+    if (data.type !== 'FeatureCollection' || !data.features?.length) throw new Error(`Invalid snapshot ${upstream}`);
+    const file = `comparison-${year}.geojson`;
+    await atomicWrite(new URL(file, output), bytes);
+    snapshots.push({ year, file, source: `${source.replace('/tree/', '/blob/')}/geojson/${upstream}.geojson`,
+      sha256: createHash('sha256').update(bytes).digest('hex') });
+  }
+  await save('comparison.json', { source, revision, snapshots });
+}
+
 const [archive, land, lakes, rivers] = await Promise.all([
   sourceFile('cliopatria-v0.2.1.zip', atlasSources.cliopatria.download),
   sourceFile('natural-earth-v5.1.2-land.geojson', atlasSources.naturalEarth.downloads.land),

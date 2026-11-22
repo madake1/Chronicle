@@ -110,7 +110,8 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
       if (!markers.has(key)) markers.set(key, makeMarker().setLngLat(position).addTo(map));
     }
 
-    const historical = placesAt(atlasPlaces.places, year, zoom);
+    const historical = document.querySelector('#atlas-show-places').checked
+      ? placesAt(atlasPlaces.places, year, zoom) : [];
     const reference = document.querySelector('#atlas-reference-places')?.checked
       ? (atlasPlaces.referencePlaces ?? []).filter(place => zoom >= place.minZoom).map(place => ({ place }))
       : [];
@@ -134,7 +135,7 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
       });
     }
 
-    for (const { name, position, minZoom } of mountains) {
+    for (const { name, position, minZoom } of document.querySelector('#atlas-show-terrain').checked ? mountains : []) {
       if (zoom < minZoom || !reserve(position, name)) continue;
       add(`mountain:${name}`, position, () => {
         const label = document.createElement('span');
@@ -145,7 +146,7 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
       });
     }
     const seen = new Set();
-    for (const river of anchors) {
+    for (const river of document.querySelector('#atlas-show-rivers').checked ? anchors : []) {
       if (seen.size === 14) break;
       if (zoom < river.labelZoom || seen.has(river.name) || !reserve(river.position, river.name)) continue;
       seen.add(river.name);
@@ -170,6 +171,9 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
   const referenceToggle = document.querySelector('#atlas-reference-places');
   referenceToggle.closest('label').hidden = !atlasPlaces.referencePlaces?.length;
   referenceToggle.addEventListener('change', render);
+  for (const id of ['atlas-show-places', 'atlas-show-rivers', 'atlas-show-terrain']) {
+    document.getElementById(id).addEventListener('change', render);
+  }
   function updateYear(selectedYear) {
     if (year === selectedYear) return;
     year = selectedYear;
@@ -219,6 +223,7 @@ export function addGeographicDetail(map, readData, initial, labels) {
       if (mountains && !map.getSource('mountains')) {
         map.addSource('mountains', { type: 'geojson', data: mountains.areas });
         map.addLayer({ id: 'mountains', type: 'fill', source: 'mountains', minzoom: 3,
+          layout: { visibility: document.querySelector('#atlas-show-terrain').checked ? 'visible' : 'none' },
           paint: { 'fill-color': '#8a785b', 'fill-opacity': 0.20 } }, 'major-rivers');
       }
       labels.updatePhysical(layers.rivers, mountains?.labels ?? []);

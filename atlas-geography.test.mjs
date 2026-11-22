@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { matchingSnapshot } from './public/atlas/comparison.mjs';
 import { placesAt } from './public/atlas/geography.mjs';
 import { prepareRivers } from './scripts/atlas-rivers.mjs';
 
@@ -33,4 +34,12 @@ test('自然地理只导入选定尺度的河流，保留原始几何和缩放�
     features: [make('River', 3), make('Lake Centerline', 2), make('River', 7)] });
   assert.deepEqual(rivers.features, [{ type: 'Feature', geometry,
     properties: { name: '黄河', rank: 3, labelZoom: 4 } }]);
+});
+
+test('对照地图只自动选中年份完全匹配的原始快照', () => {
+  const snapshots = [{ year: -2000 }, { year: -500 }, { year: 1200 }];
+  assert.equal(matchingSnapshot(snapshots, -1999), snapshots[0]);
+  assert.equal(matchingSnapshot(snapshots, -2000), undefined);
+  assert.equal(matchingSnapshot(snapshots, 1191), undefined);
+  assert.equal(matchingSnapshot(snapshots, 1200), snapshots[2]);
 });
