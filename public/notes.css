@@ -1,0 +1,44 @@
+#note-dialog {
+  width: min(780px, calc(100% - 2rem));
+  max-height: min(90vh, 850px);
+  overflow: hidden;
+}
+
+#note-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.note-header, .note-actions {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+}
+
+.note-header { justify-content: space-between; }
+.note-header h2 { overflow-wrap: anywhere; }
+.note-actions { flex-wrap: wrap; justify-content: flex-end; }
+.note-body { overflow: auto; min-height: 0; }
+.note-status { color: var(--muted); overflow-wrap: anywhere; }
+.note-status:empty { display: none; }
+.note-editor { display: grid; gap: .4rem; }
+.note-editor textarea {
+  width: 100%;
+  min-height: 11rem;
+  height: min(45vh, 26rem);
+  resize: vertical;
+  font-family: ui-monospace, Consolas, monospace;
+}
+
+.note-preview { padding: .25rem .5rem; overflow-wrap: anywhere; }
+.note-preview > * { margin: 0 0 .9rem; }
+.note-preview img { display: block; max-width: 100%; height: auto; }
+.note-preview blockquote { border-left: 3px solid var(--line); padding-left: .8rem; color: var(--muted); }
+.note-preview pre { overflow-x: auto; padding: .7rem; background: var(--soft); }
+
+@media (max-width: 650px) {
+  #note-dialog { width: calc(100% - 1rem); max-height: 92dvh; padding: .8rem; }
+  .note-actions button { flex: 1 1 auto; }
+  #library :is(th, td):is(:nth-child(3), :nth-child(5), :nth-child(6)) { display: none; }
+}

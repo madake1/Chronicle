@@ -1,16 +1,64 @@
 import { createServer } from 'node:http';
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
+import { atomicWrite, exportNote, imageLimit, loadImage, loadNote, NoteError, noteLimit,
+  notePath, saveImage, saveNote } from './note-storage.mjs';
 
 const dataDirectory = new URL('./data/', import.meta.url);
 const dataFile = new URL('chronicle.json', dataDirectory);
-const temporaryFile = new URL('chronicle.tmp', dataDirectory);
 const assets = new Map([
   ['/', ['index.html', 'text/html']],
   ['/styles.css', ['styles.css', 'text/css']],
   ['/app.mjs', ['app.mjs', 'text/javascript']],
+  ['/notes.mjs', ['notes.mjs', 'text/javascript']],
+  ['/notes.css', ['notes.css', 'text/css']],
   ['/chronology.mjs', ['chronology.mjs', 'text/javascript']],
 ]);
 let pendingWrite = Promise.resolve();
+
+function queueWrite(action) {
+  const result = pendingWrite.then(action);
+  pendingWrite = result.catch(() => {});
+  return result;
+}
+
+async function readWorks() {
+  const saved = await readFile(dataFile, 'utf8').catch(error => {
+    if (error.code !== 'ENOENT') throw error;
+    return null;
+  });
+  return saved === null ? JSON.parse(await readFile(new URL('./fixtures.json', import.meta.url), 'utf8')) :
+    JSON.parse(saved).works;
+}
+
+async function writeWorks(works) {
+  await mkdir(dataDirectory, { recursive: true });
+  await atomicWrite(dataFile, JSON.stringify({ schemaVersion: 1, works }, null, 2));
+}
+
+async function readBody(request, limit) {
+  const chunks = [];
+  let size = 0;
+  // Leaving early lets the HTTP handler send a useful error before the socket closes.
+  for await (const chunk of request.iterator({ destroyOnReturn: false })) {
+    size += chunk.length;
+    if (size > limit) {
+      request.resume();
+      throw new NoteError(413, '上传内容超过大小限制');
+    }
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+async function readJson(request, limit) {
+  if (request.headers['content-type']?.split(';')[0].trim() !== 'application/json') {
+    throw new NoteError(415, '需要 JSON 格式');
+  }
+  const body = await readBody(request, limit);
+  try { return JSON.parse(body); } catch {
+    throw new NoteError(400, 'JSON 格式无效');
+  }
+}
 
 function validWork(work) {
   return work && typeof work.id === 'string' && typeof work.title === 'string' &&
@@ -34,43 +82,87 @@ function send(response, status, value) {
 }
 
 const port = Number(process.env.PORT || 4173);
+const allowedOrigins = new Set();
+
+async function handleNote(request, response, id, suffix, name) {
+  const findWork = works => {
+    const work = works.find(item => item.id === id);
+    if (!work) throw new NoteError(404, '找不到作品');
+    return work;
+  };
+  if (request.method === 'GET') {
+    const work = findWork(await readWorks());
+    if (!suffix) return send(response, 200, await loadNote(dataDirectory, work));
+    if (suffix === 'assets' && name) {
+      const { bytes, type } = await loadImage(dataDirectory, id, name);
+      response.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'private, no-store' });
+      return response.end(bytes);
+    }
+    if (!name && (suffix === 'export.md' || suffix === 'export.zip')) {
+      const zip = suffix.endsWith('.zip');
+      const bytes = await exportNote(dataDirectory, work, zip);
+      response.writeHead(200, {
+        'Content-Type': zip ? 'application/zip' : 'text/markdown; charset=utf-8',
+        'Content-Disposition': `attachment; filename="note.${zip ? 'zip' : 'md'}"`,
+        'Cache-Control': 'no-store',
+      });
+      return response.end(bytes);
+    }
+  }
+  if (request.method === 'PUT' && !suffix) {
+    const note = await readJson(request, noteLimit * 6 + 4096);
+    if (typeof note?.content !== 'string' || (note.revision !== null &&
+        (typeof note.revision !== 'string' || !/^[a-f0-9]{64}$/.test(note.revision)))) {
+      throw new NoteError(400, '笔记内容或版本无效');
+    }
+    if (Buffer.byteLength(note.content) > noteLimit) throw new NoteError(413, '笔记不能超过 512 KB');
+    const saved = await queueWrite(async () => {
+      const works = await readWorks();
+      const work = findWork(works);
+      const path = notePath(id);
+      await saveNote(dataDirectory, work, note.content, note.revision);
+      if (work.notePath !== path) {
+        work.notePath = path;
+        await writeWorks(works);
+      }
+      return { ...await loadNote(dataDirectory, work), notePath: path };
+    });
+    return send(response, 200, saved);
+  }
+  if (request.method === 'POST' && suffix === 'assets' && !name) {
+    const bytes = await readBody(request, imageLimit);
+    const path = await queueWrite(async () => {
+      findWork(await readWorks());
+      return saveImage(dataDirectory, id, bytes, request.headers['content-type']);
+    });
+    return send(response, 201, { path });
+  }
+  throw new NoteError(404, '找不到笔记接口');
+}
+
 createServer(async (request, response) => {
   try {
+    response.setHeader('X-Content-Type-Options', 'nosniff');
+    response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
+    if (request.method !== 'GET' && (request.headers['sec-fetch-site'] === 'cross-site' ||
+        (request.headers.origin && !allowedOrigins.has(request.headers.origin)))) {
+      return send(response, 403, { error: '请从 Chronicle 本机页面保存' });
+    }
+    const noteRoute = /^\/api\/works\/([a-zA-Z0-9_-]{1,100})\/note(?:\/(assets|export\.md|export\.zip)(?:\/([a-zA-Z0-9.-]+))?)?$/.exec(request.url);
+    if (noteRoute) return await handleNote(request, response, ...noteRoute.slice(1));
     if (request.url === '/api/works' && request.method === 'GET') {
-      const saved = await readFile(dataFile, 'utf8').catch(error => {
-        if (error.code !== 'ENOENT') throw error;
-        return null;
-      });
-      return send(response, 200, saved ? JSON.parse(saved).works :
-        JSON.parse(await readFile(new URL('./fixtures.json', import.meta.url), 'utf8')));
+      return send(response, 200, await readWorks());
     }
     if (request.url === '/api/works' && request.method === 'PUT') {
-      if (!request.headers['content-type']?.startsWith('application/json') ||
-          (request.headers.origin && request.headers.origin !== `http://127.0.0.1:${port}` &&
-           request.headers.origin !== `http://localhost:${port}`)) {
-        return send(response, 403, { error: '请从 Chronicle 本机页面保存' });
-      }
-      let body = '';
-      request.setEncoding('utf8');
-      for await (const chunk of request) {
-        body += chunk;
-        if (body.length > 2_000_000) return send(response, 413, { error: '资料库太大' });
-      }
-      let works;
-      try { works = JSON.parse(body); } catch {
-        return send(response, 400, { error: 'JSON 格式无效' });
-      }
+      const works = await readJson(request, 2_000_000);
       if (!Array.isArray(works) || !works.every(validWork) ||
           new Set(works.map(work => work.id)).size !== works.length) {
         return send(response, 400, { error: '作品字段、年代或 ID 无效' });
       }
-      const write = pendingWrite.then(async () => {
-        await mkdir(dataDirectory, { recursive: true });
-        await writeFile(temporaryFile, JSON.stringify({ schemaVersion: 1, works }, null, 2));
-        await rename(temporaryFile, dataFile);
+      await queueWrite(async () => {
+        const notes = new Map((await readWorks()).map(work => [work.id, work.notePath]));
+        await writeWorks(works.map(work => ({ ...work, notePath: notes.get(work.id) })));
       });
-      pendingWrite = write.catch(() => {});
-      await write;
       return send(response, 200, { saved: true });
     }
     const asset = request.method === 'GET' && assets.get(request.url);
@@ -79,7 +171,12 @@ createServer(async (request, response) => {
     response.writeHead(200, { 'Content-Type': `${asset[1]}; charset=utf-8` });
     response.end(content);
   } catch (error) {
+    if (error instanceof NoteError) return send(response, error.status, { error: error.message });
     console.error(error);
     send(response, 500, { error: '无法读取或保存本地资料库' });
   }
-}).listen(port, '127.0.0.1', () => console.log(`Chronicle · http://127.0.0.1:${port}`));
+}).listen(port, '127.0.0.1', function () {
+  allowedOrigins.add(`http://127.0.0.1:${this.address().port}`);
+  allowedOrigins.add(`http://localhost:${this.address().port}`);
+  console.log(`Chronicle · http://127.0.0.1:${this.address().port}`);
+});

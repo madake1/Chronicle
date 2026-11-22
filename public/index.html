@@ -5,20 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Chronicle · 作品时间轴</title>
   <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/notes.css">
   <script type="module" src="/app.mjs"></script>
 </head>
 <body>
   <header class="top">
     <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
     <nav aria-label="页面">
-      <button data-page="timeline" aria-current="page">时间轴</button>
-      <button data-page="library">作品库</button>
+      <button data-page="library" aria-current="page">作品库</button>
+      <button data-page="timeline">时间轴</button>
     </nav>
     <button id="theme" class="quiet" aria-label="切换主题">切换主题</button>
   </header>
   <main>
     <div class="heading">
-      <div><h1 id="page-title">故事时间轴</h1><p id="summary"></p></div>
+      <div><h1 id="page-title">作品库</h1><p id="summary"></p></div>
       <button id="add" class="primary">＋ 新增作品</button>
     </div>
     <div class="filters">
@@ -29,7 +30,7 @@
     </div>
     <p id="notice" role="status" hidden></p>
     <div class="workspace">
-      <section id="timeline" class="panel" aria-label="故事时间轴">
+      <section id="timeline" class="panel" aria-label="故事时间轴" hidden>
         <div class="toolbar">
           <form id="jump"><input name="year" placeholder="例如 公元前431" aria-label="定位年份" required><button>定位年份</button></form>
           <div class="controls">
@@ -43,7 +44,7 @@
         </div>
         <footer class="legend"><span>━ 故事跨度</span><span>◆ 年份 / 短跨度</span><span>▱ 可能发生范围</span><span id="visible-span"></span><span class="hint">滚轮缩放 · 拖动平移</span></footer>
       </section>
-      <section id="library" class="panel" aria-label="作品库" hidden></section>
+      <section id="library" class="panel" aria-label="作品库"></section>
       <aside id="details" class="panel" aria-label="作品详情" hidden></aside>
     </div>
   </main>
@@ -63,6 +64,28 @@
       <p id="form-error" role="alert"></p>
       <div class="form-actions"><button type="button" id="cancel">取消</button><button class="primary" id="save">保存作品</button></div>
     </form>
+  </dialog>
+  <dialog id="note-dialog" aria-labelledby="note-title">
+    <header class="note-header">
+      <h2 id="note-title" tabindex="-1"></h2>
+      <button type="button" data-note-action="close" aria-label="关闭笔记">×</button>
+    </header>
+    <div class="note-body">
+      <article class="note-preview" hidden></article>
+      <label class="note-editor" hidden>
+        <span>Markdown 正文</span>
+        <textarea rows="14" placeholder="写下个人评价、历史考据或参考资料…"></textarea>
+      </label>
+      <input type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
+    </div>
+    <p class="note-status" role="status"></p>
+    <footer class="note-actions">
+      <button type="button" data-note-action="markdown">导出 Markdown</button>
+      <button type="button" data-note-action="zip">导出 ZIP</button>
+      <button type="button" data-note-action="image">插入图片</button>
+      <button type="button" class="primary" data-note-action="edit">编辑笔记</button>
+      <button type="button" class="primary" data-note-action="save">保存笔记</button>
+    </footer>
   </dialog>
 </body>
 </html>

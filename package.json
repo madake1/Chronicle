@@ -2,5 +2,13 @@
   "name": "chronicle",
   "private": true,
   "type": "module",
-  "scripts": { "start": "node server.mjs", "test": "node --test" }
+  "engines": { "node": ">=20.19.0" },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "markdown-it": "^15.0.3"
+  }
 }

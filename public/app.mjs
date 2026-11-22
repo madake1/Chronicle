@@ -1,11 +1,12 @@
 import { parseYear, formatYear, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
+import { openNote } from './notes.mjs';
 
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
 const statuses = ['未开始', '进行中', '已完成', '已放弃'];
 const confidences = ['确定', '推测', '约略'];
 const series = ['--game', '--novel', '--film', '--tv', '--muted'];
-const state = { works: [], page: 'timeline', selected: null, view: [-500, 1550], history: [], ready: false };
+const state = { works: [], page: 'library', selected: null, view: [-500, 1550], history: [], ready: false };
 let bounds = timelineBounds();
 const scroll = document.querySelector('.timeline-scroll');
 const form = $('edit-form');
@@ -158,10 +159,27 @@ function drawTimeline(works = filtered()) {
   $('rows').replaceChildren(rows);
 }
 
+function noteButton(work) {
+  const control = button(work.notePath ? '查看笔记' : '创建笔记', () => {
+    openNote(work, notePath => {
+      work.notePath = notePath;
+      for (const item of document.querySelectorAll('[data-note-work]')) {
+        if (item.dataset.noteWork === work.id) {
+          item.textContent = '查看笔记';
+          item.setAttribute('aria-label', `${work.title} · 查看笔记`);
+        }
+      }
+    });
+  });
+  control.dataset.noteWork = work.id;
+  control.setAttribute('aria-label', `${work.title} · ${control.textContent}`);
+  return control;
+}
+
 function renderLibrary(works) {
   const table = node('table');
   const header = table.createTHead().insertRow();
-  for (const title of ['作品', '类型', '故事年代', '状态', '评分']) header.append(node('th', title));
+  for (const title of ['作品', '笔记', '类型', '故事年代', '状态', '评分']) header.append(node('th', title));
   const body = table.createTBody();
   const comparer = {
     year: (a, b) => firstYear(a) - firstYear(b),
@@ -172,6 +190,7 @@ function renderLibrary(works) {
     const row = body.insertRow();
     row.classList.toggle('selected', state.selected === work.id);
     row.insertCell().append(button(work.title, () => select(work), 'row-name'));
+    row.insertCell().append(noteButton(work));
     for (const value of [work.type, work.segments.map(describe).join('；') || '年代未知', work.status, work.rating || '—']) {
       row.insertCell().textContent = value;
     }
@@ -229,7 +248,7 @@ function renderDetails(work) {
     panel.append(links);
   }
   const actions = node('div', undefined, 'detail-actions');
-  actions.append(button('编辑作品', () => openEditor(work)), button('删除作品', async () => {
+  actions.append(noteButton(work), button('编辑作品', () => openEditor(work)), button('删除作品', async () => {
     if (!confirm(`删除《${work.title}》？`)) return;
     try {
       await persist(state.works.filter(item => item.id !== work.id));
@@ -360,6 +379,7 @@ form.addEventListener('submit', async event => {
     const fields = Object.fromEntries([...new FormData(form)].map(([name, value]) => [name, value.trim()]));
     if (!fields.title) throw new Error('请输入作品名称');
     const work = {
+      ...editing,
       ...fields,
       id: editing?.id || crypto.randomUUID(),
       segments: [...$('segment-fields').children].map(row => row.read()),
