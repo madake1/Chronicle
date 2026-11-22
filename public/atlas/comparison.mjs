@@ -20,7 +20,10 @@ export function bindMapSources(map, readData, currentYear, clearPolity, updatePl
 
   function visibility(ids, show) {
     for (const id of ids) {
-      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', show ? 'visible' : 'none');
+      const value = show ? 'visible' : 'none';
+      if (map.getLayer(id) && (map.getLayoutProperty(id, 'visibility') ?? 'visible') !== value) {
+        map.setLayoutProperty(id, 'visibility', value);
+      }
     }
   }
 

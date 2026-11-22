@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile } from 'node:fs/promises';
+import { gzipSync } from 'node:zlib';
 import { unzipSync } from 'fflate';
 import { atomicWrite } from '../note-storage.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
@@ -28,7 +29,11 @@ async function sourceFile(name, url) {
 }
 
 async function save(name, value) {
-  await atomicWrite(new URL(name, output), JSON.stringify(value));
+  const json = JSON.stringify(value);
+  await atomicWrite(new URL(name, output), json);
+  if (name === 'geography-10.json' || name === 'geography-50.json') {
+    await atomicWrite(new URL(`${name}.gz`, output), gzipSync(json));
+  }
 }
 
 function collection(features) {

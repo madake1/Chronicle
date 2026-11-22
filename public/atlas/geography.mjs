@@ -180,7 +180,10 @@ export function addGeographicLabels(map, rivers, atlasPlaces, Marker, Popup) {
     render();
   }
   updateYear.updatePhysical = (riverData, mountainData) => {
-    anchors = riverAnchors(riverData);
+    if (rivers !== riverData) {
+      rivers = riverData;
+      anchors = riverAnchors(riverData);
+    }
     mountains = mountainData;
     render();
   };
@@ -196,6 +199,7 @@ export function addGeographicDetail(map, readData, initial, labels) {
   let applied = 110;
   let request = 0;
   let mountainRequest;
+  let appliedMountains;
 
   async function update() {
     const scale = geographyScale(map.getZoom());
@@ -216,6 +220,7 @@ export function addGeographicDetail(map, readData, initial, labels) {
     try {
       const [layers, mountains] = await Promise.all([cache.get(scale), mountainRequest]);
       if (current !== request) return;
+      if (scale === applied && mountains === appliedMountains) return;
       if (scale !== applied) {
         for (const name of ['land', 'lakes', 'rivers']) map.getSource(name).setData(layers[name]);
         applied = scale;
@@ -226,6 +231,7 @@ export function addGeographicDetail(map, readData, initial, labels) {
           layout: { visibility: document.querySelector('#atlas-show-terrain').checked ? 'visible' : 'none' },
           paint: { 'fill-color': '#8a785b', 'fill-opacity': 0.20 } }, 'major-rivers');
       }
+      appliedMountains = mountains;
       labels.updatePhysical(layers.rivers, mountains?.labels ?? []);
     } catch (error) {
       console.warn('自然地理参考图层加载失败', error);

@@ -207,11 +207,26 @@ createServer(async (request, response) => {
     const asset = request.method === 'GET' && (assets.get(request.url) ??
       (shard && [`../atlas-data/${shard[1]}`, 'application/json']));
     if (!asset) return send(response, 404, { error: '页面不存在' });
-    const content = await readFile(new URL(`./public/${asset[0]}`, import.meta.url)).catch(error => {
+    const url = new URL(`./public/${asset[0]}`, import.meta.url);
+    const geography = /\/geography-(?:10|50)\.json$/.test(url.pathname);
+    const acceptsGzip = request.headers['accept-encoding']?.split(',').some(encoding => {
+      const [name, quality] = encoding.trim().split(/\s*;\s*/);
+      return name.toLowerCase() === 'gzip' && (quality === undefined || Number(quality.slice(2)) > 0);
+    });
+    const compressed = geography && acceptsGzip
+      ? await readFile(new URL(`${url.href}.gz`)).catch(error => {
+        if (error.code !== 'ENOENT') throw error;
+        return null;
+      })
+      : null;
+    const content = compressed ?? await readFile(url).catch(error => {
       if (error.code !== 'ENOENT') throw error;
       throw new NoteError(404, '资源尚未准备');
     });
-    response.writeHead(200, { 'Content-Type': `${asset[1]}; charset=utf-8` });
+    response.writeHead(200, { 'Content-Type': `${asset[1]}; charset=utf-8`,
+      ...(geography ? { Vary: 'Accept-Encoding' } : {}),
+      ...(compressed ? { 'Content-Encoding': 'gzip' } : {}),
+    });
     response.end(content);
   } catch (error) {
     if (error instanceof NoteError) return send(response, error.status, { error: error.message });
