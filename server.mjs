@@ -2,6 +2,7 @@ import { createServer } from 'node:http';
 import { mkdir, readFile } from 'node:fs/promises';
 import { atomicWrite, exportNote, exportNotes, imageLimit, loadImage, loadNote, NoteError, noteLimit,
   notePath, saveImage, saveNote } from './note-storage.mjs';
+import { atlasYears } from './atlas-sources.mjs';
 
 const dataDirectory = new URL('./data/', import.meta.url);
 const dataFile = new URL('chronicle.json', dataDirectory);
@@ -13,7 +14,17 @@ const assets = new Map([
   ['/batch-notes.mjs', ['batch-notes.mjs', 'text/javascript']],
   ['/notes.css', ['notes.css', 'text/css']],
   ['/chronology.mjs', ['chronology.mjs', 'text/javascript']],
+  ['/atlas', ['atlas/index.html', 'text/html']],
+  ['/atlas/atlas.mjs', ['atlas/atlas.mjs', 'text/javascript']],
+  ['/atlas/atlas.css', ['atlas/atlas.css', 'text/css']],
 ]);
+for (const name of ['maplibre-gl.mjs', 'maplibre-gl-worker.mjs', 'maplibre-gl-shared.mjs', 'maplibre-gl.css']) {
+  assets.set(`/atlas/vendor/${name}`, [`../node_modules/maplibre-gl/dist/${name}`,
+    name.endsWith('.css') ? 'text/css' : 'text/javascript']);
+}
+for (const name of ['manifest.json', 'land.geojson', 'lakes.geojson', ...atlasYears.map(year => `year-${year}.geojson`)]) {
+  assets.set(`/atlas/data/${name}`, [`../atlas-data/${name}`, 'application/json']);
+}
 let pendingWrite = Promise.resolve();
 
 function queueWrite(action) {
@@ -187,7 +198,10 @@ createServer(async (request, response) => {
     }
     const asset = request.method === 'GET' && assets.get(request.url);
     if (!asset) return send(response, 404, { error: '页面不存在' });
-    const content = await readFile(new URL(`./public/${asset[0]}`, import.meta.url));
+    const content = await readFile(new URL(`./public/${asset[0]}`, import.meta.url)).catch(error => {
+      if (error.code !== 'ENOENT') throw error;
+      throw new NoteError(404, '资源尚未准备');
+    });
     response.writeHead(200, { 'Content-Type': `${asset[1]}; charset=utf-8` });
     response.end(content);
   } catch (error) {

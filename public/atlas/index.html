@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>历史时空 · Chronicle</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/atlas/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="/atlas/atlas.css">
+  <script type="module" src="/atlas/atlas.mjs"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
+    <nav aria-label="页面">
+      <a class="nav-link" href="/">作品库</a>
+      <a class="nav-link" href="/atlas" aria-current="page">历史时空</a>
+    </nav>
+  </header>
+  <main>
+    <div class="heading">
+      <div><h1>历史时空</h1><p class="meta">世界政权疆界 · 年代切片</p></div>
+    </div>
+    <section class="panel atlas-panel" aria-label="历史世界地图">
+      <div class="atlas-toolbar">
+        <div id="atlas-years" role="group" aria-label="选择年代"></div>
+        <p id="atlas-status" role="status">正在加载地图…</p>
+      </div>
+      <div id="atlas-map" aria-label="可平移和缩放的世界地图"></div>
+      <footer class="atlas-footer">
+        <span><i aria-hidden="true"></i> Cliopatria 收录的历史疆界</span>
+        <span>Natural Earth 自然地理底图</span>
+      </footer>
+    </section>
+    <details class="atlas-sources">
+      <summary>地图数据来源</summary>
+      <ul id="atlas-sources"></ul>
+    </details>
+  </main>
+</body>
+</html>

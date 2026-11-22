@@ -1,0 +1,51 @@
+.atlas-toolbar, .atlas-footer, #atlas-years {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5rem;
+}
+
+.atlas-toolbar, .atlas-footer {
+  justify-content: space-between;
+  padding: .75rem 1rem;
+}
+
+#atlas-years [aria-pressed="true"] {
+  color: var(--panel);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+#atlas-status, .atlas-footer, .atlas-sources {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+#atlas-map {
+  position: relative;
+  height: clamp(20rem, 63vh, 52rem);
+  background: #dfe9ec;
+}
+
+#atlas-map .maplibregl-ctrl-icon {
+  display: grid;
+  place-items: center;
+  background-image: none;
+  color: #242d27;
+  font: 600 1.2rem/1 system-ui, sans-serif;
+}
+#atlas-map .maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon::after { content: '+'; }
+#atlas-map .maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon::after { content: '−'; }
+
+.atlas-footer i {
+  display: inline-block;
+  width: .9em;
+  height: .75em;
+  border-radius: 2px;
+  background: #b1875b;
+  margin-right: .25em;
+}
+
+.atlas-sources { margin: .8rem .1rem; }
+.atlas-sources summary { cursor: pointer; }
+.atlas-sources li { margin: .25rem 0; }
