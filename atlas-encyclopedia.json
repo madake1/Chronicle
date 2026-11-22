@@ -1,0 +1,1749 @@
+{
+  "archiveSha256": "e10a4e429fca708788ff9e7572a95fce801fae55852d217cffabc1c59cd4eed4",
+  "byRecord": {
+    "176": "Q1055713",
+    "190": "Q1517159",
+    "205": "Q135364",
+    "218": "Q241790",
+    "265": "Q1194906",
+    "296": "Q844750",
+    "307": "Q837855",
+    "323": "Q17167",
+    "327": "Q2650109",
+    "328": "Q1154556",
+    "329": "Q1137403",
+    "330": "Q870517",
+    "331": "Q148837",
+    "332": "Q216068",
+    "333": "Q1147897",
+    "334": "Q2665398",
+    "335": "Q558603",
+    "336": "Q208742",
+    "337": "Q736936",
+    "338": "Q2429397",
+    "339": "Q227007",
+    "340": "Q1330149",
+    "341": "Q197598",
+    "342": "Q1068408",
+    "343": "Q17161",
+    "344": "Q83958",
+    "345": "Q131802",
+    "346": "Q1065073",
+    "347": "Q4827705",
+    "348": "Q504759",
+    "349": "Q912043",
+    "350": "Q12459974",
+    "351": "Q389688",
+    "352": "Q34756",
+    "353": "Q185063",
+    "354": "Q846025",
+    "355": "Q83958",
+    "2213": "Q449639",
+    "2608": "Q185488",
+    "2656": "Q2379418",
+    "2985": "Q206789",
+    "3056": "Q193292",
+    "3145": "Q829356",
+    "3153": "Q83142",
+    "3198": "Q234197",
+    "3586": "Q187897",
+    "3636": "Q581741",
+    "3750": "Q28057",
+    "3755": "Q62389",
+    "3787": "Q28208",
+    "3807": "Q140446",
+    "3879": "Q28567",
+    "3882": "Q2039087",
+    "3889": "Q18211496",
+    "4036": "Q1476089",
+    "4043": "Q26385",
+    "4062": "Q71747",
+    "4141": "Q1365493",
+    "4152": "Q157070",
+    "4204": "Q211661",
+    "4212": "Q2297073",
+    "4216": "Q2723760",
+    "4224": "Q858841",
+    "4253": "Q12567",
+    "4282": "Q1469742",
+    "4290": "Q1051600",
+    "4295": "Q1991742",
+    "4329": "Q14624218",
+    "4336": "Q849967",
+    "4348": "Q7427",
+    "4350": "Q478805",
+    "4359": "Q12723",
+    "4361": "Q12719",
+    "4369": "Q1108445",
+    "4373": "Q2662180",
+    "4378": "Q174306",
+    "4380": "Q4958",
+    "4382": "Q1541699",
+    "4386": "Q4948",
+    "4388": "Q13093931",
+    "4392": "Q12491027",
+    "4395": "Q199442",
+    "4398": "Q154667",
+    "4400": "Q1297894",
+    "4426": "Q638064",
+    "4427": "Q2580032",
+    "4434": "Q756617",
+    "4436": "Q756895",
+    "4439": "Q1194765",
+    "4444": "Q7462",
+    "4447": "Q43100",
+    "4448": "Q680472",
+    "4451": "Q1483430",
+    "4452": "Q756617",
+    "4455": "Q201705",
+    "4458": "Q703919",
+    "4460": "Q2272880",
+    "4463": "Q187985",
+    "4464": "Q1068371",
+    "4465": "Q7038",
+    "4466": "Q83546",
+    "4467": "Q2070440",
+    "4468": "Q8890160",
+    "4469": "Q668412",
+    "4474": "Q1322662",
+    "4481": "Q6806806",
+    "4484": "Q8890160",
+    "4487": "Q1541779",
+    "4490": "Q26472",
+    "4492": "Q15487",
+    "4493": "Q1261908",
+    "4496": "Q216786",
+    "4498": "Q70972",
+    "4501": "Q250515",
+    "4503": "Q7135130",
+    "4505": "Q34",
+    "4506": "Q1483495",
+    "4507": "Q5636647",
+    "4511": "Q200797",
+    "4512": "Q151536",
+    "4514": "Q3271735",
+    "4515": "Q921067",
+    "4516": "Q2670895",
+    "4517": "Q249578",
+    "4518": "Q13534654",
+    "4519": "Q12544",
+    "4520": "Q1411866",
+    "4521": "Q1250763",
+    "4522": "Q1334322",
+    "4523": "Q179876",
+    "4524": "Q252323",
+    "4525": "Q494354",
+    "4526": "Q170174",
+    "4527": "Q160307",
+    "4528": "Q171150",
+    "4529": "Q20",
+    "4530": "Q303421",
+    "4531": "Q175276",
+    "4532": "Q2668584",
+    "4533": "Q1241847",
+    "4534": "Q205708",
+    "4535": "Q849967",
+    "4536": "Q267816",
+    "4537": "Q179876",
+    "4538": "Q1332305",
+    "4539": "Q12548",
+    "4540": "Q217177",
+    "4541": "Q1514510",
+    "4542": "Q588672",
+    "4543": "Q4350658",
+    "4544": "Q494354",
+    "4545": "Q7703611",
+    "4546": "Q33061",
+    "4548": "Q732738",
+    "4549": "Q837187",
+    "4550": "Q888574",
+    "4551": "Q842091",
+    "4552": "Q75613",
+    "4553": "Q5947557",
+    "4554": "Q3708094",
+    "4555": "Q1252942",
+    "4556": "Q2060937",
+    "4557": "Q138803",
+    "4558": "Q13522657",
+    "4559": "Q2390604",
+    "4560": "Q74011",
+    "4561": "Q19336869",
+    "4562": "Q2477776",
+    "4563": "Q179293",
+    "4564": "Q954585",
+    "4565": "Q70972",
+    "4566": "Q276951",
+    "4567": "Q12548",
+    "4568": "Q1065299",
+    "4569": "Q205718",
+    "4570": "Q816814",
+    "4571": "Q1315339",
+    "4572": "Q276841",
+    "4573": "Q239502",
+    "4574": "Q255931",
+    "4575": "Q1337854",
+    "4576": "Q2991084",
+    "4588": "Q3167772",
+    "4589": "Q1241847",
+    "4595": "Q1261908",
+    "4601": "Q185488",
+    "4608": "Q1139762",
+    "4616": "Q582948",
+    "4624": "Q1761381",
+    "4635": "Q206789",
+    "4691": "Q1322662",
+    "4724": "Q1991742",
+    "4747": "Q849967",
+    "4752": "Q269109",
+    "4766": "Q2502248",
+    "4772": "Q18211496",
+    "4777": "Q1687929",
+    "4781": "Q2379418",
+    "4793": "Q829356",
+    "4826": "Q83546",
+    "4844": "Q7462",
+    "4847": "Q7427",
+    "4849": "Q200262",
+    "4851": "Q234197",
+    "4855": "Q5066",
+    "4868": "Q837187",
+    "4869": "Q638064",
+    "4871": "Q187985",
+    "4873": "Q2272880",
+    "4888": "Q140446",
+    "4889": "Q1317579",
+    "4894": "Q756895",
+    "4895": "Q28208",
+    "4901": "Q188586",
+    "4922": "Q2477776",
+    "4927": "Q170174",
+    "4961": "Q174306",
+    "4963": "Q2039087",
+    "4964": "Q75613",
+    "4978": "Q862304",
+    "4988": "Q250515",
+    "4990": "Q1147823",
+    "4992": "Q546266",
+    "4999": "Q478805",
+    "5005": "Q1448688",
+    "5010": "Q2428714",
+    "5020": "Q154667",
+    "5027": "Q849967",
+    "5032": "Q19336869",
+    "5035": "Q2070440",
+    "5040": "Q1884830",
+    "5041": "Q816814",
+    "5042": "Q2670639",
+    "5045": "Q2564694",
+    "5058": "Q6806806",
+    "5059": "Q661980",
+    "5062": "Q459188",
+    "5087": "Q1315339",
+    "5091": "Q568638",
+    "5096": "Q1068371",
+    "5099": "Q4948",
+    "5100": "Q888574",
+    "5101": "Q975405",
+    "5102": "Q45670",
+    "5103": "Q241748",
+    "5104": "Q1541699",
+    "5105": "Q335088",
+    "5106": "Q3708094",
+    "5107": "Q201705",
+    "5108": "Q538677",
+    "5109": "Q703919",
+    "5110": "Q420759",
+    "5111": "Q12548",
+    "5112": "Q6151113",
+    "5113": "Q1483430",
+    "5114": "Q2662372",
+    "5115": "Q3627069",
+    "5116": "Q671362",
+    "5117": "Q756617",
+    "5118": "Q1515009",
+    "5119": "Q70972",
+    "5120": "Q43100",
+    "5121": "Q272033",
+    "5122": "Q179293",
+    "5123": "Q16933165",
+    "5124": "Q255931",
+    "5125": "Q736839",
+    "5126": "Q157070",
+    "5127": "Q2596884",
+    "5128": "Q204920",
+    "5129": "Q466581",
+    "5130": "Q26385",
+    "5131": "Q239502",
+    "5132": "Q199688",
+    "5133": "Q756617",
+    "5134": "Q151536",
+    "5135": "Q2984183",
+    "5136": "Q12723",
+    "5137": "Q3271735",
+    "5138": "Q1050942",
+    "5139": "Q12544",
+    "5140": "Q249578",
+    "5141": "Q1365493",
+    "5142": "Q568638",
+    "5143": "Q5790",
+    "5144": "Q199443",
+    "5145": "Q189545",
+    "5146": "Q7135130",
+    "5147": "Q1483495",
+    "5148": "Q5636647",
+    "5149": "Q180114",
+    "5150": "Q11750543",
+    "5151": "Q581741",
+    "5152": "Q2086556",
+    "5153": "Q235030",
+    "5154": "Q70972",
+    "5155": "Q1334322",
+    "5156": "Q15487",
+    "5157": "Q216786",
+    "5158": "Q175276",
+    "5159": "Q486918",
+    "5160": "Q1431527",
+    "5161": "Q20",
+    "5162": "Q171150",
+    "5163": "Q1514510",
+    "5164": "Q12548",
+    "5165": "Q179876",
+    "5166": "Q55502",
+    "5205": "Q3037",
+    "5758": "Q1884830",
+    "5859": "Q2281221",
+    "5894": "Q1514510",
+    "6024": "Q1469742",
+    "6162": "Q170174",
+    "6167": "Q230791",
+    "6396": "Q1154406",
+    "6426": "Q27260",
+    "6433": "Q854",
+    "6441": "Q1311219",
+    "6485": "Q307697",
+    "6489": "Q887803",
+    "6519": "Q3284315",
+    "6530": "Q213638",
+    "6569": "Q1642472",
+    "6587": "Q581741",
+    "6604": "Q4401026",
+    "6637": "Q201705",
+    "6647": "Q1317579",
+    "6652": "Q874954",
+    "6690": "Q1122980",
+    "6704": "Q1139762",
+    "6735": "Q2288",
+    "6740": "Q4083686",
+    "6757": "Q167134",
+    "6859": "Q49326",
+    "6919": "Q2096678",
+    "6924": "Q148540",
+    "6936": "Q521263",
+    "6951": "Q178913",
+    "6964": "Q638064",
+    "6974": "Q207521",
+    "6977": "Q582861",
+    "6978": "Q2365048",
+    "6982": "Q829356",
+    "6985": "Q282428",
+    "6990": "Q184536",
+    "6998": "Q171393",
+    "7014": "Q48189",
+    "7019": "Q33698",
+    "7042": "Q154667",
+    "7043": "Q83546",
+    "7053": "Q208169",
+    "7056": "Q10800789",
+    "7058": "Q1469100",
+    "7067": "Q10791211",
+    "7070": "Q28025",
+    "7075": "Q2500952",
+    "7092": "Q216786",
+    "7096": "Q4765854",
+    "7107": "Q148499",
+    "7138": "Q317078",
+    "7146": "Q1232887",
+    "7147": "Q28179",
+    "7157": "Q39",
+    "7162": "Q179876",
+    "7167": "Q796583",
+    "7171": "Q217196",
+    "7173": "Q1264808",
+    "7175": "Q324470",
+    "7178": "Q311341",
+    "7180": "Q179876",
+    "7184": "Q238445",
+    "7187": "Q12544",
+    "7192": "Q151536",
+    "7196": "Q168352",
+    "7200": "Q28567",
+    "7205": "Q167639",
+    "7208": "Q853477",
+    "7209": "Q160440",
+    "7212": "Q47261",
+    "7213": "Q9903",
+    "7214": "Q186537",
+    "7216": "Q187684",
+    "7217": "Q1794352",
+    "7222": "Q190513",
+    "7229": "Q580447",
+    "7233": "Q79861",
+    "7234": "Q374521",
+    "7235": "Q4332415",
+    "7244": "Q45670",
+    "7245": "Q28573",
+    "7246": "Q1572529",
+    "7248": "Q68518",
+    "7249": "Q10957559",
+    "7250": "Q2261321",
+    "7255": "Q752662",
+    "7256": "Q229411",
+    "7257": "Q2070440",
+    "7258": "Q155594",
+    "7259": "Q732738",
+    "7260": "Q2746",
+    "7261": "Q836169",
+    "7262": "Q11709",
+    "7263": "Q4948",
+    "7264": "Q1059707",
+    "7265": "Q123027565",
+    "7266": "Q1716871",
+    "7267": "Q12560",
+    "7268": "Q174306",
+    "7269": "Q153529",
+    "7270": "Q4712",
+    "7271": "Q2980623",
+    "7273": "Q1481436",
+    "7274": "Q106311455",
+    "7275": "Q487829",
+    "7276": "Q605051",
+    "7277": "Q70972",
+    "7278": "Q12548",
+    "7279": "Q631210",
+    "7280": "Q2991012",
+    "7281": "Q2132267",
+    "7282": "Q204920",
+    "7283": "Q79965",
+    "7284": "Q62623",
+    "7285": "Q194355",
+    "7286": "Q155019",
+    "7287": "Q676745",
+    "7288": "Q58389",
+    "7289": "Q1406298",
+    "7290": "Q12548",
+    "7291": "Q62623",
+    "7292": "Q71747",
+    "7293": "Q555994",
+    "7294": "Q1947408",
+    "7295": "Q70972",
+    "7296": "Q1152",
+    "7297": "Q863279",
+    "7299": "Q2608489",
+    "7300": "Q484195",
+    "7302": "Q170770",
+    "7303": "Q65968",
+    "7304": "Q841364"
+  },
+  "entities": {
+    "Q1055713": {
+      "zh": "燕国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%87%95%E5%9B%BD"
+    },
+    "Q1517159": {
+      "zh": "哈德拉毛",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E5%BE%B7%E6%8B%89%E6%AF%9B"
+    },
+    "Q135364": {
+      "zh": "奥尔梅克文明",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A5%E5%B0%94%E6%A2%85%E5%85%8B%E6%96%87%E6%98%8E"
+    },
+    "Q241790": {
+      "zh": "库施",
+      "url": "https://zh.wikipedia.org/wiki/%E5%BA%AB%E6%96%BD%E7%8E%8B%E5%9C%8B"
+    },
+    "Q1194906": {
+      "zh": "阿薩瑪卡",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E6%B9%BF%E6%B3%A2"
+    },
+    "Q844750": {
+      "zh": "萨波特克文明",
+      "url": "https://zh.wikipedia.org/wiki/%E8%96%A9%E6%B3%A2%E7%89%B9%E5%85%8B%E6%96%87%E6%98%8E"
+    },
+    "Q837855": {
+      "zh": "齊國",
+      "url": "https://zh.wikipedia.org/wiki/%E9%BD%90%E5%9B%BD"
+    },
+    "Q17167": {
+      "zh": "罗马共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%BD%97%E9%A9%AC%E5%85%B1%E5%92%8C%E5%9B%BD"
+    },
+    "Q2650109": {
+      "zh": "徐国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%BE%90%E5%9B%BD"
+    },
+    "Q1154556": {
+      "zh": "后周",
+      "url": "https://zh.wikipedia.org/wiki/%E5%90%8E%E5%91%A8"
+    },
+    "Q1137403": {
+      "zh": "越国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%B6%8A%E5%9C%8B"
+    },
+    "Q870517": {
+      "zh": "奥德里西亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A5%E5%BE%B7%E9%87%8C%E8%A5%BF%E4%BA%9A%E7%8E%8B%E5%9B%BD"
+    },
+    "Q148837": {
+      "zh": "希腊城邦",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%8C%E8%87%98%E5%9F%8E%E9%82%A6"
+    },
+    "Q216068": {
+      "zh": "示巴王国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%A4%BA%E5%B7%B4%E7%8E%8B%E5%9C%8B"
+    },
+    "Q1147897": {
+      "zh": "卫国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%AB%E5%9B%BD"
+    },
+    "Q2665398": {
+      "zh": "摩蹉国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%91%A9%E5%B7%AE"
+    },
+    "Q558603": {
+      "zh": "般遮羅",
+      "url": "https://zh.wikipedia.org/wiki/%E8%88%AC%E9%81%AE%E7%BE%85"
+    },
+    "Q208742": {
+      "zh": "伯罗奔尼撒联盟",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BC%AF%E7%BD%97%E5%A5%94%E5%B0%BC%E6%92%92%E8%81%94%E7%9B%9F"
+    },
+    "Q736936": {
+      "zh": "鲁国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%B2%81%E5%9B%BD"
+    },
+    "Q2429397": {
+      "zh": "古迦太基",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8F%A4%E8%BF%A6%E5%A4%AA%E5%9F%BA"
+    },
+    "Q227007": {
+      "zh": "邾国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%82%BE%E5%9B%BD"
+    },
+    "Q1330149": {
+      "zh": "苏罗娑",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8B%8F%E7%BD%97%E5%A8%91"
+    },
+    "Q197598": {
+      "zh": "郑国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%84%AD%E5%9C%8B"
+    },
+    "Q1068408": {
+      "zh": "俱盧",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BF%B1%E7%9B%A7"
+    },
+    "Q17161": {
+      "zh": "伊特拉斯坎文明",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BC%8A%E7%89%B9%E6%8B%89%E6%96%AF%E5%9D%8E%E6%96%87%E6%98%8E"
+    },
+    "Q83958": {
+      "zh": "马其顿王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%A6%AC%E5%85%B6%E9%A0%93%E7%8E%8B%E5%9C%8B"
+    },
+    "Q131802": {
+      "zh": "斯基泰人",
+      "url": "https://zh.wikipedia.org/wiki/%E6%96%AF%E5%9F%BA%E6%B3%B0%E4%BA%BA"
+    },
+    "Q1065073": {
+      "zh": "宋国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AE%8B%E5%9B%BD"
+    },
+    "Q4827705": {
+      "zh": "阿槃提",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E6%A7%83%E6%8F%90"
+    },
+    "Q504759": {
+      "zh": "楚国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%A5%9A%E5%9B%BD"
+    },
+    "Q912043": {
+      "zh": "晋国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%99%8B%E5%9B%BD"
+    },
+    "Q12459974": {
+      "zh": "诃黎王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%AF%83%E9%BB%8E%E7%8E%8B%E6%9C%9D"
+    },
+    "Q389688": {
+      "zh": "阿契美尼德帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%A5%91%E7%BE%8E%E5%B0%BC%E5%BE%B7%E7%8E%8B%E6%9C%9D"
+    },
+    "Q34756": {
+      "zh": "秦国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%A7%A6%E5%9B%BD"
+    },
+    "Q185063": {
+      "zh": "战国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%88%98%E5%9B%BD%E6%97%B6%E6%9C%9F"
+    },
+    "Q846025": {
+      "zh": "十六大国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%B0%E5%BA%A6%E5%88%97%E5%9B%BD%E6%97%B6%E4%BB%A3"
+    },
+    "Q449639": {
+      "zh": "阿勒底亚",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%8B%92%E5%BA%95%E4%BA%9A"
+    },
+    "Q185488": {
+      "zh": "伏尔加保加利亚",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BC%8F%E5%B0%94%E5%8A%A0%E4%BF%9D%E5%8A%A0%E5%88%A9%E4%BA%9A"
+    },
+    "Q2379418": {
+      "zh": "古韦拉克鲁斯文化",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8F%A4%E9%9F%A6%E6%8B%89%E5%85%8B%E9%B2%81%E6%96%AF%E6%96%87%E5%8C%96"
+    },
+    "Q206789": {
+      "zh": "迦纳帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%BF%A6%E7%B4%8D%E5%B8%9D%E5%9C%8B"
+    },
+    "Q193292": {
+      "zh": "平安时代",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B9%B3%E5%AE%89%E6%97%B6%E4%BB%A3"
+    },
+    "Q829356": {
+      "zh": "马库里亚",
+      "url": "https://zh.wikipedia.org/wiki/%E9%A6%AC%E5%BA%AB%E9%87%8C%E4%BA%9E%E7%8E%8B%E5%9C%8B"
+    },
+    "Q83142": {
+      "zh": "叶尼塞吉尔吉斯人",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8F%B6%E5%B0%BC%E5%A1%9E%E5%90%89%E5%B0%94%E5%90%89%E6%96%AF%E4%BA%BA"
+    },
+    "Q234197": {
+      "zh": "三佛齐",
+      "url": "https://zh.wikipedia.org/wiki/%E4%B8%89%E4%BD%9B%E9%BD%90"
+    },
+    "Q187897": {
+      "zh": "托尔特克",
+      "url": "https://zh.wikipedia.org/wiki/%E6%89%98%E5%B0%94%E7%89%B9%E5%85%8B"
+    },
+    "Q581741": {
+      "zh": "奇穆王國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%87%E5%A7%86%E6%96%87%E5%8C%96"
+    },
+    "Q28057": {
+      "zh": "耽罗",
+      "url": "https://zh.wikipedia.org/wiki/%E8%80%BD%E7%BE%85"
+    },
+    "Q62389": {
+      "zh": "冰島自由邦",
+      "url": "https://zh.wikipedia.org/wiki/%E5%86%B0%E5%B3%B6%E8%81%AF%E9%82%A6"
+    },
+    "Q28208": {
+      "zh": "高丽",
+      "url": "https://zh.wikipedia.org/wiki/%E9%AB%98%E9%BA%97"
+    },
+    "Q140446": {
+      "zh": "扎格维王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%89%8E%E6%A0%BC%E7%BB%B4%E7%8E%8B%E6%9C%9D"
+    },
+    "Q28567": {
+      "zh": "瑪雅文明",
+      "url": "https://zh.wikipedia.org/wiki/%E7%91%AA%E9%9B%85%E6%96%87%E6%98%8E"
+    },
+    "Q2039087": {
+      "zh": "昌德拉王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%98%8C%E5%BE%B7%E6%8B%89%E7%8E%8B%E6%9C%9D"
+    },
+    "Q18211496": {
+      "zh": "索兰奇王国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%B9%94%E5%8D%A2%E5%9F%BA%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1476089": {
+      "zh": "韦克桑",
+      "url": "https://zh.wikipedia.org/wiki/%E9%9F%A6%E5%85%8B%E6%A1%91"
+    },
+    "Q26385": {
+      "zh": "韦尔芒杜瓦",
+      "url": "https://zh.wikipedia.org/wiki/%E9%9F%A6%E5%B0%94%E8%8A%92%E6%9D%9C%E7%93%A6%E4%BC%AF%E5%9B%BD"
+    },
+    "Q71747": {
+      "zh": "布列塔尼公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%83%E5%88%97%E5%A1%94%E5%B0%BC%E5%85%AC%E5%9B%BD"
+    },
+    "Q1365493": {
+      "zh": "比萨共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%AF%94%E8%96%A9%E5%85%B1%E5%92%8C%E5%9C%8B"
+    },
+    "Q157070": {
+      "zh": "佛兰德伯国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BD%9B%E5%85%B0%E5%BE%B7%E4%BC%AF%E5%9B%BD"
+    },
+    "Q211661": {
+      "zh": "耶姆特兰",
+      "url": "https://zh.wikipedia.org/wiki/%E8%80%B6%E5%A7%86%E7%89%B9%E8%98%AD"
+    },
+    "Q2297073": {
+      "zh": "卡利亚里王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E5%88%A9%E4%BA%9A%E9%87%8C%E7%8E%8B%E5%9B%BD"
+    },
+    "Q2723760": {
+      "zh": "加盧拉王國",
+      "url": "https://en.wikipedia.org/wiki/Judicate_of_Gallura"
+    },
+    "Q858841": {
+      "zh": "克羅地亞王國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%85%8B%E7%BE%85%E5%9F%83%E8%A5%BF%E4%BA%9E%E7%8E%8B%E5%9C%8B_(925%E5%B9%B4%E2%80%941102%E5%B9%B4)"
+    },
+    "Q12567": {
+      "zh": "維京人",
+      "url": "https://zh.wikipedia.org/wiki/%E7%B6%AD%E4%BA%AC%E4%BA%BA"
+    },
+    "Q1469742": {
+      "zh": "巽他王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B7%BD%E4%BB%96%E7%8E%8B%E5%9C%8B"
+    },
+    "Q1051600": {
+      "zh": "普利亞和卡拉布里亞督军区",
+      "url": "https://en.wikipedia.org/wiki/Duchy_of_Naples"
+    },
+    "Q1991742": {
+      "zh": "阿尔巴王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E7%88%BE%E5%B7%B4%E7%8E%8B%E5%9C%8B"
+    },
+    "Q14624218": {
+      "zh": "西遮娄其王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E9%81%AE%E5%A8%84%E5%85%B6%E7%8E%8B%E6%9C%9D"
+    },
+    "Q849967": {
+      "zh": "凱爾特布立吞人",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%83%E7%AB%8B%E5%90%9E%E4%BA%BA"
+    },
+    "Q7427": {
+      "zh": "西夏",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E5%A4%8F"
+    },
+    "Q478805": {
+      "zh": "阿那萨吉人",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E9%82%A3%E8%90%A8%E5%90%89%E4%BA%BA"
+    },
+    "Q12723": {
+      "url": "https://en.wikipedia.org/wiki/Pallars_Juss%C3%A0"
+    },
+    "Q12719": {
+      "url": "https://en.wikipedia.org/wiki/Pallars_Sobir%C3%A0"
+    },
+    "Q1108445": {
+      "zh": "基辅罗斯",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9F%BA%E8%BE%85%E7%BD%97%E6%96%AF"
+    },
+    "Q2662180": {
+      "zh": "畏兀儿",
+      "url": "https://zh.wikipedia.org/wiki/%E9%AB%98%E6%98%8C%E5%9B%9E%E9%B6%BB"
+    },
+    "Q174306": {
+      "zh": "热那亚共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%83%AD%E9%82%A3%E4%BA%9A%E5%85%B1%E5%92%8C%E5%9B%BD"
+    },
+    "Q4958": {
+      "zh": "辽朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%BE%BD%E6%9C%9D"
+    },
+    "Q1541699": {
+      "zh": "安普里亚斯伯国",
+      "url": "https://en.wikipedia.org/wiki/County_of_Emp%C3%BAries"
+    },
+    "Q4948": {
+      "zh": "威尼斯共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A8%81%E5%B0%BC%E6%96%AF%E5%85%B1%E5%92%8C%E5%9B%BD"
+    },
+    "Q13093931": {
+      "zh": "戎牙路",
+      "url": "https://zh.wikipedia.org/wiki/%E9%87%8D%E8%BF%A6%E7%BD%97"
+    },
+    "Q12491027": {
+      "zh": "巴厘島王國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B7%B4%E5%8E%98%E7%8E%8B%E5%9B%BD"
+    },
+    "Q199442": {
+      "zh": "阿拉贡王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E6%8B%89%E8%B4%A1%E7%8E%8B%E5%9B%BD"
+    },
+    "Q154667": {
+      "zh": "格鲁吉亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%A0%BC%E9%B2%81%E5%90%89%E4%BA%9A%E7%8E%8B%E5%9B%BD"
+    },
+    "Q1297894": {
+      "zh": "里瓦戈萨",
+      "url": "https://en.wikipedia.org/wiki/County_of_Ribagorza"
+    },
+    "Q638064": {
+      "zh": "希尔凡",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%8C%E7%88%BE%E5%87%A1"
+    },
+    "Q2580032": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Almer%C3%ADa"
+    },
+    "Q756617": {
+      "zh": "丹麦王国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%B8%B9%E9%BA%A5%E7%8E%8B%E5%9C%8B"
+    },
+    "Q756895": {
+      "zh": "谏义里国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%B0%8F%E4%B9%89%E9%87%8C%E5%9B%BD"
+    },
+    "Q1194765": {
+      "zh": "迦摩缕波",
+      "url": "https://zh.wikipedia.org/wiki/%E8%BF%A6%E6%91%A9%E7%BC%95%E6%B3%A2"
+    },
+    "Q7462": {
+      "zh": "宋朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AE%8B%E6%9C%9D"
+    },
+    "Q43100": {
+      "zh": "克什米尔",
+      "url": "https://zh.wikipedia.org/wiki/%E5%85%8B%E4%BB%80%E7%B1%B3%E5%B0%94"
+    },
+    "Q680472": {
+      "zh": "沃伦公国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B2%83%E4%BC%A6%E5%85%AC%E5%9B%BD"
+    },
+    "Q1483430": {
+      "zh": "基辅大公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9F%BA%E8%BE%85%E5%A4%A7%E5%85%AC%E5%9B%BD"
+    },
+    "Q201705": {
+      "zh": "高棉帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%AB%98%E6%A3%89%E5%B8%9D%E5%9B%BD"
+    },
+    "Q703919": {
+      "zh": "吴朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%90%B3%E6%9C%9D"
+    },
+    "Q2272880": {
+      "zh": "塔克魯爾王國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A1%94%E5%85%8B%E9%B2%81%E5%B0%94"
+    },
+    "Q187985": {
+      "zh": "藏族",
+      "url": "https://zh.wikipedia.org/wiki/%E8%97%8F%E6%97%8F"
+    },
+    "Q1068371": {
+      "zh": "兆汉人",
+      "url": "https://en.wikipedia.org/wiki/Chauhan_dynasty"
+    },
+    "Q7038": {
+      "zh": "赫罗纳",
+      "url": "https://zh.wikipedia.org/wiki/%E8%B5%AB%E7%BD%97%E7%BA%B3"
+    },
+    "Q83546": {
+      "zh": "弗拉基米尔-苏兹达尔大公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%BC%97%E6%8B%89%E5%9F%BA%E7%B1%B3%E5%B0%94-%E8%8B%8F%E5%85%B9%E8%BE%BE%E5%B0%94%E5%A4%A7%E5%85%AC%E5%9B%BD"
+    },
+    "Q2070440": {
+      "zh": "讷韦尔子爵",
+      "url": "https://en.wikipedia.org/wiki/County_of_Nevers"
+    },
+    "Q8890160": {
+      "zh": "波兰王国",
+      "url": "https://en.wikipedia.org/wiki/Kingdom_of_Poland"
+    },
+    "Q668412": {
+      "zh": "波罗王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%A2%E7%BD%97%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1322662": {
+      "zh": "切尔尼戈夫统治者列表",
+      "url": "https://zh.wikipedia.org/wiki/%E5%88%87%E5%B0%94%E5%B0%BC%E6%88%88%E5%A4%AB%E5%85%AC%E5%9B%BD"
+    },
+    "Q6806806": {
+      "url": "https://en.wikipedia.org/wiki/Chola_Empire"
+    },
+    "Q1541779": {
+      "zh": "奧索納伯爵",
+      "url": "https://en.wikipedia.org/wiki/County_of_Osona"
+    },
+    "Q26472": {
+      "zh": "大理国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E7%90%86%E5%9B%BD"
+    },
+    "Q15487": {
+      "zh": "贝尔加",
+      "url": "https://zh.wikipedia.org/wiki/%E8%B4%9D%E5%B0%94%E5%8A%A0"
+    },
+    "Q1261908": {
+      "zh": "佩列亚斯拉夫公国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BD%A9%E5%88%97%E4%BA%9A%E6%96%AF%E6%8B%89%E5%A4%AB%E5%85%AC%E5%9B%BD"
+    },
+    "Q216786": {
+      "zh": "占城",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A0%E5%A9%86"
+    },
+    "Q70972": {
+      "zh": "法兰西王国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%95%E8%98%AD%E8%A5%BF%E7%8E%8B%E5%9C%8B"
+    },
+    "Q250515": {
+      "zh": "东恒伽王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E4%B8%9C%E6%81%92%E4%BC%BD%E7%8E%8B%E6%9C%9D"
+    },
+    "Q7135130": {
+      "zh": "帕拉瑪拉王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%95%E6%8B%89%E7%91%AA%E6%8B%89%E7%8E%8B%E6%9C%9D"
+    },
+    "Q34": {
+      "zh": "瑞典",
+      "url": "https://zh.wikipedia.org/wiki/%E7%91%9E%E5%85%B8"
+    },
+    "Q1483495": {
+      "zh": "斯摩棱斯克公国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%96%AF%E6%91%A9%E6%A3%B1%E6%96%AF%E5%85%8B%E5%85%AC%E5%9B%BD"
+    },
+    "Q5636647": {
+      "zh": "哈巴里王朝",
+      "url": "https://en.wikipedia.org/wiki/Habbari_Emirate"
+    },
+    "Q200797": {
+      "zh": "波洛茨克",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%A2%E6%8B%89%E8%8C%A8%E5%85%8B"
+    },
+    "Q151536": {
+      "zh": "诺夫哥罗德共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%AF%BA%E5%A4%AB%E5%93%A5%E7%BD%97%E5%BE%B7%E5%85%B1%E5%92%8C%E5%9B%BD"
+    },
+    "Q3271735": {
+      "zh": "阿尔勒王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%B0%94%E5%8B%92%E7%8E%8B%E5%9B%BD"
+    },
+    "Q921067": {
+      "zh": "穆尔西亚王国",
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Murcia"
+    },
+    "Q2670895": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Alpuente"
+    },
+    "Q249578": {
+      "zh": "加茲尼帝國",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BC%BD%E8%89%B2%E5%B0%BC%E7%8E%8B%E5%9C%8B"
+    },
+    "Q13534654": {
+      "zh": "泰法王国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%89%98%E8%8E%B1%E5%A4%9A%E6%B3%B0%E6%B3%95"
+    },
+    "Q12544": {
+      "zh": "拜占庭帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9D%B1%E7%BE%85%E9%A6%AC%E5%B8%9D%E5%9C%8B"
+    },
+    "Q1411866": {
+      "zh": "纳贾希王朝",
+      "url": "https://en.wikipedia.org/wiki/Najahid_dynasty"
+    },
+    "Q1250763": {
+      "zh": "西西里埃米尔国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%A5%BF%E9%87%8C%E9%85%8B%E9%95%B7%E5%9C%8B"
+    },
+    "Q1334322": {
+      "zh": "图卢兹伯国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9B%BE%E5%8D%A2%E5%85%B9%E4%BC%AF%E5%9B%BD"
+    },
+    "Q179876": {
+      "zh": "英格兰王国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8B%B1%E6%A0%BC%E8%98%AD%E7%8E%8B%E5%9C%8B"
+    },
+    "Q252323": {
+      "zh": "德尼亞泰法",
+      "url": "https://zh.wikipedia.org/wiki/%E5%BE%B7%E5%B0%BC%E4%BA%9E%E6%B3%B0%E6%B3%95"
+    },
+    "Q494354": {
+      "zh": "喀喇汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%96%80%E5%96%87%E6%B1%97%E5%9B%BD"
+    },
+    "Q170174": {
+      "zh": "教皇国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%95%99%E5%AE%97%E5%9B%BD"
+    },
+    "Q160307": {
+      "zh": "法蒂玛王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%95%E8%92%82%E7%8E%9B%E5%93%88%E9%87%8C%E5%8F%91%E5%9B%BD"
+    },
+    "Q171150": {
+      "zh": "匈牙利王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8C%88%E7%89%99%E5%88%A9%E7%8E%8B%E5%9B%BD"
+    },
+    "Q20": {
+      "zh": "挪威",
+      "url": "https://zh.wikipedia.org/wiki/%E6%8C%AA%E5%A8%81"
+    },
+    "Q303421": {
+      "zh": "加利西亞王國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8A%A0%E5%88%A9%E8%A5%BF%E4%BA%9E%E7%8E%8B%E5%9C%8B"
+    },
+    "Q175276": {
+      "zh": "莱昂王国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8E%B1%E6%98%82%E7%8E%8B%E5%9B%BD"
+    },
+    "Q2668584": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Carmona"
+    },
+    "Q1241847": {
+      "zh": "阿波利亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%B0%94%E5%8D%9A%E9%9B%B7%E4%BA%9A%E7%8E%8B%E5%9B%BD"
+    },
+    "Q205708": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Granada"
+    },
+    "Q267816": {
+      "zh": "贝内文托公国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%B4%9D%E5%86%85%E6%96%87%E6%89%98%E5%85%AC%E5%9B%BD"
+    },
+    "Q1332305": {
+      "zh": "羅渦",
+      "url": "https://zh.wikipedia.org/wiki/%E7%BE%85%E6%B8%A6"
+    },
+    "Q12548": {
+      "zh": "神圣罗马帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%A5%9E%E5%9C%A3%E7%BD%97%E9%A9%AC%E5%B8%9D%E5%9B%BD"
+    },
+    "Q217177": {
+      "zh": "泰法",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%B0%E6%B3%95"
+    },
+    "Q1514510": {
+      "zh": "乌赫尔伯国",
+      "url": "https://en.wikipedia.org/wiki/County_of_Urgell"
+    },
+    "Q588672": {
+      "zh": "哈马德王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E9%A6%AC%E5%BE%B7%E7%8E%8B%E6%9C%9D"
+    },
+    "Q4350658": {
+      "zh": "佩列梅什利公国",
+      "url": "https://en.wikipedia.org/wiki/Principality_of_Peremyshl"
+    },
+    "Q7703611": {
+      "zh": "阿基坦公国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BA%9E%E5%A5%8E%E4%B8%B9%E5%85%AC%E5%9C%8B"
+    },
+    "Q33061": {
+      "zh": "薩拉戈薩王國",
+      "url": "https://zh.wikipedia.org/wiki/%E8%96%A9%E6%8B%89%E6%88%88%E8%96%A9%E6%B3%B0%E6%B3%95%E5%9C%8B"
+    },
+    "Q732738": {
+      "zh": "曼恩",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9B%BC%E6%81%A9"
+    },
+    "Q837187": {
+      "zh": "汉达尼德王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E5%A7%86%E4%B8%B9%E7%8E%8B%E6%9C%9D"
+    },
+    "Q888574": {
+      "zh": "蒲甘王国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%92%B2%E7%94%98%E7%8E%8B%E5%9C%8B"
+    },
+    "Q842091": {
+      "zh": "诺曼底公国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%AB%BE%E6%9B%BC%E7%AC%AC%E5%85%AC%E5%9C%8B"
+    },
+    "Q75613": {
+      "zh": "穆拉比特王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E7%A9%86%E6%8B%89%E6%AF%94%E7%89%B9%E7%8E%8B%E6%9C%9D"
+    },
+    "Q5947557": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Ceuta"
+    },
+    "Q3708094": {
+      "zh": "塞尔柱帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A1%9E%E5%B0%94%E6%9F%B1%E5%B8%9D%E5%9B%BD"
+    },
+    "Q1252942": {
+      "zh": "杜克里亚",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9D%9C%E5%85%8B%E5%88%A9%E4%BA%9A"
+    },
+    "Q2060937": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Albarrac%C3%ADn"
+    },
+    "Q138803": {
+      "zh": "卡拉米塔教派",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E5%B0%94%E9%A9%AC%E7%89%B9%E6%B4%BE"
+    },
+    "Q13522657": {
+      "zh": "鲁西永",
+      "url": "https://zh.wikipedia.org/wiki/%E9%B2%81%E8%A5%BF%E6%B0%B8"
+    },
+    "Q2390604": {
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Arcos"
+    },
+    "Q74011": {
+      "zh": "诺曼人征服意大利南部",
+      "url": "https://zh.wikipedia.org/wiki/%E8%AF%BA%E6%9B%BC%E5%BE%81%E6%9C%8D%E5%8D%97%E6%84%8F%E5%A4%A7%E5%88%A9"
+    },
+    "Q19336869": {
+      "zh": "布卢瓦伯国",
+      "url": "https://en.wikipedia.org/wiki/County_of_Blois"
+    },
+    "Q2477776": {
+      "zh": "基马克汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9F%BA%E9%A6%AC%E5%85%8B%E6%B1%97%E5%9C%8B"
+    },
+    "Q179293": {
+      "zh": "卡斯蒂利亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E6%96%AF%E8%92%82%E5%88%A9%E4%BA%9A%E7%8E%8B%E5%9B%BD"
+    },
+    "Q954585": {
+      "zh": "布雷切尼奥格王国",
+      "url": "https://en.wikipedia.org/wiki/Brycheiniog"
+    },
+    "Q276951": {
+      "zh": "塞维利亚泰法",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A1%9E%E7%BB%B4%E5%88%A9%E4%BA%9A%E6%B3%B0%E6%B3%95"
+    },
+    "Q1065299": {
+      "zh": "萨勒诺公国",
+      "url": "https://en.wikipedia.org/wiki/Principality_of_Salerno"
+    },
+    "Q205718": {
+      "zh": "兹里德王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%BD%90%E9%87%8C%E7%8E%8B%E6%9C%9D"
+    },
+    "Q816814": {
+      "zh": "圭内斯王国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%A0%BC%E6%B8%A9%E5%86%85%E6%96%AF%E7%8E%8B%E5%9B%BD"
+    },
+    "Q1315339": {
+      "url": "https://en.wikipedia.org/wiki/Lohara_dynasty"
+    },
+    "Q276841": {
+      "zh": "巴达霍斯泰法",
+      "url": "https://en.wikipedia.org/wiki/Taifa_of_Badajoz"
+    },
+    "Q239502": {
+      "zh": "加利西亚－沃里尼亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8A%A0%E5%88%A9%E8%A5%BF%E4%BA%9A-%E6%B2%83%E4%BC%A6%E7%8E%8B%E5%9B%BD"
+    },
+    "Q255931": {
+      "zh": "駭黎朋猜",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E5%88%A9%E5%A5%94%E7%8C%9C"
+    },
+    "Q1337854": {
+      "zh": "科尔多瓦酋长国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%A7%91%E5%B0%94%E5%A4%9A%E7%93%A6%E9%85%8B%E9%95%BF%E5%9B%BD"
+    },
+    "Q2991084": {
+      "zh": "安茹伯爵",
+      "url": "https://en.wikipedia.org/wiki/County_of_Anjou"
+    },
+    "Q3167772": {
+      "zh": "波隆纳鲁瓦王国",
+      "url": "https://en.wikipedia.org/wiki/Kingdom_of_Polonnaruwa"
+    },
+    "Q1139762": {
+      "zh": "加涅姆-博尔努帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8A%A0%E6%B6%85%E5%A7%86-%E5%8D%9A%E5%B0%94%E5%8A%AA%E5%B8%9D%E5%9B%BD"
+    },
+    "Q582948": {
+      "zh": "維京人殖民北美",
+      "url": "https://zh.wikipedia.org/wiki/%E8%AB%BE%E6%96%AF%E4%BA%BA%E6%AE%96%E6%B0%91%E5%8C%97%E7%BE%8E"
+    },
+    "Q1761381": {
+      "zh": "魯古多羅王國",
+      "url": "https://en.wikipedia.org/wiki/Judicate_of_Logudoro"
+    },
+    "Q269109": {
+      "zh": "梁赞大公",
+      "url": "https://zh.wikipedia.org/wiki/%E6%A2%81%E8%B5%9E%E5%A4%A7%E5%85%AC%E5%9B%BD"
+    },
+    "Q2502248": {
+      "zh": "科克内斯公国",
+      "url": "https://en.wikipedia.org/wiki/Principality_of_Koknese"
+    },
+    "Q1687929": {
+      "zh": "杰西卡公国",
+      "url": "https://en.wikipedia.org/wiki/Principality_of_Jersika"
+    },
+    "Q200262": {
+      "zh": "纳瓦拉王国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%B4%8D%E7%93%A6%E6%8B%89%E7%8E%8B%E5%9C%8B"
+    },
+    "Q5066": {
+      "zh": "金朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%87%91%E6%9C%9D"
+    },
+    "Q1317579": {
+      "zh": "吉打苏丹王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%90%89%E6%89%93%E8%8B%8F%E4%B8%B9%E5%9B%BD"
+    },
+    "Q188586": {
+      "zh": "西西里王国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%A5%BF%E9%87%8C%E7%8E%8B%E5%9C%8B"
+    },
+    "Q862304": {
+      "zh": "西辽",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%BE%BD"
+    },
+    "Q1147823": {
+      "zh": "加哈達瓦拉",
+      "url": "https://en.wikipedia.org/wiki/Gahadavala_dynasty"
+    },
+    "Q546266": {
+      "zh": "香槟伯国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%A6%99%E6%A7%9F%E4%BC%AF%E5%9B%BD"
+    },
+    "Q1448688": {
+      "zh": "烏尤尼德王朝",
+      "url": "https://en.wikipedia.org/wiki/Uyunid_dynasty"
+    },
+    "Q2428714": {
+      "zh": "犀那王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E7%8A%80%E9%82%A3%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1884830": {
+      "zh": "瑪赫迪王朝",
+      "url": "https://en.wikipedia.org/wiki/Mahdids"
+    },
+    "Q2670639": {
+      "url": "https://en.wikipedia.org/wiki/Southern_Powys_(medieval)"
+    },
+    "Q2564694": {
+      "url": "https://en.wikipedia.org/wiki/Northern_Powys_(medieval)"
+    },
+    "Q661980": {
+      "zh": "奥波莱公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A5%E6%B3%A2%E8%8E%B1%E5%85%AC%E5%9B%BD"
+    },
+    "Q459188": {
+      "zh": "马恩岛及群岛王国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%BE%A4%E5%B3%B6%E7%8E%8B%E5%9C%8B"
+    },
+    "Q568638": {
+      "zh": "西里西亚公国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E9%87%8C%E8%A5%BF%E4%BA%9E%E5%85%AC%E5%9C%8B"
+    },
+    "Q975405": {
+      "zh": "魯姆蘇丹國",
+      "url": "https://zh.wikipedia.org/wiki/%E9%AD%AF%E5%A7%86%E8%98%87%E4%B8%B9%E5%9C%8B"
+    },
+    "Q45670": {
+      "zh": "葡萄牙王國",
+      "url": "https://zh.wikipedia.org/wiki/%E8%91%A1%E8%90%84%E7%89%99%E7%8E%8B%E5%9C%8B"
+    },
+    "Q241748": {
+      "zh": "塞尔维亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A1%9E%E5%B0%94%E7%BB%B4%E4%BA%9A%E7%8E%8B%E5%9B%BD_(%E8%BF%91%E4%BB%A3)"
+    },
+    "Q335088": {
+      "zh": "奇里乞亚亚美尼亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%87%E9%87%8C%E4%B9%9E%E4%BA%9A%E4%BA%9A%E7%BE%8E%E5%B0%BC%E4%BA%9A%E7%8E%8B%E5%9B%BD"
+    },
+    "Q538677": {
+      "zh": "安茹帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AE%89%E8%8C%B9%E5%B8%9D%E5%9B%BD"
+    },
+    "Q420759": {
+      "zh": "保加利亚第二帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BF%9D%E5%8A%A0%E5%88%A9%E4%BA%9A%E7%AC%AC%E4%BA%8C%E5%B8%9D%E5%9B%BD"
+    },
+    "Q6151113": {
+      "zh": "舜天王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%88%9C%E5%A4%A9%E7%8E%8B%E6%9C%9D"
+    },
+    "Q2662372": {
+      "url": "https://en.wikipedia.org/wiki/Principality_of_Minsk"
+    },
+    "Q3627069": {
+      "zh": "匈牙利皇冠領地波士尼亞省",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%A2%E6%96%AF%E5%B0%BC%E4%BA%9A%E5%B7%B4%E7%BA%B3%E7%89%B9%E5%9B%BD"
+    },
+    "Q671362": {
+      "zh": "图罗夫-平斯克公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9B%BE%E7%BD%97%E5%A4%AB-%E5%B9%B3%E6%96%AF%E5%85%8B%E5%85%AC%E5%9B%BD"
+    },
+    "Q1515009": {
+      "zh": "大波兰公爵",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A4%A7%E6%B3%A2%E5%85%B0%E5%85%AC%E7%88%B5"
+    },
+    "Q272033": {
+      "zh": "的黎波里伯国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%9A%84%E9%BB%8E%E6%B3%A2%E9%87%8C%E4%BC%AF%E5%9B%BD"
+    },
+    "Q16933165": {
+      "zh": "桑多梅日公國",
+      "url": "https://en.wikipedia.org/wiki/Duchy_of_Sandomierz"
+    },
+    "Q736839": {
+      "zh": "镰仓幕府",
+      "url": "https://zh.wikipedia.org/wiki/%E9%95%B0%E4%BB%93%E5%B9%95%E5%BA%9C"
+    },
+    "Q2596884": {
+      "url": "https://en.wikipedia.org/wiki/Principality_of_Drutsk"
+    },
+    "Q204920": {
+      "zh": "阿拉贡联合王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E6%8B%89%E8%B4%A1%E8%81%94%E5%90%88%E7%8E%8B%E5%9B%BD"
+    },
+    "Q466581": {
+      "zh": "曷萨拉王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9B%B7%E8%90%A8%E6%8B%89%E7%8E%8B%E6%9C%9D"
+    },
+    "Q199688": {
+      "zh": "穆瓦希德王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E7%A9%86%E7%93%A6%E5%B8%8C%E5%BE%B7%E5%93%88%E9%87%8C%E5%8F%91%E5%9B%BD"
+    },
+    "Q2984183": {
+      "zh": "波列斯瓦夫三世的遗嘱",
+      "url": "https://en.wikipedia.org/wiki/Testament_of_Boles%C5%82aw_III_Wrymouth"
+    },
+    "Q1050942": {
+      "zh": "奧州藤原氏",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A7%E5%B7%9E%E8%97%A4%E5%8E%9F%E6%B0%8F"
+    },
+    "Q5790": {
+      "zh": "雅達瓦王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%9B%85%E9%81%94%E7%93%A6%E7%8E%8B%E6%9C%9D"
+    },
+    "Q199443": {
+      "zh": "古尔王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8F%A4%E5%B0%94%E7%8E%8B%E6%9C%9D"
+    },
+    "Q189545": {
+      "zh": "赞吉王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%B5%9E%E5%90%89%E7%8E%8B%E6%9C%9D"
+    },
+    "Q180114": {
+      "zh": "阿尤布王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%B0%A4%E5%B8%83%E7%8E%8B%E6%9C%9D"
+    },
+    "Q11750543": {
+      "url": "https://en.wikipedia.org/wiki/Duchy_of_Kuyavia"
+    },
+    "Q2086556": {
+      "zh": "卡卡提亚王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E5%8D%A1%E6%8F%90%E4%BA%9E%E7%8E%8B%E6%9C%9D"
+    },
+    "Q235030": {
+      "zh": "安条克公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AE%89%E6%A2%9D%E5%85%8B%E5%85%AC%E5%9C%8B"
+    },
+    "Q486918": {
+      "zh": "花剌子模王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8A%B1%E5%89%8C%E5%AD%90%E6%A8%A1%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1431527": {
+      "zh": "布洛涅伯國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%83%E6%B4%9B%E6%B6%85%E4%BC%AF%E5%9C%8B"
+    },
+    "Q55502": {
+      "zh": "耶路撒冷王國",
+      "url": "https://zh.wikipedia.org/wiki/%E8%80%B6%E8%B7%AF%E6%92%92%E5%86%B7%E7%8E%8B%E5%9C%8B"
+    },
+    "Q3037": {
+      "zh": "加德满都",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8A%A0%E5%BE%B7%E6%BB%BF%E9%83%BD"
+    },
+    "Q2281221": {
+      "zh": "奧蘭治親王國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A7%E8%98%AD%E6%B2%BB%E8%A6%AA%E7%8E%8B%E5%9C%8B"
+    },
+    "Q230791": {
+      "zh": "苏格兰王国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8B%8F%E6%A0%BC%E5%85%B0%E7%8E%8B%E5%9B%BD"
+    },
+    "Q1154406": {
+      "zh": "室町幕府",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AE%A4%E7%94%BA%E5%B9%95%E5%BA%9C"
+    },
+    "Q27260": {
+      "zh": "薩瑪王朝",
+      "url": "https://en.wikipedia.org/wiki/Samma_dynasty"
+    },
+    "Q854": {
+      "zh": "斯里兰卡",
+      "url": "https://zh.wikipedia.org/wiki/%E6%96%AF%E9%87%8C%E8%98%AD%E5%8D%A1"
+    },
+    "Q1311219": {
+      "zh": "贾夫纳王国",
+      "url": "https://en.wikipedia.org/wiki/Jaffna_kingdom"
+    },
+    "Q307697": {
+      "zh": "扎亚尼德王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%89%8E%E4%BA%9A%E5%B0%BC%E5%BE%B7%E7%8E%8B%E6%9C%9D"
+    },
+    "Q887803": {
+      "zh": "汶萊帝國",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B1%B6%E8%90%8A%E5%B8%9D%E5%9C%8B"
+    },
+    "Q3284315": {
+      "zh": "苏木都剌国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8B%8F%E6%9C%A8%E9%83%BD%E5%89%8C%E5%9B%BD"
+    },
+    "Q213638": {
+      "zh": "塞浦路斯王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A1%9E%E6%B5%A6%E8%B7%AF%E6%96%AF%E7%8E%8B%E5%9B%BD"
+    },
+    "Q1642472": {
+      "zh": "湯都王國",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B9%AF%E9%83%BD"
+    },
+    "Q4401026": {
+      "url": "https://en.wikipedia.org/wiki/Namayan"
+    },
+    "Q874954": {
+      "zh": "西奥多罗公国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%8B%84%E5%A5%A7%E5%A4%9A%E7%BE%85%E5%85%AC%E5%9C%8B"
+    },
+    "Q1122980": {
+      "zh": "沃奈桑伯爵领地",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B2%83%E5%A5%88%E6%A1%91%E4%BC%AF%E7%88%B5%E9%A2%86%E5%9C%B0"
+    },
+    "Q2288": {
+      "zh": "特维尔",
+      "url": "https://zh.wikipedia.org/wiki/%E7%89%B9%E7%BB%B4%E5%B0%94"
+    },
+    "Q4083686": {
+      "zh": "孟加拉苏丹国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AD%9F%E5%8A%A0%E6%8B%89%E8%98%87%E4%B8%B9%E5%9C%8B"
+    },
+    "Q167134": {
+      "url": "https://en.wikipedia.org/wiki/Jaunpur_Sultanate"
+    },
+    "Q49326": {
+      "zh": "满者伯夷",
+      "url": "https://zh.wikipedia.org/wiki/%E6%BB%A1%E8%80%85%E4%BC%AF%E5%A4%B7"
+    },
+    "Q2096678": {
+      "zh": "桑达尔王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A9%B9%E9%81%94%E7%88%BE%E4%BE%AF%E5%9C%8B"
+    },
+    "Q148540": {
+      "zh": "佛罗伦萨共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BD%9B%E7%BD%97%E4%BC%A6%E8%90%A8%E5%85%B1%E5%92%8C%E5%9B%BD"
+    },
+    "Q521263": {
+      "zh": "西藏历史",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E8%97%8F%E5%8E%86%E5%8F%B2"
+    },
+    "Q178913": {
+      "zh": "特拉比松帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%89%B9%E6%8B%89%E6%AF%94%E6%9D%BE%E5%B8%9D%E5%9B%BD"
+    },
+    "Q207521": {
+      "zh": "阿比西尼亚帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9F%83%E5%A1%9E%E4%BF%84%E6%AF%94%E4%BA%9A%E5%B8%9D%E5%9B%BD"
+    },
+    "Q582861": {
+      "zh": "马林王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%A9%AC%E6%9E%97%E8%8B%8F%E4%B8%B9%E5%9B%BD"
+    },
+    "Q2365048": {
+      "zh": "阿达尔苏丹国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E8%BE%BE%E5%B0%94%E8%8B%8F%E4%B8%B9%E5%9B%BD"
+    },
+    "Q282428": {
+      "zh": "馬木留克王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%A6%AC%E6%9C%A8%E7%95%99%E5%85%8B%E8%98%87%E4%B8%B9%E5%9C%8B"
+    },
+    "Q184536": {
+      "zh": "马里帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%A9%AC%E9%87%8C%E5%B8%9D%E5%9B%BD"
+    },
+    "Q171393": {
+      "zh": "瓦拉几亚",
+      "url": "https://zh.wikipedia.org/wiki/%E7%93%A6%E6%8B%89%E5%B9%BE%E4%BA%9E"
+    },
+    "Q48189": {
+      "zh": "条顿骑士团",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9D%A1%E9%A1%BF%E9%AA%91%E5%A3%AB%E5%9B%A2"
+    },
+    "Q33698": {
+      "zh": "立窝尼亚语",
+      "url": "https://zh.wikipedia.org/wiki/%E7%AB%8B%E7%AA%9D%E5%B0%BC%E4%BA%9A%E8%AF%AD"
+    },
+    "Q208169": {
+      "zh": "拉古萨共和国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%8B%89%E5%8F%A4%E8%96%A9%E5%85%B1%E5%92%8C%E5%9C%8B"
+    },
+    "Q10800789": {
+      "zh": "后黎朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%BE%8C%E9%BB%8E%E6%9C%9D"
+    },
+    "Q1469100": {
+      "zh": "尕勒莽王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E6%8B%89%E6%9B%BC%E4%BE%AF%E5%9C%8B"
+    },
+    "Q10791211": {
+      "zh": "妙乌王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A6%99%E4%B9%8C%E7%8E%8B%E5%9B%BD"
+    },
+    "Q28025": {
+      "zh": "琉球国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%90%89%E7%90%83%E5%9B%BD"
+    },
+    "Q2500952": {
+      "zh": "阿瓦王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E7%93%A6%E7%8E%8B%E6%9C%9D"
+    },
+    "Q4765854": {
+      "zh": "掸族各邦",
+      "url": "https://zh.wikipedia.org/wiki/%E6%92%A3%E6%97%8F%E8%AB%B8%E9%82%A6"
+    },
+    "Q148499": {
+      "zh": "勃兰登堡边领",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8B%83%E8%98%AD%E7%99%BB%E5%A0%A1%E4%BE%AF%E5%9C%8B"
+    },
+    "Q317078": {
+      "zh": "普斯科夫共和國",
+      "url": "https://zh.wikipedia.org/wiki/%E6%99%AE%E6%96%AF%E7%A7%91%E5%A4%AB%E5%85%B1%E5%92%8C%E5%9C%8B"
+    },
+    "Q1232887": {
+      "zh": "萨沃伊伯爵",
+      "url": "https://zh.wikipedia.org/wiki/%E8%96%A9%E4%BC%8F%E4%BE%9D%E4%BC%AF%E5%9C%8B"
+    },
+    "Q28179": {
+      "zh": "朝鲜王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9C%9D%E9%B2%9C%E7%8E%8B%E6%9C%9D"
+    },
+    "Q39": {
+      "zh": "瑞士",
+      "url": "https://zh.wikipedia.org/wiki/%E7%91%9E%E5%A3%AB"
+    },
+    "Q796583": {
+      "zh": "刚果王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%88%9A%E6%9E%9C%E7%8E%8B%E5%9B%BD"
+    },
+    "Q217196": {
+      "zh": "卡斯提尔联合王国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E6%96%AF%E8%92%82%E5%88%A9%E4%BA%9E%E8%81%AF%E5%90%88%E7%8E%8B%E5%9C%8B"
+    },
+    "Q1264808": {
+      "zh": "杜勒卡迪尔",
+      "url": "https://zh.wikipedia.org/wiki/%E6%9D%9C%E5%8B%92%E5%8D%A1%E8%BF%AA%E7%88%BE%E4%BE%AF%E5%9C%8B"
+    },
+    "Q324470": {
+      "zh": "黑羊王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%BB%91%E7%BE%8A%E7%8E%8B%E6%9C%9D"
+    },
+    "Q311341": {
+      "zh": "哈萨绿洲",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E8%96%A9%E7%B6%A0%E6%B4%B2"
+    },
+    "Q238445": {
+      "zh": "格拉納達王國",
+      "url": "https://zh.wikipedia.org/wiki/%E6%A0%BC%E6%8B%89%E7%B4%8D%E9%81%94%E9%85%8B%E9%95%B7%E5%9C%8B"
+    },
+    "Q168352": {
+      "zh": "安哈特家族",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E6%96%AF%E5%9D%8E%E5%B0%BC%E5%AE%B6%E6%97%8F"
+    },
+    "Q167639": {
+      "zh": "毗奢耶那伽罗王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%AF%97%E5%A5%A2%E8%80%B6%E9%82%A3%E4%BC%BD%E7%BD%97%E5%B8%9D%E5%9B%BD"
+    },
+    "Q853477": {
+      "zh": "澜沧王国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%BE%9C%E6%B2%A7%E7%8E%8B%E5%9B%BD"
+    },
+    "Q160440": {
+      "zh": "克里米亚汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%85%8B%E9%87%8C%E7%B1%B3%E4%BA%9E%E6%B1%97%E5%9C%8B"
+    },
+    "Q47261": {
+      "zh": "巴伐利亚公国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B7%B4%E4%BC%90%E5%88%A9%E4%BA%9A%E5%85%AC%E5%9B%BD"
+    },
+    "Q9903": {
+      "zh": "明朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%98%8E%E6%9C%9D"
+    },
+    "Q186537": {
+      "zh": "喀山汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%96%80%E5%B1%B1%E6%B1%97%E5%9C%8B"
+    },
+    "Q187684": {
+      "zh": "伊庇魯斯專制國",
+      "url": "https://zh.wikipedia.org/wiki/%E4%BC%8A%E5%BA%87%E9%AD%AF%E6%96%AF%E5%B0%88%E5%88%B6%E5%9C%8B"
+    },
+    "Q1794352": {
+      "zh": "特里爾選侯國",
+      "url": "https://zh.wikipedia.org/wiki/%E7%89%B9%E9%87%8C%E7%88%BE%E9%81%B8%E4%BE%AF%E5%9C%8B"
+    },
+    "Q190513": {
+      "zh": "西伯利亚汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%A5%BF%E4%BC%AF%E5%88%A9%E4%BA%9A%E6%B1%97%E5%9B%BD"
+    },
+    "Q580447": {
+      "zh": "施蒂利亞公國",
+      "url": "https://zh.wikipedia.org/wiki/%E6%96%BD%E8%92%82%E5%88%A9%E4%BA%9E%E5%85%AC%E5%9C%8B"
+    },
+    "Q79861": {
+      "zh": "米却肯州",
+      "url": "https://zh.wikipedia.org/wiki/%E7%B1%B3%E5%8D%B4%E8%82%AF%E5%B7%9E"
+    },
+    "Q374521": {
+      "zh": "巴赫曼尼苏丹国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B7%B4%E8%B5%AB%E6%9B%BC%E5%B0%BC%E8%8B%8F%E4%B8%B9%E5%9B%BD"
+    },
+    "Q4332415": {
+      "zh": "四衛拉特",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9B%9B%E8%A1%9B%E6%8B%89%E7%89%B9"
+    },
+    "Q28573": {
+      "zh": "印加帝國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%B0%E5%8A%A0%E5%B8%9D%E5%9C%8B"
+    },
+    "Q1572529": {
+      "zh": "勃固王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8B%83%E5%9B%BA%E7%8E%8B%E6%9C%9D"
+    },
+    "Q68518": {
+      "zh": "易洛魁聯盟",
+      "url": "https://zh.wikipedia.org/wiki/%E6%98%93%E6%B4%9B%E9%AD%81%E8%81%AF%E7%9B%9F"
+    },
+    "Q10957559": {
+      "zh": "摩尔达维亚公国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%91%A9%E5%B0%94%E8%BE%BE%E7%BB%B4%E4%BA%9A%E5%85%AC%E5%9B%BD"
+    },
+    "Q2261321": {
+      "zh": "拉玛赞",
+      "url": "https://en.wikipedia.org/wiki/Ramadanid_Emirate"
+    },
+    "Q752662": {
+      "zh": "哈夫斯王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E5%A4%AB%E6%96%AF%E7%8E%8B%E6%9C%9D"
+    },
+    "Q229411": {
+      "zh": "德里苏丹国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%BE%B7%E9%87%8C%E8%98%87%E4%B8%B9%E5%9C%8B"
+    },
+    "Q155594": {
+      "zh": "奥尔登堡王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A5%E5%B0%94%E7%99%BB%E5%A0%A1%E7%8E%8B%E6%9C%9D"
+    },
+    "Q2746": {
+      "zh": "梁赞",
+      "url": "https://zh.wikipedia.org/wiki/%E6%A2%81%E8%B5%9E"
+    },
+    "Q836169": {
+      "zh": "卡西姆汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E8%A5%BF%E5%A7%86%E6%B1%97%E5%9C%8B"
+    },
+    "Q11709": {
+      "zh": "洛迪王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B4%9B%E8%BF%AA%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1059707": {
+      "zh": "兰纳",
+      "url": "https://zh.wikipedia.org/wiki/%E8%98%AD%E7%B4%8D"
+    },
+    "Q123027565": {
+      "url": "https://en.wikipedia.org/wiki/Kashmir_Sultanate"
+    },
+    "Q1716871": {
+      "zh": "瓦卢瓦-安茹王室",
+      "url": "https://zh.wikipedia.org/wiki/%E7%93%A6%E5%8D%A2%E7%93%A6%E2%80%94%E5%AE%89%E8%8C%B9%E5%AE%B6%E6%97%8F"
+    },
+    "Q12560": {
+      "zh": "奥斯曼帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A5%E6%96%AF%E6%9B%BC%E5%B8%9D%E5%9B%BD"
+    },
+    "Q153529": {
+      "zh": "米兰公国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%B1%B3%E5%85%B0%E5%85%AC%E5%9B%BD"
+    },
+    "Q4712": {
+      "zh": "勃艮第公國",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8B%83%E8%89%AE%E7%AC%AC%E5%85%AC%E5%9C%8B"
+    },
+    "Q2980623": {
+      "zh": "波斯尼亚王国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%A2%E5%A3%AB%E5%B0%BC%E4%BA%9E%E7%8E%8B%E5%9C%8B"
+    },
+    "Q1481436": {
+      "zh": "富瓦伯国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AF%8C%E7%93%A6%E4%BC%AF%E5%9B%BD"
+    },
+    "Q106311455": {
+      "zh": "聖薩瓦公國",
+      "url": "https://en.wikipedia.org/wiki/Duchy_of_Saint_Sava"
+    },
+    "Q487829": {
+      "zh": "察合台汗国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%AF%9F%E5%90%88%E5%8F%B0%E6%B1%97%E5%9C%8B"
+    },
+    "Q605051": {
+      "zh": "图赖讷",
+      "url": "https://zh.wikipedia.org/wiki/%E5%9B%BE%E8%B5%96%E8%AE%B7"
+    },
+    "Q631210": {
+      "zh": "諾蓋汗國",
+      "url": "https://zh.wikipedia.org/wiki/%E8%AB%BE%E8%93%8B%E6%B1%97%E5%9C%8B"
+    },
+    "Q2991012": {
+      "zh": "迪斯蒙伯爵",
+      "url": "https://en.wikipedia.org/wiki/Earl_of_Desmond"
+    },
+    "Q2132267": {
+      "zh": "拉蘇勒王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%8B%89%E8%98%87%E5%8B%92%E7%8E%8B%E6%9C%9D"
+    },
+    "Q79965": {
+      "zh": "金帳汗國",
+      "url": "https://zh.wikipedia.org/wiki/%E6%AC%BD%E5%AF%9F%E6%B1%97%E5%9C%8B"
+    },
+    "Q62623": {
+      "zh": "卡尔马联合",
+      "url": "https://zh.wikipedia.org/wiki/%E5%8D%A1%E5%B0%94%E9%A9%AC%E8%81%94%E7%9B%9F"
+    },
+    "Q194355": {
+      "zh": "雅盖洛王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E9%9B%85%E7%9B%96%E9%9A%86%E7%8E%8B%E6%9C%9D"
+    },
+    "Q155019": {
+      "zh": "洛林公国",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B4%9B%E6%9E%97%E5%85%AC%E5%9B%BD"
+    },
+    "Q676745": {
+      "zh": "阿尔马尼亚克行省",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E9%A9%AC%E5%B0%BC%E4%BA%9A%E5%85%8B"
+    },
+    "Q58389": {
+      "zh": "波旁王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E6%B3%A2%E6%97%81%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1406298": {
+      "zh": "塞尔维亚帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A1%9E%E5%B0%94%E7%BB%B4%E4%BA%9A%E5%B8%9D%E5%9B%BD"
+    },
+    "Q555994": {
+      "zh": "白羊王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E7%99%BD%E7%BE%8A%E7%8E%8B%E6%9C%9D"
+    },
+    "Q1947408": {
+      "url": "https://en.wikipedia.org/wiki/County_of_P%C3%A9rigord"
+    },
+    "Q1152": {
+      "zh": "奥弗涅",
+      "url": "https://zh.wikipedia.org/wiki/%E5%A5%A7%E5%BC%97%E6%B6%85"
+    },
+    "Q863279": {
+      "zh": "素可泰王国",
+      "url": "https://zh.wikipedia.org/wiki/%E7%B4%A0%E5%8F%AF%E6%B3%B0%E7%8E%8B%E5%9B%BD"
+    },
+    "Q2608489": {
+      "zh": "阿兹特克联盟",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E5%85%B9%E7%89%B9%E5%85%8B%E5%B8%9D%E5%9B%BD"
+    },
+    "Q484195": {
+      "zh": "帖木儿帝国",
+      "url": "https://zh.wikipedia.org/wiki/%E5%B8%96%E6%9C%A8%E5%84%BF%E5%B8%9D%E5%9B%BD"
+    },
+    "Q170770": {
+      "zh": "莫斯科大公国",
+      "url": "https://zh.wikipedia.org/wiki/%E8%8E%AB%E6%96%AF%E7%A7%91%E5%A4%A7%E5%85%AC%E5%9B%BD"
+    },
+    "Q65968": {
+      "zh": "哈布斯堡王朝",
+      "url": "https://zh.wikipedia.org/wiki/%E5%93%88%E5%B8%83%E6%96%AF%E5%A0%A1%E7%8E%8B%E6%9C%9D"
+    },
+    "Q841364": {
+      "zh": "大城王国",
+      "url": "https://zh.wikipedia.org/wiki/%E9%98%BF%E7%91%9C%E9%99%80%E8%80%B6%E7%8E%8B%E5%9B%BD"
+    }
+  }
+}

@@ -23,18 +23,37 @@
     </div>
     <section class="panel atlas-panel" aria-label="历史世界地图">
       <div class="atlas-toolbar">
-        <div id="atlas-years" role="group" aria-label="选择年代"></div>
+        <div class="atlas-time">
+          <label for="atlas-year">地图年代</label>
+          <input id="atlas-year" type="range" min="0" max="3" step="1" value="0" disabled>
+          <div id="atlas-years" aria-hidden="true"></div>
+        </div>
         <p id="atlas-status" role="status">正在加载地图…</p>
       </div>
-      <div id="atlas-map" aria-label="可平移和缩放的世界地图"></div>
+      <div class="atlas-map-stage">
+        <div id="atlas-map" aria-label="可平移和缩放的世界地图"></div>
+        <section id="atlas-polity" class="panel atlas-polity" aria-label="政权资料" hidden>
+          <div class="atlas-polity-header">
+            <h2 id="atlas-polity-name"></h2>
+            <button id="atlas-polity-close" type="button" aria-label="关闭政权资料">×</button>
+          </div>
+          <p id="atlas-polity-original" class="meta" lang="en" hidden></p>
+          <p id="atlas-polity-year"></p>
+          <p id="atlas-polity-years"></p>
+          <p><a id="atlas-polity-encyclopedia" target="_blank" rel="noopener noreferrer" hidden>查看百科</a>
+            <span id="atlas-polity-no-encyclopedia" class="meta">暂无百科链接</span></p>
+        </section>
+      </div>
       <footer class="atlas-footer">
         <span><i aria-hidden="true"></i> Cliopatria 收录的历史疆界</span>
         <span>Natural Earth 自然地理底图</span>
+        <span>未着色区域表示本数据集缺少记录，当时仍可能有人居住或存在政权。</span>
       </footer>
     </section>
     <details class="atlas-sources">
       <summary>地图数据来源</summary>
       <ul id="atlas-sources"></ul>
+      <p id="atlas-source-record" hidden></p>
     </details>
   </main>
 </body>

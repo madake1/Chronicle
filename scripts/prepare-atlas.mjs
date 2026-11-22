@@ -3,6 +3,7 @@ import { mkdir, readFile } from 'node:fs/promises';
 import { unzipSync } from 'fflate';
 import { atomicWrite } from '../note-storage.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
+import { buildEncyclopedia } from './atlas-encyclopedia.mjs';
 
 const output = new URL('../atlas-data/', import.meta.url);
 const raw = new URL('raw/', output);
@@ -41,10 +42,12 @@ const geojson = unpacked['cliopatria_polities_only_v021.geojson'];
 if (!geojson) throw new Error('Missing Cliopatria GeoJSON');
 const original = JSON.parse(Buffer.from(geojson.buffer, geojson.byteOffset, geojson.byteLength));
 const slices = [];
+const encyclopediaRecords = new Map();
 for (const year of atlasYears) {
   const features = original.features.flatMap((feature, sourceIndex) => {
-    const { Name, Type, FromYear, ToYear } = feature.properties;
+    const { Name, Type, FromYear, ToYear, Wikipedia, Wikidata } = feature.properties;
     if (Type !== 'POLITY' || FromYear > year || ToYear < year) return [];
+    encyclopediaRecords.set(sourceIndex, { sourceIndex, Wikipedia, Wikidata });
     return [{ type: 'Feature', geometry: feature.geometry, properties: {
       name: Name, fromYear: FromYear, toYear: ToYear, sourceIndex,
     } }];
@@ -64,9 +67,20 @@ for (const [name, bytes] of Object.entries({ land, lakes })) {
   }))));
 }
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+const encyclopediaFile = new URL('../atlas-encyclopedia.json', import.meta.url);
+if (process.argv.includes('--refresh-encyclopedia')) {
+  console.log('Resolving Wikipedia and Wikidata links…');
+  const index = await buildEncyclopedia([...encyclopediaRecords.values()]);
+  await atomicWrite(encyclopediaFile, JSON.stringify({
+    archiveSha256: digest(archive), ...index,
+  }, null, 2) + '\n');
+}
+const encyclopedia = JSON.parse(await readFile(encyclopediaFile, 'utf8'));
+if (encyclopedia.archiveSha256 !== digest(archive)) throw new Error('百科索引与 Cliopatria 原始包版本不匹配');
 await save('manifest.json', {
   schemaVersion: 1,
   slices,
   sources: atlasSources,
+  encyclopedia: { byRecord: encyclopedia.byRecord, entities: encyclopedia.entities },
   sha256: { cliopatriaArchive: digest(archive), naturalEarthLand: digest(land), naturalEarthLakes: digest(lakes) },
 });
