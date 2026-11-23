@@ -1,0 +1,2200 @@
+{
+  "version": "全球大事记 1.1 · 2026-11-23",
+  "events": [
+    {
+      "id": "uruk-early-writing",
+      "name": "乌鲁克出现早期文字",
+      "startYear": -3200,
+      "endYear": -3000,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "两河流域出土的早期泥板用于记录物资、劳作和交易，见证了城市社会发展中的书写实践。",
+      "placeName": "乌鲁克考古区",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/de/essays/the-origins-of-writing"
+        }
+      ]
+    },
+    {
+      "id": "akkadian-dynasty",
+      "name": "阿卡德王朝兴起与扩张",
+      "startYear": -2350,
+      "endYear": -2150,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "萨尔贡及其继承人把两河流域多个城邦置于同一王朝之下。",
+      "placeName": "两河流域",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/ko/-/media/files/learn/for-educators/publications-for-educators/art-of-the-ancient-near-east.pdf"
+        }
+      ]
+    },
+    {
+      "id": "hammurabi-reign",
+      "name": "汉谟拉比统治巴比伦",
+      "startYear": -1792,
+      "endYear": -1750,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "汉谟拉比扩张巴比伦王国，刻有判例和规定的石碑留下王室治理的重要记录。",
+      "placeName": "古巴比伦",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/de/toah/hd/meru/hd_meru.htm"
+        }
+      ]
+    },
+    {
+      "id": "hittite-collapse",
+      "name": "赫梯帝国在青铜时代末期瓦解",
+      "startYear": -1200,
+      "endYear": -1200,
+      "datePrecision": "reported-year",
+      "dateLabel": "约略纪年",
+      "category": "politics",
+      "description": "赫梯帝国的中央政权约在公元前1200年瓦解，安纳托利亚南部仍有继承其部分传统的国家。",
+      "placeName": "安纳托利亚",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/es/essays/the-hittites"
+        }
+      ]
+    },
+    {
+      "id": "cyrus-enters-babylon",
+      "name": "居鲁士二世取得巴比伦",
+      "startYear": -539,
+      "endYear": -539,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "波斯统治者居鲁士二世取得巴比伦，随后该城成为阿契美尼德帝国的重要中心。",
+      "placeName": "巴比伦古城",
+      "location": [
+        44.421,
+        32.542
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/exhibitions/listings/2013/cyrus-cylinder"
+        },
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/278/"
+        }
+      ]
+    },
+    {
+      "id": "persepolis-foundation",
+      "name": "大流士一世营建波斯波利斯",
+      "startYear": -518,
+      "endYear": -518,
+      "datePrecision": "year",
+      "category": "culture",
+      "description": "阿契美尼德王朝在山麓营建王室建筑群，后来历代君主继续扩建。",
+      "placeName": "伊朗波斯波利斯遗址",
+      "location": [
+        52.891,
+        29.935
+      ],
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/114/"
+        }
+      ]
+    },
+    {
+      "id": "marathon-battle",
+      "name": "马拉松战役",
+      "startYear": -490,
+      "endYear": -490,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "雅典与普拉提亚军队击败登陆马拉松的波斯军。",
+      "placeName": "希腊马拉松平原",
+      "location": [
+        23.979,
+        38.122
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://artistproject.metmuseum.org/toah/ht/04/eusb.html"
+        }
+      ]
+    },
+    {
+      "id": "salamis-battle",
+      "name": "萨拉米斯海战",
+      "startYear": -480,
+      "endYear": -480,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "希腊联军在萨拉米斯附近击败波斯舰队。",
+      "placeName": "希腊萨拉米斯海峡",
+      "location": [
+        23.577,
+        37.96
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://artistproject.metmuseum.org/toah/ht/04/eusb.html"
+        }
+      ]
+    },
+    {
+      "id": "peloponnesian-war",
+      "name": "伯罗奔尼撒战争",
+      "startYear": -431,
+      "endYear": -404,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "以雅典和斯巴达为首的联盟长期交战，最终雅典失去帝国地位。",
+      "placeName": "希腊及爱琴海周边",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://artistproject.metmuseum.org/toah/ht/04/eusb.html"
+        }
+      ]
+    },
+    {
+      "id": "alexander-campaigns",
+      "name": "亚历山大东征",
+      "startYear": -334,
+      "endYear": -323,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "亚历山大从马其顿渡入亚洲，击败阿契美尼德王朝，军事扩张及其后的政治重组促进了希腊化文化传播。",
+      "placeName": "小亚细亚、埃及至印度河流域",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/ru/essays/art-of-the-hellenistic-age-and-the-hellenistic-tradition"
+        }
+      ]
+    },
+    {
+      "id": "alexander-enters-egypt",
+      "name": "亚历山大进入埃及",
+      "startYear": -332,
+      "endYear": -332,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "亚历山大结束波斯对埃及的统治，埃及随后进入希腊化政治秩序。",
+      "placeName": "埃及",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/pt/essays/egypt-in-the-ptolemaic-period"
+        }
+      ]
+    },
+    {
+      "id": "ashoka-reign",
+      "name": "阿育王在位",
+      "startYear": -273,
+      "endYear": -232,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "阿育王的岩刻和石柱铭文分布于多地，记录其施政理念及对佛教的支持。",
+      "placeName": "南亚孔雀王朝",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/zh/toah/ht/04/ssa.html"
+        }
+      ]
+    },
+    {
+      "id": "western-han-founded",
+      "name": "刘邦即皇帝位",
+      "startYear": -202,
+      "endYear": -202,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "楚汉争衡结束后，刘邦即皇帝位。此处采用即位年，西汉的常用纪年可从公元前 206 年起算。",
+      "placeName": "中国西汉",
+      "sources": [
+        {
+          "title": "史密森学会亚洲艺术国家博物馆",
+          "url": "https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/"
+        }
+      ]
+    },
+    {
+      "id": "roman-egypt",
+      "name": "埃及成为罗马行省",
+      "startYear": -30,
+      "endYear": -30,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "托勒密王朝结束后，屋大维将埃及纳入罗马统治。尼罗河流域成为罗马帝国的重要粮源。",
+      "placeName": "埃及",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/de/essays/roman-egypt"
+        }
+      ]
+    },
+    {
+      "id": "augustus-principate",
+      "name": "屋大维获奥古斯都称号",
+      "startYear": -27,
+      "endYear": -27,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "屋大维获得奥古斯都称号。这一政治安排通常用作罗马元首制的起点。",
+      "placeName": "罗马",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/it/essays/the-roman-empire-27-b-c-393-a-d"
+        }
+      ]
+    },
+    {
+      "id": "eastern-han-restoration",
+      "name": "东汉建立",
+      "startYear": 25,
+      "endYear": 25,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "刘秀即位后重建汉朝统治，以洛阳为政治中心。",
+      "placeName": "中国洛阳及中原",
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目",
+          "url": "https://afe.easia.columbia.edu/timelines/china_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "vesuvius-eruption",
+      "name": "维苏威火山喷发掩埋庞贝",
+      "startYear": 79,
+      "endYear": 79,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "喷发严重破坏庞贝和赫库兰尼姆等聚落。地图标出火山，罗马时期城市遗址分布在其周围。",
+      "placeName": "维苏威火山与坎帕尼亚沿岸",
+      "location": [
+        14.426,
+        40.822
+      ],
+      "sources": [
+        {
+          "title": "庞贝考古公园",
+          "url": "https://pompeiisites.org/en/pompeii-and-beyond-en/bound-for-disaster-pompeii-and-herculaneum-2/"
+        }
+      ]
+    },
+    {
+      "id": "han-collapse",
+      "name": "东汉终结",
+      "startYear": 220,
+      "endYear": 220,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "汉献帝禅让，曹魏取代东汉，三国时期的政治格局逐渐形成。",
+      "placeName": "中国中原",
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目",
+          "url": "https://afe.easia.columbia.edu/timelines/china_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "gupta-flourishing",
+      "name": "笈多王朝在南亚北部发展",
+      "startYear": 321,
+      "endYear": 500,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "笈多时期留下重要的宗教造像、文学和学术成果。区间采用博物馆教育资料的约略纪年。",
+      "placeName": "南亚北部",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://resources.metmuseum.org/resources/metpublications/pdf/The_Art_of_South_and_Southeast_Asia_A_Resource_for_Educators.pdf"
+        }
+      ]
+    },
+    {
+      "id": "constantinople-dedication",
+      "name": "君士坦丁堡落成典礼",
+      "startYear": 330,
+      "endYear": 330,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "君士坦丁扩建拜占庭旧城，并在此建立新的罗马帝国政治中心。",
+      "placeName": "君士坦丁堡古城",
+      "placeId": "constantinople-istanbul",
+      "location": [
+        28.98,
+        41.01
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/de/essays/byzantium-ca-330-1453"
+        },
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/356/"
+        }
+      ]
+    },
+    {
+      "id": "western-roman-fall",
+      "name": "西罗马末代皇帝罗慕路斯被废",
+      "startYear": 476,
+      "endYear": 476,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "奥多亚塞废黜罗慕路斯·奥古斯都。476 年常用作西罗马帝国在意大利结束统治的标志。",
+      "placeName": "意大利半岛",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://artistproject.metmuseum.org/toah/ht/05/eust.html"
+        }
+      ]
+    },
+    {
+      "id": "justinian-accession",
+      "name": "查士丁尼一世即位",
+      "startYear": 527,
+      "endYear": 527,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "查士丁尼成为东罗马皇帝。其统治以法典编纂、教堂营建以及地中海军事扩张著称。",
+      "placeName": "东罗马帝国君士坦丁堡",
+      "placeId": "constantinople-istanbul",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/es/essays/the-byzantine-state-under-justinian-i-justinian-the-great"
+        }
+      ]
+    },
+    {
+      "id": "hagia-sophia-construction",
+      "name": "查士丁尼时期圣索菲亚大教堂营建",
+      "startYear": 532,
+      "endYear": 537,
+      "datePrecision": "year",
+      "category": "culture",
+      "description": "旧教堂在骚乱中被毁后，查士丁尼主持重建。巨大的穹顶和内部空间影响了后来的宗教建筑。",
+      "placeName": "君士坦丁堡圣索菲亚大教堂",
+      "placeId": "constantinople-istanbul",
+      "location": [
+        28.98,
+        41.008
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/de/essays/hagia-sophia-532-37"
+        }
+      ]
+    },
+    {
+      "id": "sui-founded",
+      "name": "隋朝建立",
+      "startYear": 581,
+      "endYear": 581,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "杨坚建立隋朝，数年后南北政权归于统一。",
+      "placeName": "中国北方",
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目",
+          "url": "https://afe.easia.columbia.edu/timelines/china_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "sui-reunification",
+      "name": "隋统一南北",
+      "startYear": 589,
+      "endYear": 589,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "隋灭陈，结束长期的南北政治分立。",
+      "placeName": "中国南北地区",
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目",
+          "url": "https://afe.easia.columbia.edu/timelines/china_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "sui-grand-canal",
+      "name": "隋代大运河体系形成",
+      "startYear": 601,
+      "endYear": 700,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "economy",
+      "description": "隋代拓展和连接多段水道，形成沟通南北的运输体系。时间采用资料记载的 7 世纪阶段。",
+      "placeName": "中国大运河沿线",
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/1443/"
+        }
+      ]
+    },
+    {
+      "id": "hijra",
+      "name": "穆罕默德迁往麦地那",
+      "startYear": 622,
+      "endYear": 622,
+      "datePrecision": "year",
+      "category": "religion",
+      "description": "穆罕默德与追随者迁往麦地那，建立新的社群。这一事件成为伊斯兰纪年的起点。",
+      "placeName": "麦加至麦地那",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/fr/toah/ht/06/wap.html"
+        }
+      ]
+    },
+    {
+      "id": "abbasid-founded",
+      "name": "阿拔斯王朝建立",
+      "startYear": 750,
+      "endYear": 750,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "阿拔斯家族取代倭马亚王朝在哈里发国家核心地区的统治。",
+      "placeName": "西亚与中东",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/ja/essays/the-art-of-the-abbasid-period-750-1258"
+        }
+      ]
+    },
+    {
+      "id": "an-lushan-rebellion",
+      "name": "安史之乱",
+      "startYear": 755,
+      "endYear": 763,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "安禄山举兵后叛乱延续多年。战事严重破坏唐王朝的财政与政治秩序。",
+      "placeName": "唐朝北方与中原",
+      "sources": [
+        {
+          "title": "史密森学会亚洲艺术国家博物馆",
+          "url": "https://asia.si.edu/glossary/an-lushan/"
+        }
+      ]
+    },
+    {
+      "id": "baghdad-founded",
+      "name": "阿拔斯王朝营建巴格达",
+      "startYear": 762,
+      "endYear": 762,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "哈里发曼苏尔建立新都，巴格达此后成为行政、商贸和知识交流的重要城市。",
+      "placeName": "伊拉克巴格达",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/ja/essays/the-art-of-the-abbasid-period-750-1258"
+        }
+      ]
+    },
+    {
+      "id": "samarra-capital",
+      "name": "萨迈拉成为阿拔斯王朝首都",
+      "startYear": 836,
+      "endYear": 836,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "阿拔斯哈里发迁都萨迈拉，遗址中的宫殿和清真寺见证了都城阶段。",
+      "placeName": "伊拉克萨迈拉遗址",
+      "location": [
+        43.88257,
+        34.22628
+      ],
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/276/"
+        },
+        {
+          "title": "UNESCO · 萨迈拉考古城中央区点位",
+          "url": "https://whc.unesco.org/en/list/276/maps/"
+        }
+      ]
+    },
+    {
+      "id": "chichen-itza-flourishing",
+      "name": "奇琴伊察的后古典早期发展",
+      "startYear": 901,
+      "endYear": 1200,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "尤卡坦的玛雅城市经历多个营建阶段，留下阶梯金字塔和仪式空间。",
+      "placeName": "墨西哥奇琴伊察遗址",
+      "location": [
+        -88.568,
+        20.684
+      ],
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/483/"
+        }
+      ]
+    },
+    {
+      "id": "goryeo-founded",
+      "name": "高丽王朝建立",
+      "startYear": 918,
+      "endYear": 918,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "王建建立高丽政权，随后高丽逐步控制半岛的大部分地区。",
+      "placeName": "朝鲜半岛",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/ja/toah/ht/07/eak.html"
+        }
+      ]
+    },
+    {
+      "id": "northern-song-founded",
+      "name": "北宋建立",
+      "startYear": 960,
+      "endYear": 960,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "赵匡胤建立宋朝，以开封为都。北宋时期延续到 1127 年。",
+      "placeName": "东京开封府",
+      "placeId": "song-kaifeng",
+      "location": [
+        114.34,
+        34.79
+      ],
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目",
+          "url": "https://afe.easia.columbia.edu/timelines/china_timeline.htm"
+        },
+        {
+          "title": "大都会艺术博物馆 · 中国 1000–1400 年年表",
+          "url": "https://www.metmuseum.org/zh/toah/ht/07/eac"
+        }
+      ]
+    },
+    {
+      "id": "crusades-levant",
+      "name": "东地中海十字军时期",
+      "startYear": 1095,
+      "endYear": 1291,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "欧洲多次组织东征，并在黎凡特建立政权。此条采用博物馆对这一系列东征的年代划分。",
+      "placeName": "东地中海与黎凡特",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/essays/the-crusades-1095-1291"
+        }
+      ]
+    },
+    {
+      "id": "southern-song-established",
+      "name": "南宋建立",
+      "startYear": 1127,
+      "endYear": 1127,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "北宋灭亡后，赵构即位，宋朝政治中心逐步转移到南方。",
+      "placeName": "中国东部与江南",
+      "sources": [
+        {
+          "title": "哥伦比亚大学亚洲教育项目",
+          "url": "https://afe.easia.columbia.edu/timelines/china_timeline.htm"
+        }
+      ]
+    },
+    {
+      "id": "delhi-sultanate-founded",
+      "name": "德里苏丹国建立",
+      "startYear": 1206,
+      "endYear": 1206,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "库特卜丁·艾巴克建立政权，开启德里苏丹国的第一个王朝。",
+      "placeName": "印度德里",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/ko/toah/hd/ssar/hd_ssar.htm"
+        }
+      ]
+    },
+    {
+      "id": "mongol-empire-founded",
+      "name": "铁木真获成吉思汗称号",
+      "startYear": 1206,
+      "endYear": 1206,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "蒙古诸部在铁木真领导下形成新的政治共同体，他取得成吉思汗称号。",
+      "placeName": "蒙古高原",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/pt/essays/the-legacy-of-genghis-khan"
+        }
+      ]
+    },
+    {
+      "id": "magna-carta",
+      "name": "《大宪章》获约翰王同意",
+      "startYear": 1215,
+      "endYear": 1215,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "约翰王在男爵压力下同意宪章。其后版本成为英格兰法律传统的重要来源。",
+      "placeName": "英格兰兰尼米德",
+      "sources": [
+        {
+          "title": "英国议会",
+          "url": "https://www.parliament.uk/globalassets/documents/magna-carta-and-parliament-booklet.pdf"
+        }
+      ]
+    },
+    {
+      "id": "maori-early-settlement",
+      "name": "波利尼西亚航海者定居新西兰",
+      "startYear": 1250,
+      "endYear": 1300,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "category": "society",
+      "description": "考古测年支持约 13 世纪后半叶开始定居。早期定居地点和具体年份无法用单一点位表示。",
+      "placeName": "新西兰各岛",
+      "sources": [
+        {
+          "title": "新西兰官方百科 Te Ara",
+          "url": "https://teara.govt.nz/en/when-was-new-zealand-first-settled"
+        }
+      ]
+    },
+    {
+      "id": "baghdad-1258",
+      "name": "蒙古军攻陷巴格达",
+      "startYear": 1258,
+      "endYear": 1258,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "旭烈兀率领的蒙古军攻占巴格达，阿拔斯王朝在该城的哈里发统治告终。",
+      "placeName": "伊拉克巴格达",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://artistproject.metmuseum.org/toah/ht/07/wam.html"
+        }
+      ]
+    },
+    {
+      "id": "southern-song-ended",
+      "name": "南宋灭亡",
+      "startYear": 1279,
+      "endYear": 1279,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "元朝攻灭南宋，结束宋朝政权。此条与 1271 年忽必烈定国号为元分别记录。",
+      "placeName": "中国南方",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/zh/toah/ht/07/eac"
+        }
+      ]
+    },
+    {
+      "id": "black-death-first-wave",
+      "name": "黑死病在欧洲的第一轮大流行",
+      "startYear": 1347,
+      "endYear": 1353,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "鼠疫沿陆海交通路线扩散，造成严重人口损失。此区间只指欧洲的第一轮传播，其他地区及其后反复暴发另有时间范围。",
+      "placeName": "欧洲及相邻海域",
+      "sources": [
+        {
+          "title": "伦敦博物馆",
+          "url": "https://www.londonmuseum.org.uk/collections/london-stories/great-pestilence-london/"
+        }
+      ]
+    },
+    {
+      "id": "ming-founded",
+      "name": "明朝建立",
+      "startYear": 1368,
+      "endYear": 1368,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "朱元璋建立明朝，初都南京。明初统治逐步扩展至原元朝控制的其他地区。",
+      "placeName": "南京",
+      "sources": [
+        {
+          "title": "史密森学会亚洲艺术国家博物馆",
+          "url": "https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/"
+        }
+      ]
+    },
+    {
+      "id": "columbus-first-caribbean-voyage",
+      "name": "哥伦布首次抵达加勒比海",
+      "startYear": 1492,
+      "endYear": 1492,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "西班牙王室支持的远航从欧洲抵达加勒比海，随后大西洋两岸联系迅速加深。",
+      "placeName": "加勒比海及大西洋航线",
+      "sources": [
+        {
+          "title": "美国国会图书馆",
+          "url": "https://www.loc.gov/exhibits/1492/index.html"
+        }
+      ]
+    },
+    {
+      "id": "mughal-founded",
+      "name": "莫卧儿王朝建立",
+      "startYear": 1526,
+      "endYear": 1526,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "巴布尔在第一次帕尼帕特战役获胜后，建立了莫卧儿王朝。",
+      "placeName": "印度北部",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/essays/the-art-of-the-mughals-before-1600"
+        }
+      ]
+    },
+    {
+      "id": "akbar-accession",
+      "name": "阿克巴即位",
+      "startYear": 1556,
+      "endYear": 1556,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "阿克巴继承王位，之后扩展莫卧儿政权并推进新的行政安排。",
+      "placeName": "莫卧儿帝国",
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/essays/the-art-of-the-mughals-before-1600"
+        }
+      ]
+    },
+    {
+      "id": "taj-mahal-construction",
+      "name": "泰姬陵营建",
+      "startYear": 1632,
+      "endYear": 1648,
+      "datePrecision": "year",
+      "category": "culture",
+      "description": "莫卧儿皇帝沙贾汗为穆姆塔兹·玛哈尔修建陵寝。此区间采用 UNESCO 记载的陵墓主要工程年代，附属工程另有后续。",
+      "placeName": "印度阿格拉泰姬陵",
+      "location": [
+        78.042,
+        27.175
+      ],
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心",
+          "url": "https://whc.unesco.org/en/list/252/"
+        }
+      ]
+    },
+    {
+      "id": "first-english-civil-war",
+      "name": "第一次英格兰内战",
+      "startYear": 1642,
+      "endYear": 1646,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "查理一世的支持者与议会军争夺各地的控制权。王党控制的牛津在 1646 年投降。",
+      "placeName": "英格兰与威尔士",
+      "sources": [
+        {
+          "title": "英国国家陆军博物馆",
+          "url": "https://www.nam.ac.uk/explore/british-civil-wars"
+        }
+      ]
+    },
+    {
+      "id": "qing-beijing",
+      "name": "清朝迁都北京",
+      "startYear": 1644,
+      "endYear": 1644,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "清军入关后，清廷在北京建立新的统治中心。此年用于标记北京成为清朝都城。",
+      "placeName": "北京",
+      "sources": [
+        {
+          "title": "史密森学会亚洲艺术国家博物馆",
+          "url": "https://asia.si.edu/education/educator-resources/teaching-china-with-the-smithsonian/interactives/timelines/timeline-of-chinese-history-art-and-culture/"
+        }
+      ]
+    },
+    {
+      "id": "english-bill-of-rights",
+      "name": "英格兰《权利法案》",
+      "startYear": 1689,
+      "endYear": 1689,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "法案限制王权并确认议会的一系列权利，成为此后君主立宪发展的重要文件。",
+      "placeName": "英格兰议会",
+      "sources": [
+        {
+          "title": "英国议会",
+          "url": "https://www.parliament.uk/about/living-heritage/evolutionofparliament/parliamentaryauthority/revolution/overview/billofrights/"
+        }
+      ]
+    },
+    {
+      "id": "acts-of-union",
+      "name": "英格兰与苏格兰议会合并",
+      "startYear": 1707,
+      "endYear": 1707,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "两国通过联合立法组成大不列颠王国，建立一个联合议会。",
+      "placeName": "英格兰与苏格兰",
+      "sources": [
+        {
+          "title": "英国议会",
+          "url": "https://www.parliament.uk/about/living-heritage/evolutionofparliament/legislativescrutiny/act-of-union-1707/overview/the-articles-constitution-and-trade/"
+        }
+      ]
+    },
+    {
+      "id": "cook-new-zealand",
+      "name": "库克首次航行抵达新西兰",
+      "startYear": 1769,
+      "endYear": 1769,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "库克的首次太平洋航行到达新西兰，随后测绘海岸，并与当地毛利社群接触。",
+      "placeName": "新西兰东岸及沿海",
+      "sources": [
+        {
+          "title": "新西兰官方百科 Te Ara",
+          "url": "https://teara.govt.nz/en/european-discovery-of-new-zealand"
+        }
+      ]
+    },
+    {
+      "id": "first-fleet-arrival",
+      "name": "英国第一舰队抵达悉尼湾",
+      "startYear": 1788,
+      "endYear": 1788,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "英国在悉尼湾建立殖民据点。当地原住民此前已在此生活了很长时间。",
+      "placeName": "澳大利亚悉尼湾",
+      "location": [
+        151.212,
+        -33.857
+      ],
+      "sources": [
+        {
+          "title": "澳大利亚国家博物馆",
+          "url": "https://www.nma.gov.au/defining-moments/defining-moments-timeline"
+        }
+      ]
+    },
+    {
+      "id": "bastille-storming",
+      "name": "巴黎民众攻占巴士底狱",
+      "startYear": 1789,
+      "endYear": 1789,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "巴黎起义者攻占巴士底狱，事件成为法国革命初期政治动员的象征。",
+      "placeName": "巴黎巴士底狱旧址",
+      "placeId": "paris",
+      "location": [
+        2.369,
+        48.853
+      ],
+      "sources": [
+        {
+          "title": "巴黎市政府 · 巴士底狱",
+          "url": "https://parcoursrevolution.paris.fr/en/points-of-interest/1-the-bastille"
+        }
+      ]
+    },
+    {
+      "id": "first-french-republic",
+      "name": "法国第一共和国建立",
+      "startYear": 1792,
+      "endYear": 1792,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "法国国民公会废除君主制，共和国由此开始。",
+      "placeName": "法国巴黎",
+      "placeId": "paris",
+      "sources": [
+        {
+          "title": "巴黎市政府 · 法国革命年表",
+          "url": "https://parcoursrevolution.paris.fr/fr/chronologie"
+        }
+      ]
+    },
+    {
+      "id": "argentina-independence",
+      "name": "图库曼会议宣布独立",
+      "startYear": 1816,
+      "endYear": 1816,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "图库曼的代表会议宣布摆脱西班牙统治，此后国家政治制度仍继续形成。",
+      "placeName": "阿根廷图库曼",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/argentina"
+        }
+      ]
+    },
+    {
+      "id": "chile-independence",
+      "name": "智利宣布独立",
+      "startYear": 1818,
+      "endYear": 1818,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "独立运动期间，智利正式宣布脱离西班牙统治。",
+      "placeName": "智利",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/chile"
+        }
+      ]
+    },
+    {
+      "id": "mexico-independence",
+      "name": "墨西哥实现独立",
+      "startYear": 1821,
+      "endYear": 1821,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "独立运动后，墨西哥脱离西班牙统治，建立新的国家政权。",
+      "placeName": "墨西哥",
+      "sources": [
+        {
+          "title": "墨西哥国家人类学与历史研究所",
+          "url": "https://revistas.inah.gob.mx/index.php/redesdeoccidente/article/view/17422"
+        }
+      ]
+    },
+    {
+      "id": "peru-independence",
+      "name": "圣马丁在利马宣布秘鲁独立",
+      "startYear": 1821,
+      "endYear": 1821,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "圣马丁宣布秘鲁独立。西班牙王室军队仍控制部分地区，战事延续至后续几年。",
+      "placeName": "秘鲁利马",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/peru"
+        }
+      ]
+    },
+    {
+      "id": "brazil-independence",
+      "name": "巴西宣布独立",
+      "startYear": 1822,
+      "endYear": 1822,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "佩德罗宣布巴西脱离葡萄牙统治，巴西随后成为独立帝国。",
+      "placeName": "巴西",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/brazil"
+        }
+      ]
+    },
+    {
+      "id": "slavery-abolition-act",
+      "name": "英国议会通过《废除奴隶制法案》",
+      "startYear": 1833,
+      "endYear": 1833,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "法案为英国多数殖民地废除奴隶制设定法律框架，主要条款次年生效，部分被奴役者仍被置于学徒制度下。",
+      "placeName": "英国及其殖民地",
+      "sources": [
+        {
+          "title": "英国国家档案馆",
+          "url": "https://www.nationalarchives.gov.uk/explore-the-collection/explore-by-time-period/georgians/1833-abolition-of-slavery-act-and-compensation-claims/"
+        }
+      ]
+    },
+    {
+      "id": "australian-gold-rushes",
+      "name": "澳大利亚淘金热兴起",
+      "startYear": 1851,
+      "endYear": 1851,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "黄金发现推动移民、人口增长和经济转型。",
+      "placeName": "新南威尔士与维多利亚等地",
+      "sources": [
+        {
+          "title": "澳大利亚国家博物馆",
+          "url": "https://www.nma.gov.au/defining-moments/resources/gold-rushes"
+        }
+      ]
+    },
+    {
+      "id": "taiping-rebellion",
+      "name": "太平天国运动",
+      "startYear": 1851,
+      "endYear": 1864,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "太平天国运动在广西兴起，1853 年在南京定都，最终清军于 1864 年攻占南京。",
+      "placeName": "中国南方和长江流域",
+      "sources": [
+        {
+          "title": "爱丁堡大学研究档案 · 中国历史主要事件表",
+          "url": "https://era.ed.ac.uk/server/api/core/bitstreams/cd64e1d4-c0e8-4a60-bbc0-646e63092d76/content"
+        }
+      ]
+    },
+    {
+      "id": "kanagawa-treaty",
+      "name": "《神奈川条约》签署",
+      "startYear": 1854,
+      "endYear": 1854,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "日本幕府与美国缔结条约，开放部分港口并建立有限的官方来往。",
+      "placeName": "日本神奈川",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1830-1860/opening-to-japan"
+        }
+      ]
+    },
+    {
+      "id": "origin-of-species",
+      "name": "《物种起源》首次出版",
+      "startYear": 1859,
+      "endYear": 1859,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "达尔文借助实例论证自然选择和物种变化。该书推动了关于生命演化的广泛讨论。",
+      "placeName": "英国伦敦",
+      "sources": [
+        {
+          "title": "剑桥大学达尔文通信项目",
+          "url": "https://www.darwinproject.ac.uk/origin-species"
+        }
+      ]
+    },
+    {
+      "id": "us-thirteenth-amendment",
+      "name": "美国第十三修正案获批准",
+      "startYear": 1865,
+      "endYear": 1865,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "修正案废除奴隶制和非自愿劳役，但保留了作为犯罪刑罚的例外。",
+      "placeName": "美国",
+      "sources": [
+        {
+          "title": "美国国家档案馆",
+          "url": "https://www.archives.gov/founding-docs/amendments-11-27"
+        }
+      ]
+    },
+    {
+      "id": "russo-japanese-war-end",
+      "name": "《朴次茅斯条约》签署",
+      "startYear": 1905,
+      "endYear": 1905,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "日本和俄国代表签署和约，结束日俄战争。",
+      "placeName": "美国新罕布什尔州",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1899-1913/portsmouth-treaty"
+        }
+      ]
+    },
+    {
+      "id": "south-africa-union",
+      "name": "南非联邦成立",
+      "startYear": 1910,
+      "endYear": 1910,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "英属开普、纳塔尔、德兰士瓦及奥兰治河殖民地组成南非联邦。其政治制度排斥大多数黑人居民。",
+      "placeName": "南非",
+      "sources": [
+        {
+          "title": "South African History Online",
+          "url": "https://sahistory.org.za/article/1910-1924-african-nationalism-and-working-class-and-popular-protests"
+        }
+      ]
+    },
+    {
+      "id": "anc-founded",
+      "name": "南非原住民国民大会成立",
+      "startYear": 1912,
+      "endYear": 1912,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "多地黑人代表组建南非原住民国民大会，后来更名为非洲人国民大会。",
+      "placeName": "南非布隆方丹",
+      "sources": [
+        {
+          "title": "South African History Online",
+          "url": "https://sahistory.org.za/article/1910-1924-african-nationalism-and-working-class-and-popular-protests"
+        }
+      ]
+    },
+    {
+      "id": "first-world-war",
+      "name": "第一次世界大战",
+      "startYear": 1914,
+      "endYear": 1918,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "欧洲列强的危机演变为全球战争，战事动员遍及多个大陆，停战于 1918 年签署。",
+      "placeName": "欧洲、中东、非洲及其他战区",
+      "sources": [
+        {
+          "title": "英国国家陆军博物馆",
+          "url": "https://www.nam.ac.uk/explore/first-world-war"
+        }
+      ]
+    },
+    {
+      "id": "us-nineteenth-amendment",
+      "name": "美国第十九修正案获批准",
+      "startYear": 1920,
+      "endYear": 1920,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "修正案禁止联邦与各州因性别拒绝或剥夺投票权。其他限制在其后仍影响许多人行使权利。",
+      "placeName": "美国",
+      "sources": [
+        {
+          "title": "美国国家档案馆",
+          "url": "https://www.archives.gov/founding-docs/amendments-11-27"
+        }
+      ]
+    },
+    {
+      "id": "second-world-war",
+      "name": "第二次世界大战",
+      "startYear": 1939,
+      "endYear": 1945,
+      "datePrecision": "year",
+      "category": "war",
+      "description": "战争涉及全球多处战区。此处沿用资料的 1939–1945 年总区间，亚洲的相关战事早于 1939 年。",
+      "placeName": "欧洲、亚洲、非洲和太平洋",
+      "sources": [
+        {
+          "title": "英国国家陆军博物馆",
+          "url": "https://www.nam.ac.uk/explore/second-world-war"
+        }
+      ]
+    },
+    {
+      "id": "bretton-woods",
+      "name": "布雷顿森林会议",
+      "startYear": 1944,
+      "endYear": 1944,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "各国代表协商战后货币合作制度，为国际货币基金组织和国际复兴开发银行奠定基础。",
+      "placeName": "美国新罕布什尔州布雷顿森林",
+      "sources": [
+        {
+          "title": "国际货币基金组织",
+          "url": "https://www.imf.org/en/blogs/articles/2021/08/16/from-the-history-books-the-rethinking-of-the-international-monetary-system"
+        }
+      ]
+    },
+    {
+      "id": "indonesia-proclamation",
+      "name": "印度尼西亚宣布独立",
+      "startYear": 1945,
+      "endYear": 1945,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "独立宣言宣布建立印度尼西亚国家，其后仍经历争取国际承认的过程。",
+      "placeName": "印度尼西亚雅加达",
+      "sources": [
+        {
+          "title": "印度尼西亚外交部",
+          "url": "https://kemlu.go.id/files/repositori/74504/Business%20Guide%20Indonesia-EN.pdf"
+        }
+      ]
+    },
+    {
+      "id": "un-charter",
+      "name": "《联合国宪章》签署",
+      "startYear": 1945,
+      "endYear": 1945,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "代表在旧金山签署宪章，宪章于同年 10 月生效。",
+      "placeName": "美国旧金山",
+      "sources": [
+        {
+          "title": "联合国",
+          "url": "https://www.un.org/en/about-us/un-charter/"
+        }
+      ]
+    },
+    {
+      "id": "philippines-independence-1946",
+      "name": "菲律宾共和国获美国承认独立",
+      "startYear": 1946,
+      "endYear": 1946,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "美国正式承认菲律宾独立，结束美国殖民统治的这一阶段。",
+      "placeName": "菲律宾",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/philippines"
+        }
+      ]
+    },
+    {
+      "id": "india-partition",
+      "name": "英属印度分治与独立",
+      "startYear": 1947,
+      "endYear": 1947,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "英属印度分为印度和巴基斯坦两个自治领。分治伴随着大规模迁徙和暴力。",
+      "placeName": "南亚印度与巴基斯坦",
+      "sources": [
+        {
+          "title": "英国国家陆军博物馆",
+          "url": "https://www.nam.ac.uk/explore/independence-and-partition-1947"
+        }
+      ]
+    },
+    {
+      "id": "genocide-convention-adopted",
+      "name": "联合国通过《防止及惩治灭绝种族罪公约》",
+      "startYear": 1948,
+      "endYear": 1948,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "公约界定灭绝种族罪，要求缔约方防止并惩治该罪。",
+      "placeName": "联合国大会",
+      "sources": [
+        {
+          "title": "联合国",
+          "url": "https://www.un.org/en/genocideprevention/genocide-convention.shtml"
+        }
+      ]
+    },
+    {
+      "id": "udhr-adopted",
+      "name": "《世界人权宣言》获通过",
+      "startYear": 1948,
+      "endYear": 1948,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "联合国大会通过宣言，列出适用于一切人的基本权利和自由。",
+      "placeName": "法国巴黎",
+      "sources": [
+        {
+          "title": "联合国",
+          "url": "https://www.un.org/en/about-us/udhr/history-of-the-declaration"
+        }
+      ]
+    },
+    {
+      "id": "un-peacekeepers-first",
+      "name": "联合国设立首个维和任务",
+      "startYear": 1948,
+      "endYear": 1948,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "联合国向中东派遣军事观察员，监督停战执行，形成联合国停战监督组织。",
+      "placeName": "中东",
+      "sources": [
+        {
+          "title": "联合国维和事务部",
+          "url": "https://peacekeeping.un.org/en/our-history"
+        }
+      ]
+    },
+    {
+      "id": "who-founded",
+      "name": "世界卫生组织成立",
+      "startYear": 1948,
+      "endYear": 1948,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "《世界卫生组织组织法》生效，工作范围包括国际公共卫生协调。",
+      "placeName": "国际",
+      "sources": [
+        {
+          "title": "世界卫生组织",
+          "url": "https://www.who.int/about/governance/constitution/"
+        }
+      ]
+    },
+    {
+      "id": "prc-established",
+      "name": "中华人民共和国成立",
+      "startYear": 1949,
+      "endYear": 1949,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "中华人民共和国在北京宣告成立。",
+      "placeName": "北京天安门",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1945-1952/chinese-rev"
+        }
+      ]
+    },
+    {
+      "id": "schuman-declaration",
+      "name": "《舒曼宣言》提出",
+      "startYear": 1950,
+      "endYear": 1950,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "舒曼倡议将法国和德国的煤钢生产纳入共同管理，为欧洲煤钢共同体奠定基础。",
+      "placeName": "法国巴黎",
+      "sources": [
+        {
+          "title": "欧洲联盟",
+          "url": "https://european-union.europa.eu/principles-countries-history/history-eu/1945-59_en"
+        }
+      ]
+    },
+    {
+      "id": "refugee-convention-adopted",
+      "name": "《关于难民地位的公约》获通过",
+      "startYear": 1951,
+      "endYear": 1951,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "公约规定难民的法律地位、保护及缔约国义务。",
+      "placeName": "瑞士日内瓦",
+      "sources": [
+        {
+          "title": "联合国难民署",
+          "url": "https://www.unhcr.org/about-unhcr/overview/1951-refugee-convention"
+        }
+      ]
+    },
+    {
+      "id": "obninsk-grid",
+      "name": "奥布宁斯克核电站接入电网",
+      "startYear": 1954,
+      "endYear": 1954,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "奥布宁斯克电站使用核能发电并向电网供电，是民用核电发展早期的里程碑。",
+      "placeName": "苏联奥布宁斯克",
+      "sources": [
+        {
+          "title": "国际原子能机构",
+          "url": "https://www.iaea.org/sites/default/files/publications/magazines/bulletin/bull54-4/54401210507.pdf"
+        }
+      ]
+    },
+    {
+      "id": "unef-suez",
+      "name": "联合国第一支紧急部队成立",
+      "startYear": 1956,
+      "endYear": 1956,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "苏伊士危机中，联合国设立紧急部队，协助监督停火和撤军。",
+      "placeName": "埃及及苏伊士运河地区",
+      "sources": [
+        {
+          "title": "联合国维和事务部",
+          "url": "https://peacekeeping.un.org/en/our-history"
+        }
+      ]
+    },
+    {
+      "id": "ghana-independence",
+      "name": "加纳独立",
+      "startYear": 1957,
+      "endYear": 1957,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "英国黄金海岸殖民地等地区组成独立的加纳，推动了非洲大陆的非殖民化进程。",
+      "placeName": "加纳",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/ghana"
+        }
+      ]
+    },
+    {
+      "id": "rome-treaties",
+      "name": "《罗马条约》签署",
+      "startYear": 1957,
+      "endYear": 1957,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "六国签署条约，建立欧洲经济共同体和欧洲原子能共同体。",
+      "placeName": "意大利罗马卡比托利欧山",
+      "location": [
+        12.483,
+        41.893
+      ],
+      "sources": [
+        {
+          "title": "欧洲议会",
+          "url": "https://www.europarl.europa.eu/about-parliament/en/in-the-past/the-parliament-and-the-treaties/treaty-of-rome"
+        }
+      ]
+    },
+    {
+      "id": "sputnik-one",
+      "name": "人造卫星 Sputnik 1 发射",
+      "startYear": 1957,
+      "endYear": 1957,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "苏联发射第一颗进入地球轨道的人造卫星，开启航天时代。",
+      "placeName": "苏联拜科努尔发射场",
+      "sources": [
+        {
+          "title": "NASA",
+          "url": "https://www.nasa.gov/history/65-years-ago-sputnik-ushers-in-the-space-age/"
+        }
+      ]
+    },
+    {
+      "id": "gabon-independence",
+      "name": "加蓬独立",
+      "startYear": 1960,
+      "endYear": 1960,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "加蓬脱离原法属赤道非洲殖民体系，宣布独立。",
+      "placeName": "加蓬",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/gabon"
+        }
+      ]
+    },
+    {
+      "id": "nigeria-independence",
+      "name": "尼日利亚独立",
+      "startYear": 1960,
+      "endYear": 1960,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "尼日利亚联邦结束英国殖民统治，成为独立国家。",
+      "placeName": "尼日利亚",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/nigeria"
+        }
+      ]
+    },
+    {
+      "id": "sharpeville",
+      "name": "沙佩维尔惨案",
+      "startYear": 1960,
+      "endYear": 1960,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "反通行证制度示威期间，警方开枪造成大量伤亡，引起国际关注和进一步抵抗。",
+      "placeName": "南非沙佩维尔",
+      "sources": [
+        {
+          "title": "South African History Online",
+          "url": "https://sahistory.org.za/article/sharpeville-timeline"
+        }
+      ]
+    },
+    {
+      "id": "un-decolonization-declaration",
+      "name": "联合国大会通过非殖民化宣言",
+      "startYear": 1960,
+      "endYear": 1960,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "第 1514 号决议提出殖民地国家和人民的独立权及结束殖民统治的原则。",
+      "placeName": "联合国大会",
+      "sources": [
+        {
+          "title": "联合国",
+          "url": "https://digitallibrary.un.org/record/206145"
+        }
+      ]
+    },
+    {
+      "id": "gagarin-orbit",
+      "name": "加加林完成首次载人太空飞行",
+      "startYear": 1961,
+      "endYear": 1961,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "东方一号载尤里·加加林进入轨道，完成了首次载人太空飞行。",
+      "placeName": "拜科努尔发射场与近地轨道",
+      "sources": [
+        {
+          "title": "NASA",
+          "url": "https://science.nasa.gov/resource/yuri-gagarin-first-human-in-space/"
+        }
+      ]
+    },
+    {
+      "id": "algeria-independence",
+      "name": "阿尔及利亚独立",
+      "startYear": 1962,
+      "endYear": 1962,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "经过长期战争和谈判，阿尔及利亚脱离法国殖民统治。",
+      "placeName": "阿尔及利亚",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/algeria"
+        }
+      ]
+    },
+    {
+      "id": "cuban-missile-crisis",
+      "name": "古巴导弹危机",
+      "startYear": 1962,
+      "endYear": 1962,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "苏联在古巴部署导弹引发对峙。各方经交涉化解直接冲突。",
+      "placeName": "古巴、美国及苏联",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1961-1968/cuban-missile-crisis"
+        }
+      ]
+    },
+    {
+      "id": "jamaica-independence",
+      "name": "牙买加独立",
+      "startYear": 1962,
+      "endYear": 1962,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "牙买加结束英国殖民统治，成为独立国家。",
+      "placeName": "牙买加",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/jamaica"
+        }
+      ]
+    },
+    {
+      "id": "kenya-independence",
+      "name": "肯尼亚独立",
+      "startYear": 1963,
+      "endYear": 1963,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "肯尼亚结束英国殖民统治，随后于次年成为共和国。",
+      "placeName": "肯尼亚",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/kenya"
+        }
+      ]
+    },
+    {
+      "id": "singapore-independence",
+      "name": "新加坡成为独立国家",
+      "startYear": 1965,
+      "endYear": 1965,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "新加坡脱离马来西亚，成为独立共和国，并于同年加入联合国。",
+      "placeName": "新加坡",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/singapore"
+        }
+      ]
+    },
+    {
+      "id": "australia-indigenous-referendum",
+      "name": "澳大利亚通过原住民事务宪法公投",
+      "startYear": 1967,
+      "endYear": 1967,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "公投结果支持修改宪法，使联邦能就原住民事务立法并移除人口统计排除条款。",
+      "placeName": "澳大利亚",
+      "sources": [
+        {
+          "title": "澳大利亚国家博物馆",
+          "url": "https://digital-classroom.nma.gov.au/defining-moments/indigenous-referendum"
+        }
+      ]
+    },
+    {
+      "id": "bangladesh-independence",
+      "name": "孟加拉国独立",
+      "startYear": 1971,
+      "endYear": 1971,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "东巴基斯坦的独立运动和战争最终促成孟加拉国成立。",
+      "placeName": "孟加拉国",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/bangladesh"
+        }
+      ]
+    },
+    {
+      "id": "bretton-woods-gold-convertibility-end",
+      "name": "美国暂停美元兑金",
+      "startYear": 1971,
+      "endYear": 1971,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "美国暂停将官方持有的美元兑换成黄金，布雷顿森林体系向新的汇率安排过渡。",
+      "placeName": "美国及国际货币体系",
+      "sources": [
+        {
+          "title": "国际货币基金组织",
+          "url": "https://www.imf.org/en/blogs/articles/2021/08/16/from-the-history-books-the-rethinking-of-the-international-monetary-system"
+        }
+      ]
+    },
+    {
+      "id": "nixon-china",
+      "name": "尼克松访问中国",
+      "startYear": 1972,
+      "endYear": 1972,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "美国总统尼克松访问中国，两国发表《上海公报》。此访开启关系逐步正常化。",
+      "placeName": "北京、杭州与上海",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1969-1976/rapprochement-china"
+        }
+      ]
+    },
+    {
+      "id": "stockholm-environment-conference",
+      "name": "联合国首次人类环境会议",
+      "startYear": 1972,
+      "endYear": 1972,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "会议围绕全球环境问题展开讨论并通过《斯德哥尔摩宣言》。",
+      "placeName": "瑞典斯德哥尔摩",
+      "sources": [
+        {
+          "title": "联合国",
+          "url": "https://www.un.org/en/node/88872"
+        }
+      ]
+    },
+    {
+      "id": "angola-independence",
+      "name": "安哥拉独立",
+      "startYear": 1975,
+      "endYear": 1975,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "葡萄牙殖民统治结束，安哥拉独立。不同政治力量之间的战争仍在延续。",
+      "placeName": "安哥拉",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/angola"
+        }
+      ]
+    },
+    {
+      "id": "mozambique-independence",
+      "name": "莫桑比克独立",
+      "startYear": 1975,
+      "endYear": 1975,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "葡萄牙殖民统治结束，莫桑比克成立独立国家。",
+      "placeName": "莫桑比克",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/mozambique"
+        }
+      ]
+    },
+    {
+      "id": "soweto-uprising",
+      "name": "索韦托学生起义",
+      "startYear": 1976,
+      "endYear": 1976,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "学生抗议种族隔离下的教育政策。警方镇压后，抗议扩展到其他地区。",
+      "placeName": "南非索韦托",
+      "sources": [
+        {
+          "title": "South African History Online",
+          "url": "https://sahistory.org.za/classroom/grade-9/turning-points-1960-1976-and-1990"
+        }
+      ]
+    },
+    {
+      "id": "voyager-missions-launch",
+      "name": "两艘旅行者探测器发射",
+      "startYear": 1977,
+      "endYear": 1977,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "旅行者二号和一号先后发射，利用行星位置开展对外太阳系的探测。",
+      "placeName": "美国佛罗里达州卡纳维拉尔角",
+      "sources": [
+        {
+          "title": "NASA",
+          "url": "https://science.nasa.gov/mission/voyager/"
+        }
+      ]
+    },
+    {
+      "id": "smallpox-eradicated",
+      "name": "世界卫生大会确认根除天花",
+      "startYear": 1980,
+      "endYear": 1980,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "国际监测和疫苗接种后，世界卫生大会确认天花已在全球根除。",
+      "placeName": "全球",
+      "sources": [
+        {
+          "title": "世界卫生组织",
+          "url": "https://www.who.int/emergencies/situations/smallpox"
+        }
+      ]
+    },
+    {
+      "id": "zimbabwe-independence",
+      "name": "津巴布韦独立",
+      "startYear": 1980,
+      "endYear": 1980,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "津巴布韦正式独立，结束此前罗得西亚的少数族裔统治。",
+      "placeName": "津巴布韦",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/countries/zimbabwe"
+        }
+      ]
+    },
+    {
+      "id": "berlin-wall-opening",
+      "name": "柏林墙边境开放",
+      "startYear": 1989,
+      "endYear": 1989,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "东德放宽出境的消息公布后，大量居民前往边境口岸。地图标示当晚最先放行的博恩霍尔默大街口岸。",
+      "placeName": "德国柏林博恩霍尔默大街口岸",
+      "location": [
+        13.3989,
+        52.5548
+      ],
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/departmenthistory/short-history/berlinwall"
+        },
+        {
+          "title": "柏林墙基金会 · 旧口岸纪念碑",
+          "url": "https://www.stiftung-berliner-mauer.de/en/node/2007"
+        }
+      ]
+    },
+    {
+      "id": "child-rights-convention",
+      "name": "联合国通过《儿童权利公约》",
+      "startYear": 1989,
+      "endYear": 1989,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "公约规定儿童在生存、发展、获得保护和参与等方面的权利。",
+      "placeName": "联合国大会",
+      "sources": [
+        {
+          "title": "联合国人权事务高级专员办事处",
+          "url": "https://www.ohchr.org/en/instruments-mechanisms/instruments/convention-rights-child"
+        }
+      ]
+    },
+    {
+      "id": "web-proposal",
+      "name": "万维网方案提出",
+      "startYear": 1989,
+      "endYear": 1989,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "蒂姆·伯纳斯-李提出以超文本连接和共享实验室信息的方案。",
+      "placeName": "欧洲核子研究中心",
+      "sources": [
+        {
+          "title": "欧洲核子研究中心",
+          "url": "https://home.cern/science/computing/the-birth-of-the-web/"
+        }
+      ]
+    },
+    {
+      "id": "hubble-launch",
+      "name": "哈勃太空望远镜发射",
+      "startYear": 1990,
+      "endYear": 1990,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "航天飞机将哈勃送入地球轨道，望远镜此后开展长期天文观测。",
+      "placeName": "美国肯尼迪航天中心",
+      "sources": [
+        {
+          "title": "NASA",
+          "url": "https://science.nasa.gov/mission/hubble/overview/hubble-timeline/hubble-history-timeline-full-text/"
+        }
+      ]
+    },
+    {
+      "id": "soviet-dissolution",
+      "name": "苏联解体",
+      "startYear": 1991,
+      "endYear": 1991,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "苏联的中央机构终止运作，原加盟共和国成为独立国家。",
+      "placeName": "苏联及其加盟共和国",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1989-1992/collapse-soviet-union"
+        }
+      ]
+    },
+    {
+      "id": "maastricht-treaty",
+      "name": "《马斯特里赫特条约》签署",
+      "startYear": 1992,
+      "endYear": 1992,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "成员国签署《欧洲联盟条约》。条约于 1993 年生效，欧盟由此成立。",
+      "placeName": "荷兰马斯特里赫特",
+      "sources": [
+        {
+          "title": "欧洲联盟",
+          "url": "https://european-union.europa.eu/principles-countries-history/principles-and-values/founding-agreements_en"
+        }
+      ]
+    },
+    {
+      "id": "rio-earth-summit",
+      "name": "里约地球峰会",
+      "startYear": 1992,
+      "endYear": 1992,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "各国讨论环境与发展，会议通过《里约宣言》和《21世纪议程》。",
+      "placeName": "巴西里约热内卢",
+      "sources": [
+        {
+          "title": "联合国",
+          "url": "https://www.un.org/conferences/environment/rio1992"
+        }
+      ]
+    },
+    {
+      "id": "web-public-domain",
+      "name": "欧洲核子研究中心将万维网软件置入公有领域",
+      "startYear": 1993,
+      "endYear": 1993,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "公开软件降低了其他机构部署和使用万维网技术的门槛。",
+      "placeName": "欧洲核子研究中心",
+      "sources": [
+        {
+          "title": "欧洲核子研究中心",
+          "url": "https://home.cern/science/computing/the-birth-of-the-web/"
+        }
+      ]
+    },
+    {
+      "id": "south-africa-election",
+      "name": "南非举行首次不分种族的全国选举",
+      "startYear": 1994,
+      "endYear": 1994,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "南非完成面向各族公民的全国选举，迈入新的宪政时期。",
+      "placeName": "南非",
+      "sources": [
+        {
+          "title": "South African History Online",
+          "url": "https://sahistory.org.za/article/south-african-general-elections-1994"
+        }
+      ]
+    },
+    {
+      "id": "kyoto-protocol",
+      "name": "《京都议定书》获通过",
+      "startYear": 1997,
+      "endYear": 1997,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "缔约方在京都通过议定书，为发达国家和部分经济转型国家设定量化减排义务。",
+      "placeName": "日本京都国际会议中心",
+      "placeId": "kyoto",
+      "location": [
+        135.7827,
+        35.0603
+      ],
+      "sources": [
+        {
+          "title": "联合国气候变化框架公约",
+          "url": "https://unfccc.int/process-and-meetings/the-kyoto-protocol"
+        },
+        {
+          "title": "京都国际会议中心 · 国际环境会议",
+          "url": "https://www.icckyoto.or.jp/en/icc-kyoto-initiatives/international-environmental-conferences/"
+        }
+      ]
+    },
+    {
+      "id": "rome-statute-adopted",
+      "name": "《国际刑事法院罗马规约》获通过",
+      "startYear": 1998,
+      "endYear": 1998,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "外交会议通过规约，为建立常设的国际刑事法院奠定法律基础。",
+      "placeName": "意大利罗马",
+      "sources": [
+        {
+          "title": "联合国法律事务厅",
+          "url": "https://legal.un.org/icc/statute/final.htm"
+        }
+      ]
+    },
+    {
+      "id": "panama-canal-handover",
+      "name": "巴拿马全面接管运河",
+      "startYear": 1999,
+      "endYear": 1999,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "根据此前签署的条约，巴拿马在 1999 年底全面接管运河。",
+      "placeName": "巴拿马运河",
+      "sources": [
+        {
+          "title": "美国国务院历史办公室",
+          "url": "https://history.state.gov/milestones/1977-1980/panama-canal"
+        }
+      ]
+    },
+    {
+      "id": "iss-expedition-one",
+      "name": "国际空间站首批长期驻站人员抵达",
+      "startYear": 2000,
+      "endYear": 2000,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "第一批长期驻站乘组进入国际空间站，空间站从此开始持续有人居住。",
+      "placeName": "近地轨道",
+      "sources": [
+        {
+          "title": "NASA",
+          "url": "https://www.nasa.gov/history/space-station-20th-expedition-1-crew-launches-to-the-international-space-station/"
+        }
+      ]
+    },
+    {
+      "id": "euro-cash",
+      "name": "欧元纸币和硬币投入流通",
+      "startYear": 2002,
+      "endYear": 2002,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "首批采用欧元的国家开始使用欧元现金。欧元此前已用于非现金结算。",
+      "placeName": "欧元区",
+      "sources": [
+        {
+          "title": "欧洲中央银行",
+          "url": "https://www.ecb.europa.eu/ecb/history-arts-culture/history/ec/html/index.ga.html"
+        }
+      ]
+    },
+    {
+      "id": "australian-national-apology",
+      "name": "澳大利亚联邦议会向被偷走的一代道歉",
+      "startYear": 2008,
+      "endYear": 2008,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "澳大利亚正式向因政府政策和做法而与家庭分离的原住民儿童及其家庭道歉。",
+      "placeName": "澳大利亚堪培拉联邦议会",
+      "location": [
+        149.125,
+        -35.308
+      ],
+      "sources": [
+        {
+          "title": "澳大利亚国家博物馆",
+          "url": "https://www.nma.gov.au/defining-moments/resources/national-apology"
+        }
+      ]
+    },
+    {
+      "id": "paris-climate-agreement",
+      "name": "《巴黎协定》获通过",
+      "startYear": 2015,
+      "endYear": 2015,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "联合国气候变化大会通过协定，缔约方以各自提交的行动承诺应对气候变化。",
+      "placeName": "法国巴黎地区",
+      "sources": [
+        {
+          "title": "联合国气候变化框架公约",
+          "url": "https://unfccc.int/process-and-meetings/the-paris-agreement"
+        }
+      ]
+    },
+    {
+      "id": "un-sdgs-adopted",
+      "name": "联合国通过《2030年可持续发展议程》",
+      "startYear": 2015,
+      "endYear": 2015,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "成员国通过包含十七项可持续发展目标的议程，涵盖贫困、教育、公共卫生与环境等议题。",
+      "placeName": "联合国大会",
+      "sources": [
+        {
+          "title": "联合国可持续发展办公室",
+          "url": "https://unosd.un.org/en/content/sustainable-development-goals-sdgs"
+        }
+      ]
+    },
+    {
+      "id": "covid-pandemic-characterization",
+      "name": "世卫组织将 COVID-19 描述为大流行",
+      "startYear": 2020,
+      "endYear": 2020,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "世卫组织在 3 月的通报中指出，疫情已可被描述为大流行。",
+      "placeName": "全球",
+      "sources": [
+        {
+          "title": "世界卫生组织",
+          "url": "https://www.who.int/news-room/detail/29-06-2020-covidtimeline"
+        }
+      ]
+    },
+    {
+      "id": "webb-launch",
+      "name": "詹姆斯·韦布空间望远镜发射",
+      "startYear": 2021,
+      "endYear": 2021,
+      "datePrecision": "year",
+      "category": "science",
+      "description": "望远镜由阿丽亚娜 5 号火箭送往太空，随后在远离地球的位置开展红外观测。",
+      "placeName": "法属圭亚那库鲁航天中心",
+      "sources": [
+        {
+          "title": "NASA",
+          "url": "https://science.nasa.gov/mission/webb/launch/"
+        }
+      ]
+    }
+  ]
+}

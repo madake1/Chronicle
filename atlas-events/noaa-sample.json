@@ -1,0 +1,14 @@
+{
+  "retrievedOn": "2026-11-23",
+  "events": [
+    { "id": 1, "name": "巴卜·达拉与卡拉克一带地震", "placeName": "今约旦巴卜·达拉和卡拉克一带" },
+    { "id": 2, "name": "乌加里特一带地震", "placeName": "今叙利亚乌加里特一带" },
+    { "id": 19, "name": "雷伊与埃万凯一带地震", "placeName": "今伊朗雷伊与埃万凯一带" },
+    { "id": 25, "name": "奇古钦一带地震", "placeName": "今吉尔吉斯斯坦奇古钦一带" },
+    { "id": 732, "name": "嘉靖陕西地震", "placeName": "陕西华州一带" },
+    { "id": 9954, "name": "卡斯卡迪亚地震", "placeName": "北美太平洋沿岸卡斯卡迪亚俯冲带" },
+    { "id": 3227, "name": "关东大地震", "placeName": "日本南关东一带", "mapEpicenter": true },
+    { "id": 4227, "name": "瓦尔迪维亚大地震", "placeName": "智利南部沿岸", "mapEpicenter": true },
+    { "id": 5823, "name": "苏门答腊近海大地震", "placeName": "印度尼西亚苏门答腊北部近海", "mapEpicenter": true }
+  ]
+}

@@ -65,6 +65,71 @@
 - `location` 为经度、纬度，须由可核验的场址、历史城市或遗址资料支持。`placeId` 只记录经人工核对的关联。事件点位与关联地点的地图点位分别维护。多地持续进程和未核实地点可填写 `placeName`，省略坐标。
 - 新增事件时保留稳定 ID，填写来源和日期精度，运行 `npm test` 校验，再在地图切到相应年代复查。数据和简介离线可读，打开来源链接需要联网。首批资料仅覆盖少数时期和地区，不能用于判断某年是否没有发生其他事件。
 
+### 2026-11-23 扩充
+
+原始 26 条保留在原文件。这一批新增 44 条，其中 22 条有点位，22 条只在列表显示。
+
+| 快照 | 入库 | 来源及许可 |
+|---|---:|---|
+| `public/atlas/events-wikidata.json` | 35 / 45 个候选，19 条有点位 | 2026-11-23 从英文站点链接解析 Wikidata QID，逐条核对 UNESCO、博物馆、档案馆和研究机构资料。Wikidata 结构化数据 CC0。机构资料只保留链接和本项目中文摘要。 [Wikidata 数据许可](https://www.wikidata.org/wiki/Wikidata:Licensing) |
+| `public/atlas/events-noaa.json` | 9 条，含 4 条公元前记录及 3 条震中点位 | 2026-11-23 NOAA NCEI HazEL 原始 JSON，官方目录标为 CC0。 [官方数据目录](https://catalog.data.gov/dataset/ncei-wds-global-significant-earthquake-database-2150-bc-to-present) |
+
+- Wikidata 的 QID 标识所参考的事件、历史阶段或遗址。年代以机构资料为准，遗址的营建或繁荣阶段与遗产名录公布年份分开。遗址坐标可采用经机构确认身份的 Wikidata P625 或机构地图代表点。只有地区、跨区域或没有已核验点位的记录保留在列表。大津巴布韦、平安京和特诺奇蒂特兰关联已有地点 ID。
+- 用上游数据集名与 ID 去重。逐项对照原有 26 条的主题、时间和地点，未发现重复事件。特诺奇蒂特兰传统建城纪年与既有 1521 年陷落分别保留，两者指不同事件。
+- 跨年阶段按区间含端点展示。公元前 NOAA 样本使用 `reported-year`，只在目录标注年份显示，明确标为未经独立核定，不推断误差范围。地震样本中关东、瓦尔迪维亚和苏门答腊采用目录震中。古地震、1556 年陕西和 1700 年卡斯卡迪亚保留目录地区文字。
+- 待核实 10 个候选。梅尔内普塔石碑（Q754378）、印度河文明总条目（Q42534）、高丽（Q28208）、卡拉尔（Q219279）、澳大利亚 1967 年公投（Q4825132）、大理国（Q26472）、满者伯夷（Q49326）、乌鲁克时期（Q731494）暂缓，需补实具体事件边界、与已入库阶段的关系或直接机构资料。毛利人早期定居与菲律宾独立未从本次使用的站点标题解析到 QID。万隆会议已入库，地图点位留待复核。
+
+NOAA 样本的复核名单、中文名称和是否采用震中由 `atlas-events/noaa-sample.json` 管理。原始快照可由 HazEL 重新下载。重抓时应记录新的获取日期，复核上游修订再运行导入。
+
+```powershell
+$endpoint = 'https://www.ngdc.noaa.gov/hazel/hazard-service/api/v1/earthquakes'
+curl.exe -fL "${endpoint}?maxYear=-1" -o atlas-data/raw/noaa-earthquakes-bce.json
+foreach ($year in 1556,1700,1923,1960,2004) {
+  curl.exe -fL "${endpoint}?minYear=$year&maxYear=$year" -o "atlas-data/raw/noaa-earthquakes-$year.json"
+}
+$files = 'bce','1556','1700','1923','1960','2004' | ForEach-Object { "atlas-data/raw/noaa-earthquakes-$_.json" }
+node scripts/import-noaa-events.mjs @files
+npm test
+```
+
+### 全球大事记（2026-11-23）
+
+`public/atlas/events-milestones.json` 独立收录 **80 条经机构资料整理的大事件**，时间约从公元前 3200 年到 2020 年，发布后四套数据合计 **150 条**。本批含政治 47、战争 6、经济 4、宗教 1、科学与技术 9、文化与艺术 5、社会 6、自然灾害 2。12 条有可核验点位，区域性或多地事件仍留在列表。
+
+同日的 **1.1 版**继续新增 **50 条**，大事记共 130 条，四套数据总计 **200 条**。新增覆盖古代阿卡德与希腊、南亚王朝、毛利早期定居、大洋洲社会史、非洲与亚洲独立进程、国际公约和航天。5 条附地图点位。近现代独立和政治制度事件占本轮较大比例。 [澳大利亚国家博物馆 · 历史节点](https://www.nma.gov.au/defining-moments/defining-moments-timeline) · [联合国维和史](https://peacekeeping.un.org/en/our-history) · [NASA · 韦伯发射](https://science.nasa.gov/mission/webb/launch/)
+
+- 古代和中世纪补早期楔形文字、孔雀王朝、隋代大运河、阿拔斯都城、东亚王朝更替和黑死病。近现代补独立与非殖民化、两次世界大战、联合国、货币体系、公共卫生、太空和互联网。来源直接见每条记录，中文简介为本项目整理。 [大都会艺术博物馆 · 文字起源](https://www.metmuseum.org/de/essays/the-origins-of-writing) · [联合国宪章](https://www.un.org/en/about-us/un-charter/) · [CERN · 万维网的诞生](https://home.cern/science/computing/the-birth-of-the-web/)
+- 这一批以本项目稳定 ID 维护，并与旧包对照。高丽建立、菲律宾在 1946 年获美国承认独立、澳大利亚 1967 年原住民事务公投已按机构资料独立入库。原 Wikidata 候选记录保留初审结果。终年只是特定历史阶段的终点，例如黑死病的首轮欧洲传播。
+
+### 批量目录（2026-11-23 快照）
+
+地图仍默认显示原有 200 条精选。切换到「全部事件」可按当前年份、地区、类别和关键词检索目录。目录标题可使用上游语言。「原始目录」表示结构化或文本来源的批量记录，详情提供版本、定位依据和原始来源。近代记录较密，地区筛选只使用已知地区或多地来源明确列出的各地。
+
+最终可浏览 **1,381,950 条唯一事件**，含 200 条精选及 1,381,750 条新增，20,873 条可上图，96 条可跳转本地点库。类别分布及 1,199 个来源地区标签的计数见 `atlas-data/events-catalog/verification.json`。约 79% 的事件始于 1900 年及以后，古代非洲、美洲和大洋洲的可定位素材仍较稀疏。地区标签混有历史政权与现代地理名称。
+
+| 来源 | 处理范围与断点 | 许可 |
+|---|---|---|
+| [NOAA 全球显著地震目录](https://catalog.data.gov/dataset/ncei-wds-global-significant-earthquake-database-2150-bc-to-present) | HazEL API 查询公元前 3400 至 2024 年。34 页共 6,634 个唯一 ID，匹配精选 9，新增 6,625，其中 4,022 有目录报告的震中，待复核及排除均为 0。完整分页和逐 ID 结果在 `atlas-data/raw/noaa-2026-11-23/`。 | 官方目录标为 CC0 |
+| [EventKG 3.2 命名事件](https://eventkg.l3s.uni-hannover.de/data.html) | 扫描全部 `events.nq`、`relations_events_base.nq` 和 `types_wikidata.nq`。993,268 个命名 ID 各有一项结果，643,765 入库候选，39 匹配精选，344,525 待复核，4,939 排除。另在跨库复核中暂缓 1,027 条入库候选，最终展示新增 642,738 条。缺可采用年代 271,258，日期冲突 73,260，明显异常终年 6，无名称 1。排除中 4,528 超出时间轴，411 为 Wikidata 明确标记的非事件类型。 | Simon Gottschalk、Elena Demidova，L3S Research Center，[EventKG v3.2](https://zenodo.org/records/10424118) 与 [CC BY 4.0](https://eventkg.l3s.uni-hannover.de/schema_model.html) |
+| [EventKG 3.2 TextEvent](https://eventkg.l3s.uni-hannover.de/data.html) | 扫描发布者独立分库 `text_events.nq`。709,689 个显式 TextEvent ID，新增 703,384，匹配已有 5,564，待复核 103，超出时间轴 638。另有 36,697 个仅含辅助语句的其他主体，未计为 TextEvent。保留百科贡献者署名及具体页面。 | EventKG CC BY 4.0。百科摘录遵循来源页的 CC BY-SA 条款。 |
+| [Wikidata Query Service](https://query.wikidata.org/) | 按脚本声明的直接 `P31` 类型，从公元前 3400 至 2024 年的十个时期查询首选层级 `P585` 或 `P580`，另保留 `P582`、精度、历法、地点和坐标。80 个原始查询拆为 120 个最终分片，全部完成。70,516 条查询结果归并成 57,378 个唯一 QID，新增 29,003，匹配已有 24,882，待复核 3,493，排除 0。未枚举类型、仅用其他属性记载时间和无日期的实体不属于查询范围。 | 结构化数据 [CC0](https://www.wikidata.org/wiki/Wikidata:Licensing) |
+
+- 同一上游 ID 可复用已精选的稳定本机 ID。Wikidata 与 EventKG 的同一 QID 优先合并证据，日期互相不重合则留在复核表。与 NOAA 同日、坐标相近的地震候选单列复核，关联的 EventKG 候选也暂不展示。不同 QID 或不同语言的转述可能仍含语义重复。
+- 见不到精确事件点时，保留来源地点名称或地区。Wikidata 只采用事件自身的单一 P625 坐标。P276 与地点索引的显式 QID 唯一吻合时，可启用「查看关联地点」。NOAA 的 1900 年以前震中不自动采用。EventKG 的上游地点节点 ID 保留在来源元数据，节点 ID 本身不能生成点位。
+- 日期原值、来源图和精度保存在机器可读出处。区间两端包含在内，世纪、千年、十年或约年保留范围。文本目录日期只使用上游抽取结果。EventKG 命名文件与文本分库分别建账，名义范围由发布者文件限定。人物、关系网络和描述扩展文件未导入。本轮未连接 EventKG 30.6 GB 实体名文件和 23 GB 实体关系文件，后者保留了可断点续传的片段。当前 EventKG 地理覆盖主要取决于可合并的 Wikidata 补充。
+- 本机完整重建需要 Node.js、Python 3 和支持 Range 的 curl。下载存于忽略的 `atlas-data/raw/`，软件离线读取 `atlas-data/events-catalog/`。重新运行同一个采集日期会沿用已成功的分页、离线文件和查询分片。EventKG 3.2 文件长度和 SHA-256 见 `eventkg-3.2/snapshot-integrity.json`，年代解析和文本重排各有检查点。为保持快照，需另备份目录原始文件和账本。
+- 逐条账本包括 NOAA 的 `outcomes.json`，EventKG 的 `outcomes.jsonl.gz`、`text-outcomes.jsonl.gz`，以及 Wikidata 的 `manifest.json` 和 `outcomes.json`。Wikidata 待复核中，1,420 缺名、1,185 与 NOAA 可能重合、540 与 EventKG 日期不重合、322 内部日期冲突、17 历法或日期限定词不能安全解释、9 起止倒置。
+
+```powershell
+node scripts/update-noaa-catalog.mjs 2026-11-23
+python scripts/import-eventkg.py 2026-11-23 --download
+python scripts/fetch-wikidata-events.py 2026-11-23
+python scripts/import-wikidata-catalog.py 2026-11-23
+python scripts/import-eventkg-text.py 2026-11-23 --download
+node scripts/verify-event-catalog.mjs
+npm test
+```
+
 ## 尚未完成的数据
 
 - WHG 的 Viabundus 下载为 v1.2，本机使用发布者 v2。中国 1911 年城镇此前在登录后仍显示下载不可用，县、府此前也未出现可用导出。[WHG 目录](https://whgazetteer.org/public_data/)

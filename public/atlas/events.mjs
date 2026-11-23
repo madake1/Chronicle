@@ -1,5 +1,5 @@
 import { formatYear } from '../chronology.mjs';
-import { createEventIndex, eventCategories, eventYears, groupEventMarkers } from './event-data.mjs';
+import { createEventIndex, eventCategories, eventRegions, eventYears, groupEventMarkers } from './event-data.mjs';
 import { readPlaceApi } from './place-api.mjs';
 import { placePopup } from './geography.mjs';
 import { placeAt } from './places.mjs';
@@ -18,13 +18,18 @@ function button(label, action) {
   return node;
 }
 
-const metadata = event => [eventYears(event), eventCategories[event.category], event.placeName].filter(Boolean).join(' · ');
+const metadata = event => [eventYears(event), eventCategories[event.category], event.placeName,
+  event.quality === 'catalogue' && '原始目录'].filter(Boolean).join(' · ');
 
 export function bindEvents(map, Marker, dataset, closePlace) {
   const findEvents = createEventIndex(dataset);
   const toggle = document.querySelector('#atlas-show-events');
   const section = document.querySelector('#atlas-events');
   const category = document.querySelector('#atlas-event-category');
+  const scope = document.querySelector('#atlas-event-scope');
+  const region = document.querySelector('#atlas-event-region');
+  const regionControl = document.querySelector('#atlas-event-region-control');
+  const more = document.querySelector('#atlas-event-more');
   const search = document.querySelector('#atlas-event-search');
   const status = document.querySelector('#atlas-event-status');
   const list = document.querySelector('#atlas-event-list');
@@ -37,9 +42,12 @@ export function bindEvents(map, Marker, dataset, closePlace) {
   let parentGroup;
   let returnToEvent;
   let placeRequest = 0;
+  let catalogue;
+  let catalogueRequest;
+  let limit = 60;
 
   category.append(...Object.entries(eventCategories).map(([id, label]) => new Option(label, id)));
-  toggle.disabled = category.disabled = search.disabled = false;
+  toggle.disabled = category.disabled = search.disabled = scope.disabled = false;
   section.hidden = false;
 
   function highlight() {
@@ -75,6 +83,11 @@ export function bindEvents(map, Marker, dataset, closePlace) {
     content.replaceChildren(title, element('p', metadata(event), 'meta'), element('p', event.description));
     if (group) content.prepend(backButton('← 返回邻近事件', () => choose(group, event)));
     if (!event.location) content.append(element('p', '没有可用于本事件的可靠地图点位。', 'meta'));
+    if (event.provenance) {
+      const { dataset, id, retrievedOn, locationBasis } = event.provenance;
+      content.append(element('p', `${dataset} · ${id} · 获取于 ${retrievedOn}`, 'meta'),
+        element('p', `定位依据 · ${locationBasis}`, 'meta'));
+    }
     if (event.placeId) {
       const placeStatus = element('p', '', 'meta');
       placeStatus.setAttribute('role', 'status');
@@ -194,19 +207,55 @@ export function bindEvents(map, Marker, dataset, closePlace) {
   }
 
   function refresh() {
-    visible = findEvents(year, category.value, search.value);
+    const all = scope.value === 'all';
+    visible = (all && catalogue ? catalogue : findEvents)(year, category.value, search.value, all ? region.value : '');
     if (!panel.hidden && (selected && !visible.includes(selected) ||
         parentGroup?.some(event => !visible.includes(event)))) close();
-    list.replaceChildren(...visible.map(event => {
+    list.replaceChildren(...visible.slice(0, limit).map(event => {
       const row = document.createElement('li');
       row.dataset.eventId = event.id;
       row.append(eventButton(event, true));
       return row;
     }));
+    more.hidden = visible.length <= limit;
     status.textContent = year === undefined ? '选择对照快照后查看事件' :
       `${formatYear(year)} · ${visible.length ? `${visible.length} 项事件` : '没有匹配的事件'}`;
     highlight();
     drawMarkers();
+  }
+
+  function refreshFilters() {
+    limit = 60;
+    refresh();
+  }
+
+  async function loadCatalogue() {
+    catalogueRequest?.abort();
+    catalogue = undefined;
+    refreshFilters();
+    const all = scope.value === 'all';
+    regionControl.hidden = !all;
+    if (!all || year === undefined) return;
+    const request = new AbortController();
+    catalogueRequest = request;
+    status.textContent = `${formatYear(year)} · 正在读取全部事件…`;
+    try {
+      const response = await fetch(`/api/atlas/events?year=${year}`, { signal: request.signal });
+      if (!response.ok) throw new Error('读取失败');
+      const { events, sources } = await response.json();
+      if (request.signal.aborted) return;
+      if (!sources.length) throw new Error('没有本机目录');
+      const allEvents = [...findEvents(year), ...events];
+      catalogue = createEventIndex({ version: '本机历史事件库', events: allEvents });
+      const previous = region.value;
+      const regions = new Set(allEvents.flatMap(eventRegions));
+      region.replaceChildren(new Option('全部地区', ''), ...[...regions].sort().map(name => new Option(name, name)));
+      region.value = regions.has(previous) ? previous : '';
+      refreshFilters();
+    } catch {
+      if (request.signal.aborted) return;
+      status.textContent = `${formatYear(year)} · 全部事件暂无法读取，当前显示精选`;
+    }
   }
 
   document.querySelector('#atlas-event-close').onclick = close;
@@ -216,8 +265,17 @@ export function bindEvents(map, Marker, dataset, closePlace) {
     else if (selected && parentGroup) choose(parentGroup, selected);
     else close();
   });
-  search.addEventListener('input', refresh);
-  category.addEventListener('change', refresh);
+  search.addEventListener('input', refreshFilters);
+  category.addEventListener('change', refreshFilters);
+  region.addEventListener('change', refreshFilters);
+  scope.addEventListener('change', () => {
+    close();
+    void loadCatalogue();
+  });
+  more.addEventListener('click', () => {
+    limit += 60;
+    refresh();
+  });
   toggle.addEventListener('change', () => {
     if (!toggle.checked && !selected) close();
     drawMarkers();
@@ -228,6 +286,6 @@ export function bindEvents(map, Marker, dataset, closePlace) {
     if (next === year) return;
     close();
     year = next;
-    refresh();
+    void loadCatalogue();
   } };
 }

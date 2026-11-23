@@ -7,6 +7,7 @@ import { bindMapSources } from './comparison.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
 import { addGeographicLabels, addGeographicDetail } from './geography.mjs';
 import { bindEvents } from './events.mjs';
+import { mergeEventDatasets } from './event-data.mjs';
 
 const status = document.querySelector('#atlas-status');
 const years = document.querySelector('#atlas-years');
@@ -155,10 +156,12 @@ function renderSources(items) {
 }
 
 async function initialize() {
-  const eventDataset = fetch('/atlas/events.json').then(async response => {
+  const eventFiles = ['events.json', 'events-wikidata.json', 'events-noaa.json', 'events-milestones.json'];
+  const eventDataset = Promise.all(eventFiles.map(async file => {
+    const response = await fetch(`/atlas/${file}`);
     if (!response.ok) throw new Error('事件数据无法读取');
     return response.json();
-  }).catch(error => {
+  })).then(datasets => mergeEventDatasets(...datasets)).catch(error => {
     console.warn(error.message);
     return null;
   });

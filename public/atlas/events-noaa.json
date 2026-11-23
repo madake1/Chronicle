@@ -1,0 +1,228 @@
+{
+  "version": "NOAA 样本 2026-11-23",
+  "events": [
+    {
+      "id": "noaa-earthquake-1",
+      "name": "巴卜·达拉与卡拉克一带地震",
+      "startYear": -2150,
+      "endYear": -2150,
+      "datePrecision": "reported-year",
+      "dateLabel": "目录记载年份，年代未独立核定",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的今约旦巴卜·达拉和卡拉克一带地震。目录所列震级为 7.3。",
+      "placeName": "今约旦巴卜·达拉和卡拉克一带",
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "1",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "采用目录地区描述，未采用目录代表点作为震中"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 1 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/1"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-2",
+      "name": "乌加里特一带地震",
+      "startYear": -2000,
+      "endYear": -2000,
+      "datePrecision": "reported-year",
+      "dateLabel": "目录记载年份，年代未独立核定",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的今叙利亚乌加里特一带地震。",
+      "placeName": "今叙利亚乌加里特一带",
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "2",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "采用目录地区描述，未采用目录代表点作为震中"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 2 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/2"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-19",
+      "name": "雷伊与埃万凯一带地震",
+      "startYear": -400,
+      "endYear": -400,
+      "datePrecision": "reported-year",
+      "dateLabel": "目录记载年份，年代未独立核定",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的今伊朗雷伊与埃万凯一带地震。目录所列震级为 7.6。",
+      "placeName": "今伊朗雷伊与埃万凯一带",
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "19",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "采用目录地区描述，未采用目录代表点作为震中"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 19 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/19"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-25",
+      "name": "奇古钦一带地震",
+      "startYear": -250,
+      "endYear": -250,
+      "datePrecision": "reported-year",
+      "dateLabel": "目录记载年份，年代未独立核定",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的今吉尔吉斯斯坦奇古钦一带地震。目录所列震级为 6.7。",
+      "placeName": "今吉尔吉斯斯坦奇古钦一带",
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "25",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "采用目录地区描述，未采用目录代表点作为震中"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 25 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/25"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-732",
+      "name": "嘉靖陕西地震",
+      "startYear": 1556,
+      "endYear": 1556,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的陕西华州一带地震。目录记载日期为 1 月 23 日。目录所列震级为 8。",
+      "placeName": "陕西华州一带",
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "732",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "day",
+        "locationBasis": "采用目录地区描述，未采用目录代表点作为震中"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 732 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/732"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-9954",
+      "name": "卡斯卡迪亚地震",
+      "startYear": 1700,
+      "endYear": 1700,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的北美太平洋沿岸卡斯卡迪亚俯冲带地震。目录记载日期为 1 月 27 日。目录所列震级为 9。",
+      "placeName": "北美太平洋沿岸卡斯卡迪亚俯冲带",
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "9954",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "day",
+        "locationBasis": "采用目录地区描述，未采用目录代表点作为震中"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 9954 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/9954"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-3227",
+      "name": "关东大地震",
+      "startYear": 1923,
+      "endYear": 1923,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的日本南关东一带地震。目录记载日期为 9 月 1 日。目录所列震级为 7.9。",
+      "placeName": "日本南关东一带",
+      "location": [
+        139.5,
+        35.1
+      ],
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "3227",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "day",
+        "locationBasis": "NOAA 目录震中坐标"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 3227 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/3227"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-4227",
+      "name": "瓦尔迪维亚大地震",
+      "startYear": 1960,
+      "endYear": 1960,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的智利南部沿岸地震。目录记载日期为 5 月 22 日。目录所列震级为 9.5。",
+      "placeName": "智利南部沿岸",
+      "location": [
+        -73.407,
+        -38.143
+      ],
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "4227",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "day",
+        "locationBasis": "NOAA 目录震中坐标"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 4227 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/4227"
+        }
+      ]
+    },
+    {
+      "id": "noaa-earthquake-5823",
+      "name": "苏门答腊近海大地震",
+      "startYear": 2004,
+      "endYear": 2004,
+      "datePrecision": "year",
+      "category": "disaster",
+      "description": "NOAA NCEI 显著地震目录收录的印度尼西亚苏门答腊北部近海地震。目录记载日期为 12 月 26 日。目录所列震级为 9.1。",
+      "placeName": "印度尼西亚苏门答腊北部近海",
+      "location": [
+        95.982,
+        3.295
+      ],
+      "provenance": {
+        "dataset": "NOAA NCEI · Global Significant Earthquake Database",
+        "id": "5823",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "day",
+        "locationBasis": "NOAA 目录震中坐标"
+      },
+      "sources": [
+        {
+          "title": "NOAA NCEI · 显著地震目录第 5823 条",
+          "url": "https://www.ngdc.noaa.gov/hazel/view/hazards/earthquake/event-more-info/5823"
+        }
+      ]
+    }
+  ]
+}

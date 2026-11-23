@@ -117,11 +117,14 @@
       <section id="atlas-events" aria-labelledby="atlas-events-title" hidden>
         <div class="atlas-event-toolbar">
           <h2 id="atlas-events-title">历史事件</h2>
+          <label>收录范围 <select id="atlas-event-scope" disabled><option value="featured">精选</option><option value="all">全部事件</option></select></label>
           <label>事件类别 <select id="atlas-event-category" disabled><option value="">全部</option></select></label>
+          <label id="atlas-event-region-control" hidden>地区 <select id="atlas-event-region"><option value="">全部地区</option></select></label>
           <label>搜索事件 <input id="atlas-event-search" type="search" placeholder="名称、地点或关键词" disabled></label>
         </div>
         <p id="atlas-event-status" class="meta" role="status"></p>
         <ul id="atlas-event-list" aria-label="当前年份事件"></ul>
+        <button id="atlas-event-more" type="button" hidden>显示更多事件</button>
       </section>
     </section>
     <details class="atlas-sources">

@@ -1,0 +1,1074 @@
+{
+  "version": "Wikidata 人工复核 2026-11-23",
+  "events": [
+    {
+      "id": "wikidata-q177819",
+      "name": "埃及古王国时期",
+      "startYear": -2649,
+      "endYear": -2130,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "王权组织了大规模墓葬建设，吉萨和萨卡拉的金字塔群是这一时期最显著的物证。",
+      "placeName": "尼罗河下游与孟菲斯地区",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q177819",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 埃及古王国",
+          "url": "https://www.metmuseum.org/pt/essays/egypt-in-the-old-kingdom-ca-2649-2150-b-c"
+        },
+        {
+          "title": "Wikidata · Q177819",
+          "url": "https://www.wikidata.org/wiki/Q177819"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q191324",
+      "name": "埃及中王国时期",
+      "startYear": -2030,
+      "endYear": -1650,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "埃及重新走向统一。王室与地方精英的墓葬、雕像和铭文留下了较丰富的时代资料。",
+      "placeName": "尼罗河谷",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q191324",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 埃及中王国",
+          "url": "https://www.metmuseum.org/ko/essays/egypt-in-the-middle-kingdom-2030-1640-b-c"
+        },
+        {
+          "title": "Wikidata · Q191324",
+          "url": "https://www.wikidata.org/wiki/Q191324"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q180568",
+      "name": "埃及新王国时期",
+      "startYear": -1550,
+      "endYear": -1070,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "埃及的王权、神庙和国际交往进入新的阶段，底比斯及其墓地留下丰富的物证。",
+      "placeName": "尼罗河谷",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q180568",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 埃及新王国",
+          "url": "https://www.metmuseum.org/ko/essays/egypt-in-the-new-kingdom-ca-1550-1070-b-c"
+        },
+        {
+          "title": "Wikidata · Q180568",
+          "url": "https://www.wikidata.org/wiki/Q180568"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q455151",
+      "name": "阿肯那顿时期的宗教与艺术改革",
+      "startYear": -1353,
+      "endYear": -1336,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "religion",
+      "description": "阿肯那顿推崇阿顿崇拜，建立新都。王室图像与神庙空间也出现显著变化。",
+      "placeName": "尼罗河谷与阿玛尔奈",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q455151",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 阿肯那顿时期的艺术、建筑与城市",
+          "url": "https://www.metmuseum.org/essays/art-architecture-and-the-city-in-the-reign-of-amenhotep-iv-akhenaten-ca-13531336-b-c"
+        },
+        {
+          "title": "Wikidata · Q455151",
+          "url": "https://www.wikidata.org/wiki/Q455151"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q241790",
+      "name": "库施王国在尼罗河中游兴盛",
+      "startYear": -800,
+      "endYear": 400,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "库施的王室、贸易和冶铁活动在努比亚留下重要遗迹。主要政治中心和王室墓地随时期变化。",
+      "placeName": "尼罗河中游",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q241790",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 尼罗河中游",
+          "url": "https://whc.unesco.org/en/list/1336/"
+        },
+        {
+          "title": "Wikidata · Q241790",
+          "url": "https://www.wikidata.org/wiki/Q241790"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q139377",
+      "name": "阿克苏姆王国发展",
+      "startYear": 1,
+      "endYear": 800,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "economy",
+      "description": "阿克苏姆通过红海与阿拉伯及地中海世界贸易，巨石碑与铭文记录了当地政治和宗教的发展。",
+      "placeName": "今埃塞俄比亚北部及红海贸易网络",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q139377",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 今埃塞俄比亚北部及红海贸易网络",
+          "url": "https://whc.unesco.org/en/list/15/"
+        },
+        {
+          "title": "Wikidata · Q139377",
+          "url": "https://www.wikidata.org/wiki/Q139377"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q209217",
+      "name": "大津巴布韦遗址的山丘区发展",
+      "startYear": 1001,
+      "endYear": 1500,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "山丘区在多个世纪中有人居住。石墙与围合建筑反映了当地长期的营建与社会组织。",
+      "placeName": "大津巴布韦山丘遗址",
+      "placeId": "great-zimbabwe",
+      "location": [
+        30.933,
+        -20.27
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q209217",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 大津巴布韦山丘遗址",
+          "url": "https://whc.unesco.org/en/list/364/"
+        },
+        {
+          "title": "Wikidata · Q209217",
+          "url": "https://www.wikidata.org/wiki/Q209217"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q1741475",
+      "name": "基尔瓦基西瓦尼港贸易全盛",
+      "startYear": 1201,
+      "endYear": 1400,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "economy",
+      "description": "基尔瓦是斯瓦希里海岸的港市，连接非洲腹地与印度洋贸易，遗存包括清真寺、宫殿和铸币。",
+      "placeName": "坦桑尼亚基尔瓦基西瓦尼岛",
+      "location": [
+        39.517,
+        -8.982
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q1741475",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 坦桑尼亚基尔瓦基西瓦尼岛",
+          "url": "https://whc.unesco.org/en/list/144/"
+        },
+        {
+          "title": "Wikidata · Q1741475",
+          "url": "https://www.wikidata.org/wiki/Q1741475"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q9427",
+      "name": "廷巴克图的贸易与学术兴盛",
+      "startYear": 1401,
+      "endYear": 1600,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "廷巴克图是撒哈拉商路上的市场和伊斯兰学术中心，手稿传播与清真寺形成了重要的文化遗产。",
+      "placeName": "马里廷巴克图历史城区",
+      "location": [
+        -2.999,
+        16.773
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q9427",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的历史城区，采用 Wikidata 第一组城区级参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 马里廷巴克图历史城区",
+          "url": "https://whc.unesco.org/en/list/119/"
+        },
+        {
+          "title": "Wikidata · Q9427",
+          "url": "https://www.wikidata.org/wiki/Q9427"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q5725",
+      "name": "摩亨佐-达罗古城发展",
+      "startYear": -2500,
+      "endYear": -1500,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "印度河流域的这座城市留下有规划的街网、砖砌建筑和排水设施。年代为 UNESCO 对所处文明兴盛期的粗略范围。",
+      "placeName": "今巴基斯坦信德省摩亨佐-达罗遗址",
+      "location": [
+        68.139,
+        27.329
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q5725",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 今巴基斯坦信德省摩亨佐-达罗遗址",
+          "url": "https://whc.unesco.org/en/list/138/"
+        },
+        {
+          "title": "Wikidata · Q5725",
+          "url": "https://www.wikidata.org/wiki/Q5725"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q216243",
+      "name": "那烂陀寺院教育发展",
+      "startYear": 401,
+      "endYear": 1300,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "religion",
+      "description": "那烂陀兼有寺院与教学功能。此条采用教育机构活动的世纪范围，场址还发现有更早遗存。",
+      "placeName": "印度比哈尔邦那烂陀遗址",
+      "location": [
+        85.444,
+        25.137
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q216243",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 印度比哈尔邦那烂陀遗址",
+          "url": "https://whc.unesco.org/en/list/1502/"
+        },
+        {
+          "title": "Wikidata · Q216243",
+          "url": "https://www.wikidata.org/wiki/Q216243"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q42798",
+      "name": "婆罗浮屠营建",
+      "startYear": 701,
+      "endYear": 900,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "religion",
+      "description": "夏连特拉王朝时期修建大型佛教纪念建筑，石造台层与浮雕呈现佛教宇宙观和叙事。",
+      "placeName": "印度尼西亚中爪哇婆罗浮屠",
+      "location": [
+        110.204,
+        -7.608
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q42798",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 印度尼西亚中爪哇婆罗浮屠",
+          "url": "https://whc.unesco.org/en/list/592/"
+        },
+        {
+          "title": "Wikidata · Q42798",
+          "url": "https://www.wikidata.org/wiki/Q42798"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q163607",
+      "name": "吴哥建筑群的古典营建阶段",
+      "startYear": 801,
+      "endYear": 1400,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "吴哥作为高棉王权的中心，留下多处寺庙及水利设施。所列年代指古典建筑群的主要艺术阶段。",
+      "placeName": "柬埔寨吴哥考古区",
+      "location": [
+        103.833,
+        13.433
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q163607",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 柬埔寨吴哥考古区",
+          "url": "https://whc.unesco.org/en/list/668/"
+        },
+        {
+          "title": "Wikidata · Q163607",
+          "url": "https://www.wikidata.org/wiki/Q163607"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q29317",
+      "name": "蒲甘佛教建筑兴盛",
+      "startYear": 1001,
+      "endYear": 1300,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "religion",
+      "description": "蒲甘在作为政治中心的同时积累大量佛寺和佛塔，寺塔捐建与佛教功德实践密切相关。",
+      "placeName": "缅甸蒲甘考古区",
+      "location": [
+        94.86,
+        21.173
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q29317",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 缅甸蒲甘考古区",
+          "url": "https://whc.unesco.org/en/list/1588/"
+        },
+        {
+          "title": "Wikidata · Q29317",
+          "url": "https://www.wikidata.org/wiki/Q29317"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q841364",
+      "name": "阿瑜陀耶建城",
+      "startYear": 1350,
+      "endYear": 1350,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "阿瑜陀耶建于河流环绕的岛地，后来发展为暹罗的政治中心和国际商贸城市。",
+      "placeName": "泰国阿瑜陀耶古城",
+      "location": [
+        100.561,
+        14.348
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q841364",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "UNESCO 阿瑜陀耶历史城区的考古区代表点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 泰国阿瑜陀耶古城",
+          "url": "https://whc.unesco.org/en/list/576/"
+        },
+        {
+          "title": "Wikidata · Q841364",
+          "url": "https://www.wikidata.org/wiki/Q841364"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q863279",
+      "name": "素可泰作为暹罗王国都城",
+      "startYear": 1201,
+      "endYear": 1400,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "素可泰与周边古镇共享水利、贸易和交通网络，并发展出具有辨识度的佛教艺术。",
+      "placeName": "泰国素可泰历史区域",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q863279",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 泰国素可泰历史区域",
+          "url": "https://whc.unesco.org/en/list/574/"
+        },
+        {
+          "title": "Wikidata · Q863279",
+          "url": "https://www.wikidata.org/wiki/Q863279"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q189178",
+      "name": "日本奈良时代",
+      "startYear": 710,
+      "endYear": 794,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "以平城京为政治中心的年代里，日本与亚洲大陆的宗教和文化联系持续发展。",
+      "placeName": "日本奈良盆地及列岛诸地",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q189178",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 日本 500–1000 年历史年表",
+          "url": "https://www.metmuseum.org/ko/toah/ht/06/eaj"
+        },
+        {
+          "title": "Wikidata · Q189178",
+          "url": "https://www.wikidata.org/wiki/Q189178"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q193292",
+      "name": "平安京时代开始",
+      "startYear": 794,
+      "endYear": 794,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "都城迁至平安京，新的政治中心逐渐形成，年代上由此进入平安时期。",
+      "placeName": "日本平安京",
+      "placeId": "kyoto",
+      "location": [
+        135.758,
+        35.023
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q193292",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "大都会艺术博物馆核定迁都平安京，沿用 Chronicle 历史京都的城市级参照点"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 日本 500–1000 年历史年表",
+          "url": "https://www.metmuseum.org/ko/toah/ht/06/eaj"
+        },
+        {
+          "title": "Wikidata · Q193292",
+          "url": "https://www.wikidata.org/wiki/Q193292"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q18990",
+      "name": "《训民正音》公布",
+      "startYear": 1446,
+      "endYear": 1446,
+      "datePrecision": "year",
+      "category": "culture",
+      "description": "世宗时期公布了后来称为韩文的文字体系。新文字旨在降低书写和识字的门槛。",
+      "placeName": "朝鲜王朝",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q18990",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "大都会艺术博物馆 · 朝鲜 1400–1600 年历史年表",
+          "url": "https://artistproject.metmuseum.org/toah/ht/08/eak.html"
+        },
+        {
+          "title": "Wikidata · Q18990",
+          "url": "https://www.wikidata.org/wiki/Q18990"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q8707",
+      "name": "明治维新开始",
+      "startYear": 1868,
+      "endYear": 1868,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "日本发生政权转换，新政府以天皇名义施政。制度改革延续多年，本条标记其政治起点。",
+      "placeName": "日本",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q8707",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "日本国立国会图书馆 · 日本近代史年表",
+          "url": "https://www.ndl.go.jp/modern/e/utility/chronology.html"
+        },
+        {
+          "title": "Wikidata · Q8707",
+          "url": "https://www.wikidata.org/wiki/Q8707"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q732554",
+      "name": "查文礼仪中心发展",
+      "startYear": -1500,
+      "endYear": -401,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "religion",
+      "description": "高地遗址发展为区域朝圣和仪式中心，石造廊道、广场和雕刻反映了共享的宗教传统。",
+      "placeName": "秘鲁查文德万塔尔遗址",
+      "location": [
+        -77.178,
+        -9.593
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q732554",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 秘鲁查文德万塔尔遗址",
+          "url": "https://whc.unesco.org/en/list/330/"
+        },
+        {
+          "title": "Wikidata · Q732554",
+          "url": "https://www.wikidata.org/wiki/Q732554"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q172613",
+      "name": "特奥蒂瓦坎古城发展",
+      "startYear": 1,
+      "endYear": 700,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "墨西哥盆地的古城形成大型规划道路、广场和金字塔，对中部美洲的城市与艺术产生影响。",
+      "placeName": "墨西哥特奥蒂瓦坎考古区",
+      "location": [
+        -98.844,
+        19.693
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q172613",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 墨西哥特奥蒂瓦坎考古区",
+          "url": "https://whc.unesco.org/en/list/414/"
+        },
+        {
+          "title": "Wikidata · Q172613",
+          "url": "https://www.wikidata.org/wiki/Q172613"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q333661",
+      "name": "卡霍基亚聚落达到鼎盛",
+      "startYear": 1050,
+      "endYear": 1150,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "society",
+      "description": "卡霍基亚是密西西比文化的重要聚落。土筑丘群和公共空间保存了城市规模与社会组织的证据。",
+      "placeName": "美国伊利诺伊州卡霍基亚遗址",
+      "location": [
+        -90.064,
+        38.654
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q333661",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 美国伊利诺伊州卡霍基亚遗址",
+          "url": "https://whc.unesco.org/en/list/198/"
+        },
+        {
+          "title": "Wikidata · Q333661",
+          "url": "https://www.wikidata.org/wiki/Q333661"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q61750",
+      "name": "蒂瓦纳科达到鼎盛",
+      "startYear": 500,
+      "endYear": 900,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "的的喀喀湖以南的蒂瓦纳科是南安第斯重要中心。石造仪式建筑见证其区域影响。",
+      "placeName": "玻利维亚蒂瓦纳科遗址",
+      "location": [
+        -68.673,
+        -16.555
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q61750",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 玻利维亚蒂瓦纳科遗址",
+          "url": "https://whc.unesco.org/en/list/567/"
+        },
+        {
+          "title": "Wikidata · Q61750",
+          "url": "https://www.wikidata.org/wiki/Q61750"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q277540",
+      "name": "昌昌城进入奇穆王国繁荣阶段",
+      "startYear": 1401,
+      "endYear": 1500,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "奇穆王国以昌昌为政治中心，城中大型土坯围合建筑反映了等级与行政组织。",
+      "placeName": "秘鲁昌昌遗址",
+      "location": [
+        -79.075,
+        -8.111
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q277540",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 秘鲁昌昌遗址",
+          "url": "https://whc.unesco.org/en/list/366/"
+        },
+        {
+          "title": "Wikidata · Q277540",
+          "url": "https://www.wikidata.org/wiki/Q277540"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q676203",
+      "name": "马丘比丘营建",
+      "startYear": 1401,
+      "endYear": 1500,
+      "datePrecision": "century",
+      "dateLabel": "按世纪记载",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "印加时期在安第斯山地建成这处聚落，石砌建筑与坡地梯田利用了山脊地形。",
+      "placeName": "秘鲁马丘比丘古城遗址",
+      "location": [
+        -72.546,
+        -13.163
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q676203",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "century",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 秘鲁马丘比丘古城遗址",
+          "url": "https://whc.unesco.org/en/list/274/"
+        },
+        {
+          "title": "Wikidata · Q676203",
+          "url": "https://www.wikidata.org/wiki/Q676203"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q846967",
+      "name": "南马都尔礼仪中心营建",
+      "startYear": 1200,
+      "endYear": 1500,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "波纳佩岛近海的人工岛承载了石造宫室、祭礼空间和墓葬，是当地首领政权的礼仪中心。",
+      "placeName": "密克罗尼西亚波纳佩岛近海",
+      "location": [
+        158.332,
+        6.842
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q846967",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "approximate-year",
+        "locationBasis": "UNESCO 核定的考古遗址或历史区，Wikidata P625 为参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 密克罗尼西亚波纳佩岛近海",
+          "url": "https://whc.unesco.org/en/list/1503/"
+        },
+        {
+          "title": "Wikidata · Q846967",
+          "url": "https://www.wikidata.org/wiki/Q846967"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q3447247",
+      "name": "新西兰妇女获得议会选举权",
+      "startYear": 1893,
+      "endYear": 1893,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "多年组织运动和请愿之后，选举法赋予女性议会选举投票权。",
+      "placeName": "新西兰",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q3447247",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "新西兰国家档案馆 · 妇女选举权请愿",
+          "url": "https://www.archives.govt.nz/discover-our-stories/womens-suffrage-petition"
+        },
+        {
+          "title": "Wikidata · Q3447247",
+          "url": "https://www.wikidata.org/wiki/Q3447247"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q3310872",
+      "name": "澳大利亚联邦成立",
+      "startYear": 1901,
+      "endYear": 1901,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "六个原英国殖民地组成澳大利亚联邦，并以联邦宪法建立全国性政府。",
+      "placeName": "澳大利亚",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q3310872",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "澳大利亚国家博物馆 · 联邦成立",
+          "url": "https://www.nma.gov.au/defining-moments/resources/federation"
+        },
+        {
+          "title": "Wikidata · Q3310872",
+          "url": "https://www.wikidata.org/wiki/Q3310872"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q1501525",
+      "name": "澳大利亚高等法院作出马博案判决",
+      "startYear": 1992,
+      "endYear": 1992,
+      "datePrecision": "year",
+      "category": "society",
+      "description": "高等法院否定了殖民时将澳大利亚视为无主地的法律前提，为在普通法下承认原住民土地权确立基础。",
+      "placeName": "澳大利亚",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q1501525",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "澳大利亚国家博物馆 · 马博案判决",
+          "url": "https://www.nma.gov.au/defining-moments/resources/mabo-decision"
+        },
+        {
+          "title": "Wikidata · Q1501525",
+          "url": "https://www.wikidata.org/wiki/Q1501525"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q7350",
+      "name": "巴拿马运河通航",
+      "startYear": 1914,
+      "endYear": 1914,
+      "datePrecision": "year",
+      "category": "economy",
+      "description": "跨越巴拿马地峡的航道投入运行，缩短了大西洋与太平洋间的航程。",
+      "placeName": "巴拿马地峡",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q7350",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "美国国会图书馆 · 巴拿马运河通航",
+          "url": "https://www.loc.gov/item/2002697809/"
+        },
+        {
+          "title": "Wikidata · Q7350",
+          "url": "https://www.wikidata.org/wiki/Q7350"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q208191",
+      "name": "万隆会议召开",
+      "startYear": 1955,
+      "endYear": 1955,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "亚洲和非洲国家代表在万隆集会，讨论反殖民主义、国际合作及和平共处。",
+      "placeName": "印度尼西亚万隆",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q208191",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料核验至万隆会场，精确点位留待复核"
+      },
+      "sources": [
+        {
+          "title": "美国国务院历史办公室 · 万隆会议",
+          "url": "https://history.state.gov/milestones/1953-1960/bandung-conf"
+        },
+        {
+          "title": "Wikidata · Q208191",
+          "url": "https://www.wikidata.org/wiki/Q208191"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q1520743",
+      "name": "加拿大联邦成立",
+      "startYear": 1867,
+      "endYear": 1867,
+      "datePrecision": "year",
+      "category": "politics",
+      "description": "安大略、魁北克、新斯科舍和新不伦瑞克组成新的联邦。",
+      "placeName": "加拿大",
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q1520743",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "机构资料支持的地域范围或多个场址，未采用现代城市中心"
+      },
+      "sources": [
+        {
+          "title": "加拿大政府 · 加拿大自治领成立时的报刊原文",
+          "url": "https://www.canada.ca/en/canadian-heritage/campaigns/canada-day/about/dominion-day/newspaper-extracts.html"
+        },
+        {
+          "title": "Wikidata · Q1520743",
+          "url": "https://www.wikidata.org/wiki/Q1520743"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q2844",
+      "name": "巴西利亚新都建设",
+      "startYear": 1956,
+      "endYear": 1960,
+      "datePrecision": "year",
+      "category": "culture",
+      "description": "巴西在内陆建设新首都。卢西奥·科斯塔的城市规划与奥斯卡·尼迈耶设计的公共建筑共同形成其空间特色。",
+      "placeName": "巴西利亚规划城区",
+      "location": [
+        -47.883,
+        -15.794
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q2844",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "year",
+        "locationBasis": "UNESCO 核定的巴西利亚规划城区，Wikidata P625 为城区级参照点"
+      },
+      "sources": [
+        {
+          "title": "UNESCO 世界遗产中心 · 巴西利亚规划城区",
+          "url": "https://whc.unesco.org/en/list/445/"
+        },
+        {
+          "title": "Wikidata · Q2844",
+          "url": "https://www.wikidata.org/wiki/Q2844"
+        }
+      ]
+    },
+    {
+      "id": "wikidata-q13695",
+      "name": "特诺奇蒂特兰的传统建城纪年",
+      "startYear": 1325,
+      "endYear": 1325,
+      "datePrecision": "reported-year",
+      "dateLabel": "传统纪年",
+      "category": "culture",
+      "description": "1325 是常用的传统建城纪年。其后特诺奇蒂特兰成为湖区的政治和礼仪中心。此条与既有的 1521 年陷落事件对应不同阶段。",
+      "placeName": "墨西哥城大神庙考古区",
+      "placeId": "mexico-city",
+      "location": [
+        -99.131,
+        19.435
+      ],
+      "provenance": {
+        "dataset": "Wikidata",
+        "id": "Q13695",
+        "retrievedOn": "2026-11-23",
+        "upstreamPrecision": "traditional-year",
+        "locationBasis": "INAH 核定的大神庙考古区，Wikidata P625 为历史城区参照点"
+      },
+      "sources": [
+        {
+          "title": "墨西哥国家人类学与历史研究所 · 特诺奇蒂特兰建城",
+          "url": "https://www.inah.gob.mx/foto-del-dia/fundacion-de-mexico-tenochtitlan-origen-de-una-ciudad-simbolo-de-una-historia"
+        },
+        {
+          "title": "Wikidata · Q13695",
+          "url": "https://www.wikidata.org/wiki/Q13695"
+        }
+      ]
+    }
+  ]
+}

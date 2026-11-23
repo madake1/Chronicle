@@ -21,6 +21,9 @@ const assets = new Map([
   ['/atlas/event-data.mjs', ['atlas/event-data.mjs', 'text/javascript']],
   ['/atlas/events.mjs', ['atlas/events.mjs', 'text/javascript']],
   ['/atlas/events.json', ['atlas/events.json', 'application/json']],
+  ['/atlas/events-wikidata.json', ['atlas/events-wikidata.json', 'application/json']],
+  ['/atlas/events-noaa.json', ['atlas/events-noaa.json', 'application/json']],
+  ['/atlas/events-milestones.json', ['atlas/events-milestones.json', 'application/json']],
   ['/atlas/places.mjs', ['atlas/places.mjs', 'text/javascript']],
   ['/atlas/data.mjs', ['atlas/data.mjs', 'text/javascript']],
   ['/atlas/comparison.mjs', ['atlas/comparison.mjs', 'text/javascript']],
@@ -176,6 +179,15 @@ createServer(async (request, response) => {
       const { handlePlaceQuery } = await import('./atlas-place-index.mjs');
       const [code, result] = await handlePlaceQuery(new URL(request.url, 'http://localhost'));
       return send(response, code, result);
+    }
+    if (request.method === 'GET' && /^\/api\/atlas\/events(?:\?|$)/.test(request.url)) {
+      const value = new URL(request.url, 'http://localhost').searchParams.get('year');
+      const year = Number(value);
+      if (!/^-?\d+$/.test(value ?? '') || !Number.isInteger(year) || year < -3399 || year > 2024) {
+        return send(response, 400, { error: '无效的事件时间轴年份' });
+      }
+      const { readCatalogueYear } = await import('./atlas-event-catalog.mjs');
+      return send(response, 200, await readCatalogueYear(year));
     }
     const noteRoute = /^\/api\/works\/([a-zA-Z0-9_-]{1,100})\/note(?:\/(assets|export\.md|export\.zip)(?:\/([a-zA-Z0-9.-]+))?)?$/.exec(request.url);
     if (noteRoute) return await handleNote(request, response, ...noteRoute.slice(1));
