@@ -51,6 +51,14 @@ NON_EVENT_TYPES = {
     "Q5", "Q4167410", "Q13406463", "Q13442814", "Q571", "Q47461344",
     "Q11424", "Q3305213", "Q16521", "Q5633421",
 }
+# Direct Wikidata classes verified against their entity definitions.
+REVIEWED_TYPES = {
+    "Q1076105": "politics", "Q152450": "politics", "Q15966540": "politics",
+    "Q858439": "politics", "Q47566": "politics", "Q625298": "politics",
+    "Q2020153": "science", "Q366301": "science",
+    "Q1573906": "culture", "Q220505": "culture", "Q27787439": "culture",
+    "Q667276": "culture", "Q2295790": "culture",
+}
 
 
 def download(raw, name):
@@ -221,11 +229,14 @@ def build(raw, date, dates_only=False):
         return
 
     type_choices = {}
+    reviewed = defaultdict(set)
     non_events = {}
     for key, _, value, _ in quads(raw / FILES[2]):
         item = QID.search(value)
         if item:
             qid = item[1].decode()
+            if qid in REVIEWED_TYPES:
+                reviewed[key].add(qid)
             if qid in NON_EVENT_TYPES:
                 non_events.setdefault(key, qid)
             category = TYPE_CATEGORIES.get(qid)
@@ -254,7 +265,10 @@ def build(raw, date, dates_only=False):
     seen_events = set()
     seen_qids = {}
     outcome_tmp = raw / "outcomes.jsonl.gz.part"
-    with gzip.open(outcome_tmp, "wt", encoding="utf-8", compresslevel=3) as ledger:
+    classified = Counter()
+    category_tmp = raw / "category-review.jsonl.gz.part"
+    with (gzip.open(outcome_tmp, "wt", encoding="utf-8", compresslevel=3) as ledger,
+          gzip.open(category_tmp, "wt", encoding="utf-8", compresslevel=3) as category_ledger):
         def outcome(key, status, qids, timing=None, details=None):
             counts[status] += 1
             if status in {"deferred", "excluded"} and details:
@@ -321,6 +335,14 @@ def build(raw, date, dates_only=False):
             precision = timing["precision"]
             info = {"1": "源记录年级展示", "10": "十年范围", "100": "世纪范围", "1000": "千年范围"}
             event_id = f"eventkg-{qid.lower()}" if qid else key.replace("_", "kg-")
+            if category == "other" and event in reviewed:
+                types = sorted(reviewed[event])
+                candidates = {REVIEWED_TYPES[class_id] for class_id in types}
+                category = next(iter(candidates)) if len(candidates) == 1 else "other"
+                classified[category] += 1
+                category_ledger.write(json.dumps({
+                    "id": event_id, "name": name, "types": types, "category": category,
+                }, ensure_ascii=False) + "\n")
             value = {
                 "id": event_id, "name": name,
                 "startYear": first - 1 if first <= 0 else first,
@@ -343,12 +365,14 @@ def build(raw, date, dates_only=False):
             categories[category] += 1
             outcome(key, "added", qids, {"first": value["startYear"], "last": value["endYear"]})
     outcome_tmp.replace(raw / "outcomes.jsonl.gz")
+    category_tmp.replace(raw / "category-review.jsonl.gz")
     for decade in range(-3400, 2021, 10):
         write_json(published / f"{decade}.json", {"version": "EventKG 3.2", "events": decades[decade]})
     report = {"version": "3.2", "retrievedOn": date, "namedEvents": len(seen_events),
               "counts": dict(counts), "resolvedInRange": sum(dated_ranges.values()),
               "byCentury": dict(dated_ranges), "byCategory": dict(categories), "mapped": 0,
-              "reasonCounts": dict(reasons), "files": {name: (raw / name).stat().st_size for name in FILES}}
+              "reasonCounts": dict(reasons), "categoryReview": dict(classified),
+              "files": {name: (raw / name).stat().st_size for name in FILES}}
     write_json(raw / "report.json", report)
     print(json.dumps(report, ensure_ascii=True), flush=True)
 
