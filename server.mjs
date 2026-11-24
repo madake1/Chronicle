@@ -24,6 +24,7 @@ const assets = new Map([
   ['/atlas/events-wikidata.json', ['atlas/events-wikidata.json', 'application/json']],
   ['/atlas/events-noaa.json', ['atlas/events-noaa.json', 'application/json']],
   ['/atlas/events-milestones.json', ['atlas/events-milestones.json', 'application/json']],
+  ['/atlas/events-regional.json', ['atlas/events-regional.json', 'application/json']],
   ['/atlas/places.mjs', ['atlas/places.mjs', 'text/javascript']],
   ['/atlas/data.mjs', ['atlas/data.mjs', 'text/javascript']],
   ['/atlas/comparison.mjs', ['atlas/comparison.mjs', 'text/javascript']],

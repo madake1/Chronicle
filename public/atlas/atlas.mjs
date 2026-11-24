@@ -156,7 +156,7 @@ function renderSources(items) {
 }
 
 async function initialize() {
-  const eventFiles = ['events.json', 'events-wikidata.json', 'events-noaa.json', 'events-milestones.json'];
+  const eventFiles = ['events.json', 'events-wikidata.json', 'events-noaa.json', 'events-milestones.json', 'events-regional.json'];
   const eventDataset = Promise.all(eventFiles.map(async file => {
     const response = await fetch(`/atlas/${file}`);
     if (!response.ok) throw new Error('事件数据无法读取');

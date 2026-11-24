@@ -69,7 +69,7 @@ function check(dataset, catalogue) {
 }
 
 const featured = new URL('../public/atlas/', import.meta.url);
-const names = ['events.json', 'events-noaa.json', 'events-wikidata.json', 'events-milestones.json'];
+const names = ['events.json', 'events-noaa.json', 'events-wikidata.json', 'events-milestones.json', 'events-regional.json'];
 for (const file of names) check(await read(new URL(file, featured)), 'featured');
 for (const [qid, id] of Object.entries(await read(new URL('../atlas-events/eventkg-crosswalk.json', import.meta.url)))) {
   if (!seen.has(id) || (qids.has(qid) && qids.get(qid) !== id)) throw new Error(`无效精选交叉索引：${qid}`);

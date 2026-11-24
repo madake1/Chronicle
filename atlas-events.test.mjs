@@ -10,9 +10,21 @@ const dataset = await json('./public/atlas/events.json');
 const wikidata = await json('./public/atlas/events-wikidata.json');
 const noaa = await json('./public/atlas/events-noaa.json');
 const milestones = await json('./public/atlas/events-milestones.json');
+const regional = await json('./public/atlas/events-regional.json');
 const expanded = mergeEventDatasets(dataset, wikidata, noaa, milestones);
 const eventsAt = createEventIndex(dataset);
 const ids = events => events.map(event => event.id);
+
+test('区域专题按年代和地区显示，点位过滤保留遗址依据', () => {
+  const find = createEventIndex(mergeEventDatasets(expanded, regional));
+  const bce = sourceYearToAxis(-250);
+  assert.deepEqual(ids(find(bce, '', '', '古代非洲')).sort(),
+    ['djenne-jeno-early-settlement', 'meroe-royal-necropolis']);
+  assert.deepEqual(ids(find(bce, '', '', '古代非洲', { mapped: true })), ['meroe-royal-necropolis']);
+  assert.ok(ids(find(400, '', '', '前哥伦布时期美洲')).includes('monte-alban-urban-apogee'));
+  assert.ok(ids(find(sourceYearToAxis(-900), '', '', '大洋洲')).includes('nukuleka-lapita-settlement'));
+  assert.ok(!ids(find(601, '', '', '前哥伦布时期美洲')).includes('monte-alban-urban-apogee'));
+});
 
 test('所有事件有唯一 ID、来源、合法日期且地点引用可从仓库解析', async () => {
   const packs = await Promise.all([

@@ -1,0 +1,247 @@
+{
+  "version": "区域历史专题 1.0 · 2026-11-24",
+  "events": [
+    {
+      "id": "meroe-royal-necropolis",
+      "name": "库施王室墓地迁往麦罗埃",
+      "startYear": -300,
+      "endYear": -201,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "category": "religion",
+      "description": "约公元前 250 年，库施统治者把王室墓地从纳帕塔附近迁至麦罗埃。麦罗埃的王室金字塔群保存了这一变化的物质线索。",
+      "placeName": "麦罗埃王室墓地",
+      "region": "古代非洲",
+      "location": [
+        33.75,
+        16.93333
+      ],
+      "sources": [
+        {
+          "title": "大都会艺术博物馆",
+          "url": "https://www.metmuseum.org/fr/toah/ht/05/afs.html"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/1336/maps"
+        }
+      ]
+    },
+    {
+      "id": "djenne-jeno-early-settlement",
+      "name": "杰内杰诺早期定居",
+      "startYear": -300,
+      "endYear": -201,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "category": "society",
+      "description": "杰内古城群的考古资料把当地聚居追溯至约公元前 250 年。杰内杰诺是古城群中保存早期定居证据的遗址之一。",
+      "placeName": "杰内杰诺遗址",
+      "region": "古代非洲",
+      "sources": [
+        {
+          "title": "联合国教科文组织 · 杰内古城群",
+          "url": "https://whc.unesco.org/en/list/116/"
+        }
+      ]
+    },
+    {
+      "id": "mapungubwe-urban-phase",
+      "name": "马蓬古布韦聚落与贸易发展",
+      "startYear": 900,
+      "endYear": 1300,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "economy",
+      "description": "林波波河谷的聚落逐步发展成区域政治与贸易中心。遗址发现的玻璃珠、陶器等物证显示这里与印度洋贸易网络相连。",
+      "placeName": "马蓬古布韦文化景观",
+      "region": "古代非洲",
+      "location": [
+        29.23889,
+        -22.1925
+      ],
+      "sources": [
+        {
+          "title": "马蓬古布韦世界遗产申报档案",
+          "url": "https://whc.unesco.org/uploads/nominations/1099.pdf"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/1099/maps"
+        }
+      ]
+    },
+    {
+      "id": "caral-supe-monumental-construction",
+      "name": "卡拉尔-苏佩的纪念性建筑营建",
+      "startYear": -2600,
+      "endYear": -2100,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "culture",
+      "description": "这一阶段，苏佩河谷的卡拉尔出现大型台基、金字塔形建筑和居住组团，反映安第斯早期城市社会的组织方式。",
+      "placeName": "卡拉尔-苏佩遗址",
+      "region": "前哥伦布时期美洲",
+      "location": [
+        -77.52139,
+        -10.89167
+      ],
+      "sources": [
+        {
+          "title": "剑桥大学出版社 · 美洲历史年代表",
+          "url": "https://assets.cambridge.org/97811071/74580/frontmatter/9781107174580_frontmatter.pdf"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/1269/maps"
+        }
+      ]
+    },
+    {
+      "id": "monte-alban-urban-apogee",
+      "name": "阿尔班山城市发展的高峰",
+      "startYear": 100,
+      "endYear": 600,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "阿尔班山在这一阶段达到城市发展的高峰。山顶的广场、墓葬、公共建筑与铭文见证了瓦哈卡地区的政治和礼仪活动。",
+      "placeName": "阿尔班山考古遗址",
+      "region": "前哥伦布时期美洲",
+      "location": [
+        -96.76813,
+        17.04632
+      ],
+      "placeId": "historical-cities-reba:chandler-942",
+      "sources": [
+        {
+          "title": "剑桥大学出版社 · 美洲历史年代表",
+          "url": "https://assets.cambridge.org/97811071/74580/frontmatter/9781107174580_frontmatter.pdf"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/415/maps"
+        }
+      ]
+    },
+    {
+      "id": "chan-chan-chimu-apogee",
+      "name": "昌昌城成为奇穆王国的鼎盛都城",
+      "startYear": 1401,
+      "endYear": 1500,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "politics",
+      "description": "15 世纪，秘鲁北岸的昌昌城达到鼎盛。围墙建筑群和院落的规划保留了奇穆王国都城的空间组织。",
+      "placeName": "昌昌考古区",
+      "region": "前哥伦布时期美洲",
+      "location": [
+        -79.07474,
+        -8.10784
+      ],
+      "sources": [
+        {
+          "title": "联合国教科文组织 · 昌昌考古区",
+          "url": "https://whc.unesco.org/en/list/366/"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/366/maps"
+        }
+      ]
+    },
+    {
+      "id": "teouma-lapita-occupation",
+      "name": "特乌马遗址的拉皮塔时期活动",
+      "startYear": -1051,
+      "endYear": -611,
+      "datePrecision": "approximate",
+      "dateLabel": "校准年代外缘范围",
+      "category": "society",
+      "description": "研究者利用炉灰、贝壳和骨骼等样品测年，为埃法特岛特乌马遗址的拉皮塔堆积提出外缘年代范围。该遗址保留了居住活动和墓地的证据。",
+      "placeName": "瓦努阿图埃法特岛特乌马遗址",
+      "region": "大洋洲",
+      "sources": [
+        {
+          "title": "特乌马遗址放射性碳测年研究",
+          "url": "https://www.sciencedirect.com/science/article/pii/S2352409X15300833"
+        }
+      ]
+    },
+    {
+      "id": "nukuleka-lapita-settlement",
+      "name": "汤加努库莱卡的拉皮塔早期聚居",
+      "startYear": -901,
+      "endYear": -881,
+      "datePrecision": "approximate",
+      "dateLabel": "校准年代范围",
+      "category": "society",
+      "description": "努库莱卡遗址的珊瑚磨具测年与拉皮塔陶器序列相结合，为汤加早期聚居提供了时间依据。区间反映研究引用的校准年代。",
+      "placeName": "汤加塔布岛努库莱卡遗址",
+      "region": "大洋洲",
+      "sources": [
+        {
+          "title": "特乌马墓地测年研究对努库莱卡早期聚居年代的比较",
+          "url": "https://researchcommons.waikato.ac.nz/server/api/core/bitstreams/f4736b94-c9fb-4ab9-a5c0-e46689742f12/content"
+        }
+      ]
+    },
+    {
+      "id": "taputapuatea-marae-development",
+      "name": "塔普塔普阿泰阿礼仪建筑发展",
+      "startYear": 1301,
+      "endYear": 1800,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "temporalKind": "phase",
+      "category": "religion",
+      "description": "赖阿特阿岛的露天礼仪场地在这一时期发展，联系着岛民的祭祀、酋长权威和跨岛交流。",
+      "placeName": "塔普塔普阿泰阿文化景观",
+      "region": "大洋洲",
+      "location": [
+        -151.37238,
+        -16.8414
+      ],
+      "sources": [
+        {
+          "title": "联合国教科文组织 · 塔普塔普阿泰阿",
+          "url": "https://whc.unesco.org/en/list/1529/"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/1529/maps"
+        }
+      ]
+    },
+    {
+      "id": "roi-mata-chiefdom-sites",
+      "name": "罗伊·马塔酋长的活动与安葬",
+      "startYear": 1601,
+      "endYear": 1633,
+      "datePrecision": "approximate",
+      "dateLabel": "约略年代",
+      "category": "society",
+      "description": "瓦努阿图中部的口述传统把罗伊·马塔与三个岛屿上的居所、去世地点和集体墓葬联系起来。地图标注遗产区参考点。",
+      "placeName": "罗伊·马塔酋长领地",
+      "region": "大洋洲",
+      "location": [
+        168.17772,
+        -17.62807
+      ],
+      "sources": [
+        {
+          "title": "联合国教科文组织 · 罗伊·马塔酋长领地",
+          "url": "https://whc.unesco.org/en/list/1280/"
+        },
+        {
+          "title": "联合国教科文组织 · 遗址坐标与地图",
+          "url": "https://whc.unesco.org/en/list/1280/maps"
+        }
+      ]
+    }
+  ]
+}
