@@ -1,5 +1,5 @@
 import { formatYear } from '../chronology.mjs';
-import { createEventIndex, eventCategories, eventRegions, eventYears, groupEventMarkers } from './event-data.mjs';
+import { createEventIndex, eventCategories, eventRegions, eventSource, eventYears, groupEventMarkers } from './event-data.mjs';
 import { readPlaceApi } from './place-api.mjs';
 import { placePopup } from './geography.mjs';
 import { placeAt } from './places.mjs';
@@ -19,7 +19,7 @@ function button(label, action) {
 }
 
 const metadata = event => [eventYears(event), eventCategories[event.category], event.placeName,
-  event.quality === 'catalogue' && '原始目录'].filter(Boolean).join(' · ');
+  event.quality === 'catalogue' && eventSource(event)].filter(Boolean).join(' · ');
 
 export function bindEvents(map, Marker, dataset, closePlace) {
   const findEvents = createEventIndex(dataset);
@@ -29,6 +29,10 @@ export function bindEvents(map, Marker, dataset, closePlace) {
   const scope = document.querySelector('#atlas-event-scope');
   const region = document.querySelector('#atlas-event-region');
   const regionControl = document.querySelector('#atlas-event-region-control');
+  const source = document.querySelector('#atlas-event-source');
+  const mapped = document.querySelector('#atlas-event-mapped');
+  const catalogueControls = [regionControl, document.querySelector('#atlas-event-source-control'),
+    document.querySelector('#atlas-event-mapped-control')];
   const more = document.querySelector('#atlas-event-more');
   const search = document.querySelector('#atlas-event-search');
   const status = document.querySelector('#atlas-event-status');
@@ -208,7 +212,8 @@ export function bindEvents(map, Marker, dataset, closePlace) {
 
   function refresh() {
     const all = scope.value === 'all';
-    visible = (all && catalogue ? catalogue : findEvents)(year, category.value, search.value, all ? region.value : '');
+    visible = (all && catalogue ? catalogue : findEvents)(year, category.value, search.value,
+      all && catalogue ? region.value : '', all && catalogue ? { source: source.value, mapped: mapped.checked } : undefined);
     if (!panel.hidden && (selected && !visible.includes(selected) ||
         parentGroup?.some(event => !visible.includes(event)))) close();
     list.replaceChildren(...visible.slice(0, limit).map(event => {
@@ -234,7 +239,7 @@ export function bindEvents(map, Marker, dataset, closePlace) {
     catalogue = undefined;
     refreshFilters();
     const all = scope.value === 'all';
-    regionControl.hidden = !all;
+    for (const control of catalogueControls) control.hidden = !all;
     if (!all || year === undefined) return;
     const request = new AbortController();
     catalogueRequest = request;
@@ -251,6 +256,10 @@ export function bindEvents(map, Marker, dataset, closePlace) {
       const regions = new Set(allEvents.flatMap(eventRegions));
       region.replaceChildren(new Option('全部地区', ''), ...[...regions].sort().map(name => new Option(name, name)));
       region.value = regions.has(previous) ? previous : '';
+      const previousSource = source.value;
+      const availableSources = new Set(allEvents.map(eventSource));
+      source.replaceChildren(new Option('全部来源', ''), ...[...availableSources].sort().map(name => new Option(name, name)));
+      source.value = availableSources.has(previousSource) ? previousSource : '';
       refreshFilters();
     } catch {
       if (request.signal.aborted) return;
@@ -268,6 +277,8 @@ export function bindEvents(map, Marker, dataset, closePlace) {
   search.addEventListener('input', refreshFilters);
   category.addEventListener('change', refreshFilters);
   region.addEventListener('change', refreshFilters);
+  source.addEventListener('change', refreshFilters);
+  mapped.addEventListener('change', refreshFilters);
   scope.addEventListener('change', () => {
     close();
     void loadCatalogue();

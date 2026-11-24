@@ -12,6 +12,12 @@ const validYear = year => Number.isSafeInteger(year) && year !== 0;
 const hasText = value => typeof value === 'string' && Boolean(value.trim());
 const secureUrl = value => URL.canParse(value) && new URL(value).protocol === 'https:';
 export const eventRegions = event => event.regions ?? [event.region ?? '未标地区'];
+export const eventSource = event => ({
+  'EventKG 3.2': 'EventKG 结构化',
+  'EventKG 3.2 · TextEvent': 'EventKG 文本摘录',
+  'Wikidata': 'Wikidata 结构化',
+  'NOAA NCEI · Global Significant Earthquake Database': 'NOAA 地震目录',
+})[event.quality === 'catalogue' ? event.provenance?.dataset : ''] ?? '人工精选';
 
 export function validateEventDataset({ version, events }) {
   if (!hasText(version) || !Array.isArray(events)) throw new Error('事件数据须包含版本和事件列表');
@@ -69,12 +75,14 @@ export function createEventIndex(dataset) {
     start: sourceYearToAxis(event.startYear),
     end: sourceYearToAxis(event.endYear),
     key: searchKey([event.name, event.region, event.placeName, event.description, ...(event.aliases ?? [])].filter(Boolean).join(' ')),
-  })).sort((a, b) => a.start - b.start || a.event.name.localeCompare(b.event.name, 'zh-CN'));
-  return (year, category, query = '', region = '') => {
+  })).sort((a, b) => Number(a.event.quality === 'catalogue') - Number(b.event.quality === 'catalogue') ||
+    a.start - b.start || a.event.name.localeCompare(b.event.name, 'zh-CN'));
+  return (year, category, query = '', region = '', { source, mapped } = {}) => {
     if (!Number.isInteger(year)) return [];
     const key = searchKey(query);
     return records.filter(record => record.start <= year && year <= record.end &&
       (!category || record.event.category === category) && (!region || eventRegions(record.event).includes(region)) &&
+      (!source || eventSource(record.event) === source) && (!mapped || record.event.location) &&
       record.key.includes(key)).map(record => record.event);
   };
 }
