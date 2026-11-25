@@ -50,6 +50,15 @@
       <button id="new-root-tag" class="primary" type="button">＋ 新建顶级标签</button>
     </div>
     <p class="meta">知识数量含下级并去重</p>
+    <div id="tag-management-actions" hidden>
+      <p id="tag-management-selection"></p>
+      <div class="tag-selected-actions" role="group" aria-label="选中标签的操作">
+        <button type="button" data-tag-action="child">添加子标签</button>
+        <button type="button" data-tag-action="rename">重命名</button>
+        <button type="button" data-tag-action="move">移动</button>
+        <button type="button" data-tag-action="delete">删除</button>
+      </div>
+    </div>
     <div id="tag-management-editor"></div>
     <div id="tag-management-tree"></div>
     <p id="tag-management-status" role="status"></p>

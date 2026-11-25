@@ -17,10 +17,20 @@ export function createTagManager(dialog, { paths, changeTag }) {
   const editor = dialog.querySelector('#tag-management-editor');
   const tree = dialog.querySelector('#tag-management-tree');
   const status = dialog.querySelector('#tag-management-status');
+  const actions = dialog.querySelector('#tag-management-actions');
+  const selection = dialog.querySelector('#tag-management-selection');
   const collapsed = new Set();
   let selected = null;
-  let menu = null;
   let busy = false;
+
+  function syncSelection(tags = paths()) {
+    const tag = tags.find(item => item.id === selected);
+    actions.hidden = !tag;
+    selection.textContent = tag?.path ?? '';
+    for (const control of tree.querySelectorAll('.tag-management-name')) {
+      control.setAttribute('aria-pressed', String(control.dataset.tag === selected));
+    }
+  }
 
   function render() {
     const tags = paths();
@@ -47,36 +57,15 @@ export function createTagManager(dialog, { paths, changeTag }) {
         const item = element('li');
         const row = element('div', undefined, 'tag-management-row');
         const select = button(tag.name, () => {
+          if (busy || selected === tag.id) return;
           selected = tag.id;
-          for (const control of tree.querySelectorAll('.tag-management-name')) {
-            control.setAttribute('aria-pressed', String(control.dataset.tag === selected));
-          }
+          editor.replaceChildren();
+          syncSelection(tags);
         }, 'tag-management-name');
         select.dataset.tag = tag.id;
         select.setAttribute('aria-pressed', String(selected === tag.id));
         const count = element('span', String(tag.count), 'tag-count');
         count.setAttribute('aria-label', `${tag.count} 条知识`);
-        const actions = element('details', undefined, 'tag-management-menu');
-        actions.open = menu === tag.id;
-        const more = element('summary', '···');
-        more.setAttribute('aria-label', `${tag.name}的操作`);
-        more.onclick = () => {
-          menu = actions.open ? null : tag.id;
-          for (const other of tree.querySelectorAll('.tag-management-menu[open]')) {
-            if (other !== actions) other.open = false;
-          }
-        };
-        const controls = element('div', undefined, 'tag-management-menu-items');
-        for (const [label, operation] of [['添加子标签', 'child'], ['重命名', 'rename'], ['移动', 'move'], ['删除', 'delete']]) {
-          controls.append(button(label, () => {
-            selected = tag.id;
-            menu = null;
-            render();
-            if (operation === 'delete') showDelete(tag, byId.get(tag.parentId));
-            else showEditor(operation, tag, tags);
-          }));
-        }
-        actions.append(more, controls);
         let children;
         if ((groups.get(tag.id) ?? []).some(child => !query || visible.has(child.id))) {
           children = level(tag.id);
@@ -99,7 +88,7 @@ export function createTagManager(dialog, { paths, changeTag }) {
           syncToggle();
           row.append(toggle);
         }
-        row.append(select, count, actions);
+        row.append(select, count);
         item.append(row);
         if (children) item.append(children);
         list.append(item);
@@ -108,6 +97,7 @@ export function createTagManager(dialog, { paths, changeTag }) {
     }
     const list = level(null);
     tree.replaceChildren(list.childElementCount ? list : element('p', query ? '没有匹配的标签' : '暂无标签', 'meta'));
+    syncSelection(tags);
   }
 
   async function save(id, method, payload, focusId) {
@@ -224,11 +214,20 @@ export function createTagManager(dialog, { paths, changeTag }) {
   }
 
   dialog.querySelector('#new-root-tag').onclick = () => showEditor('root', null);
-  search.oninput = () => { menu = null; render(); };
+  for (const control of actions.querySelectorAll('[data-tag-action]')) {
+    control.onclick = () => {
+      const tags = paths();
+      const tag = tags.find(item => item.id === selected);
+      if (!tag || busy) return;
+      const operation = control.dataset.tagAction;
+      if (operation === 'delete') showDelete(tag, tags.find(item => item.id === tag.parentId));
+      else showEditor(operation, tag, tags);
+    };
+  }
+  search.oninput = render;
   return {
     open() {
       search.value = '';
-      menu = null;
       editor.replaceChildren();
       status.textContent = '';
       render();
