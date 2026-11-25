@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { cp, mkdtemp, readFile, rm, symlink } from 'node:fs/promises';
+import { cp, mkdtemp, readFile, rename, rm, symlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -102,6 +102,24 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       return result.json();
     };
     const indexPath = join(root, 'data', 'knowledge', 'index.json');
+    await t.test('索引缺失且正文仍在时拒绝读取或重建知识库', async () => {
+      const id = randomUUID();
+      const route = `${base}/${id}`;
+      const original = await (await put(route, { content: '保留这份正文', revision: null })).json();
+      const archived = indexPath + '.backup';
+      await rename(indexPath, archived);
+      try {
+        const missing = await request(base);
+        assert.equal(missing.status, 409);
+        assert.match((await missing.json()).error, /索引缺失.*已存正文/);
+        assert.equal((await put(`${base}/${randomUUID()}`, { content: '不能重建', revision: null })).status, 409);
+        await assert.rejects(readFile(indexPath), { code: 'ENOENT' });
+      } finally {
+        await rename(archived, indexPath);
+      }
+      assert.equal((await get(route)).revision, original.revision);
+      assert.equal((await remove(route)).status, 200);
+    });
     await t.test('知识录入、层级标签、双向关联及清理', async () => {
       const a = randomUUID(), b = randomUUID();
       const first = `${base}/${a}`, second = `${base}/${b}`;
