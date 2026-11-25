@@ -2,6 +2,7 @@ import { parseYear, formatYear, formatSegmentYears, ticks, describe, zoomView, c
 import { openNote } from './notes.mjs';
 import { openBatchNotes } from './batch-notes.mjs';
 import { experienceError } from './experience.mjs';
+import { workKnowledgeSection } from './work-knowledge.mjs';
 
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
@@ -282,6 +283,7 @@ function renderDetails(work) {
       render();
     } catch (error) { notify(error.message); }
   }, 'detail-delete'));
+  if (state.page === 'library') panel.append(workKnowledgeSection(work));
   panel.append(actions);
 }
 
@@ -500,7 +502,12 @@ try {
   const response = await fetch('/api/works');
   if (!response.ok) throw new Error('无法读取本地资料库');
   state.works = await response.json();
+  const params = new URLSearchParams(location.search);
+  if (params.get('page') === 'timeline') state.page = 'timeline';
+  const work = state.works.find(item => item.id === params.get('work'));
+  if (work) state.selected = work.id;
   state.ready = true;
   state.view = fitRange(state.works.flatMap(work => work.segments), 20);
   render();
+  if (work && params.get('note') === '1') noteButton(work).click();
 } catch (error) { notify(error.message); }

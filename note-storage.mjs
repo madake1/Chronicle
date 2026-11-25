@@ -66,27 +66,40 @@ export async function exportNote(data, work, zip) {
   return Buffer.from(content);
 }
 
-async function addNoteFiles(data, work, prefix, add) {
-  const { content, revision: saved } = await loadNote(data, work);
-  if (saved === null) throw new NoteError(404, `《${work.title}》没有已保存的笔记`);
-  add(`${prefix}note.md`, Buffer.from(content));
+async function addNoteFiles(content, loadAsset, add) {
+  add('note.md', Buffer.from(content));
   for (const name of new Set(referencedImages(content))) {
-    const { bytes } = await loadImage(data, work.id, name);
-    add(`${prefix}assets/${name}`, bytes);
+    const { bytes } = await loadAsset(name);
+    add(`assets/${name}`, bytes);
   }
 }
 
-export async function exportNotes(data, works, group = true) {
+export async function exportNoteContent(content, loadAsset, zip) {
+  if (!zip) return Buffer.from(content);
+  const { files, add } = archiveFiles();
+  await addNoteFiles(content, loadAsset, add);
+  return zipSync(files, { level: 0 });
+}
+
+function archiveFiles() {
   const files = {};
   let size = 0;
+  function add(path, bytes) {
+    size += bytes.length;
+    if (size > 128 * 1024 * 1024) throw new NoteError(413, 'ZIP 超过 128 MB，请分批导出或减少笔记中的图片');
+    files[path] = bytes;
+  }
+  return { files, add };
+}
+
+export async function exportNotes(data, works, group = true) {
+  const { files, add } = archiveFiles();
   for (const [index, work] of works.entries()) {
     const title = work.title.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').slice(0, 60).trim().replace(/\.+$/, '') || '作品';
     const prefix = group ? `${index + 1} - ${title}/` : '';
-    await addNoteFiles(data, work, prefix, (path, bytes) => {
-      size += bytes.length;
-      if (size > 128 * 1024 * 1024) throw new NoteError(413, 'ZIP 超过 128 MB，请分批导出或减少笔记中的图片');
-      files[path] = bytes;
-    });
+    const { content, revision: saved } = await loadNote(data, work);
+    if (saved === null) throw new NoteError(404, `《${work.title}》没有已保存的笔记`);
+    await addNoteFiles(content, name => loadImage(data, work.id, name), (path, bytes) => add(prefix + path, bytes));
   }
   return zipSync(files, { level: 0 });
 }

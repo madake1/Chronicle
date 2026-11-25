@@ -65,6 +65,12 @@ h3{font-size:1rem}
 .detail-section p{margin:.25rem 0;white-space:pre-wrap}
 .detail-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
 .detail-delete{margin-inline-start:auto}
+.work-knowledge details,.work-knowledge form,.work-knowledge h3{margin-bottom:.45rem}
+.work-knowledge summary{cursor:pointer}
+.work-knowledge details button{margin-inline-start:.5rem}
+.work-knowledge form,.work-knowledge label{display:grid;gap:.4rem}
+.work-knowledge form :is(input,select){min-width:0;width:100%}
+.work-knowledge [role=status]:empty{display:none}
 #library{overflow:auto}
 table{width:100%;border-collapse:collapse;text-align:left}
 th,td{padding:.7rem .9rem;border-bottom:1px solid var(--line)}

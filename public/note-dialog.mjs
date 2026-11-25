@@ -40,7 +40,7 @@ export async function saveNoteDownload(filename, extension, request) {
   }
 }
 
-export function createNoteDialog(dialog) {
+export function createNoteDialog(dialog, { entity = '笔记', untitledFile = 'note' } = {}) {
   const title = dialog.querySelector('h2');
   const editor = dialog.querySelector('textarea');
   const preview = dialog.querySelector('.note-preview');
@@ -48,15 +48,24 @@ export function createNoteDialog(dialog) {
   const image = dialog.querySelector('input[type=file]');
   const controls = Object.fromEntries([...dialog.querySelectorAll('[data-note-action]')]
     .map(button => [button.dataset.noteAction, button]));
+  const related = dialog.querySelector('[data-note-related]');
+  const fields = dialog.querySelector('[data-note-fields]');
+  controls.close.setAttribute('aria-label', `关闭${entity}`);
+  controls.edit.textContent = `编辑${entity}`;
+  controls.save.textContent = `保存${entity}`;
   let current;
 
   function dirty() {
-    return dialog.open && current?.editing && editor.value !== current.content;
+    return dialog.open && current?.editing && (editor.value !== current.content || current.metadata?.dirty());
   }
 
   function refresh() {
     const { editing, busy, loaded, revision } = current;
     editor.parentElement.hidden = !loaded || !editing;
+    if (fields) {
+      fields.hidden = !loaded || !editing;
+      fields.disabled = busy;
+    }
     preview.hidden = !loaded || editing;
     controls.edit.hidden = !loaded || editing;
     controls.save.hidden = !loaded || !editing;
@@ -90,36 +99,48 @@ export function createNoteDialog(dialog) {
 
   function showPreview(html) {
     preview.innerHTML = html; // The server renders Markdown with raw HTML disabled.
-    if (!preview.hasChildNodes()) preview.textContent = '这份笔记目前是空白的。';
+    if (!preview.hasChildNodes()) preview.textContent = `${entity}正文为空。`;
   }
 
   function close() {
     if (!current || current.busy) return;
-    if (dirty() && !confirm('笔记还没保存。要放弃这次修改吗？')) return;
+    if (dirty() && !confirm(`${entity}还没保存。要放弃这次修改吗？`)) return;
     dialog.close();
   }
 
-  function open({ title: noteTitle, url, onSaved }) {
+  function open({ title: noteTitle, heading, url, onSaved, draft = false, relatedUrl, metadata, edit = false }) {
     if (dialog.open) return;
-    current = { onSaved, url, noteTitle,
+    current = { onSaved, url, noteTitle, metadata,
       content: '', revision: null, editing: false, busy: false, loaded: false };
-    title.textContent = `${noteTitle} · 笔记`;
+    title.textContent = heading ?? (noteTitle ? `${noteTitle} · ${entity}` : `无标题${entity}`);
     editor.value = '';
     preview.replaceChildren();
     image.value = '';
+    if (related) {
+      related.hidden = !relatedUrl;
+      if (relatedUrl) related.href = relatedUrl;
+    }
     refresh();
     dialog.showModal();
     window.addEventListener('beforeunload', warnBeforeUnload);
+    if (draft) {
+      metadata?.load(null);
+      current.loaded = true;
+      showEditor();
+      status.textContent = '';
+      return;
+    }
     void run(async () => {
       const note = await (await noteRequest(current.url)).json();
       current.content = editor.value = note.content;
       current.revision = note.revision;
+      metadata?.load(note);
       current.loaded = true;
       showPreview(note.html);
-      if (note.revision === null) showEditor();
+      if (note.revision === null || edit) showEditor();
       else title.focus();
       status.textContent = '';
-    }, '正在打开笔记…');
+    }, `正在打开${entity}…`);
   }
 
   controls.edit.onclick = showEditor;
@@ -138,19 +159,25 @@ export function createNoteDialog(dialog) {
     if (!dialog.open) window.removeEventListener('beforeunload', warnBeforeUnload);
   });
   controls.save.onclick = () => run(async () => {
+    const metadata = current.metadata?.value();
     const note = await (await noteRequest(current.url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: editor.value, revision: current.revision }),
+      body: JSON.stringify({ content: editor.value, revision: current.revision, metadata }),
     })).json();
     current.content = note.content;
     current.revision = note.revision;
+    if (typeof note.title === 'string') {
+      current.noteTitle = note.title;
+      title.textContent = note.title ? `${note.title} · ${entity}` : `无标题${entity}`;
+    }
+    current.metadata?.load(note);
     current.editing = false;
     showPreview(note.html);
     current.onSaved?.(note);
     title.focus();
-    status.textContent = '笔记已保存';
-  }, '正在保存…');
+    status.textContent = `${entity}已保存`;
+  }, `正在保存${entity}…`);
 
   controls.image.onclick = () => image.click();
   image.onchange = () => {
@@ -168,7 +195,7 @@ export function createNoteDialog(dialog) {
       const alt = file.name.replace(/\.[^.]+$/, '').replace(/[\[\]\\\r\n]/g, ' ').trim() || '插图';
       editor.setRangeText(`\n![${alt}](${path})\n`, selectionStart, selectionEnd, 'end');
       editor.focus();
-      status.textContent = '图片已插入，保存笔记后即可阅读和导出';
+      status.textContent = `图片已插入，保存${entity}后即可阅读和导出`;
     }, '正在上传图片…');
   };
 
@@ -177,11 +204,11 @@ export function createNoteDialog(dialog) {
       status.textContent = '请先保存编辑内容，再导出笔记';
       return;
     }
-    const name = current.noteTitle.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').trim().slice(0, 100) || 'note';
+    const name = (current.noteTitle ?? '').replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').trim().slice(0, 100) || untitledFile;
     void run(async () => {
       await saveNoteDownload(`${name}.${extension}`, extension,
         () => noteRequest(`${current.url}/export.${extension}`));
-      status.textContent = '已导出笔记';
+      status.textContent = `已导出${entity}`;
     });
   }
 
