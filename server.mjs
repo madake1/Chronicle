@@ -1,4 +1,5 @@
 import { createServer } from 'node:http';
+import { createKnowledgeService } from './knowledge.mjs';
 import { mkdir, readFile } from 'node:fs/promises';
 import { atomicWrite } from './atomic-write.mjs';
 import { NoteError } from './note-files.mjs';
@@ -10,6 +11,10 @@ import { experienceError } from './public/experience.mjs';
 const dataDirectory = new URL('./data/', import.meta.url);
 const dataFile = new URL('chronicle.json', dataDirectory);
 const assets = new Map([
+  ['/knowledge', ['knowledge.html', 'text/html']],
+  ['/knowledge.mjs', ['knowledge.mjs', 'text/javascript']],
+  ['/knowledge.css', ['knowledge.css', 'text/css']],
+  ['/work-knowledge.mjs', ['work-knowledge.mjs', 'text/javascript']],
   ['/', ['index.html', 'text/html']],
   ['/styles.css', ['styles.css', 'text/css']],
   ['/app.mjs', ['app.mjs', 'text/javascript']],
@@ -117,6 +122,8 @@ function send(response, status, value) {
 
 const port = Number(process.env.PORT || 4173);
 const allowedOrigins = new Set();
+const knowledge = createKnowledgeService({ data: dataDirectory, readWorks, readJson, readBody, send, queueWrite });
+await knowledge.reconcile().catch(error => console.error('知识库关联恢复失败', error.message));
 
 async function handleNote(request, response, id, suffix, name) {
   const findWork = works => {
@@ -171,6 +178,17 @@ async function handleNote(request, response, id, suffix, name) {
     });
     return send(response, 201, { path });
   }
+  if (request.method === 'DELETE' && !suffix) {
+    await queueWrite(async () => {
+      const works = await readWorks();
+      const work = findWork(works);
+      if (!work.notePath) throw new NoteError(404, '找不到已保存的作品笔记');
+      delete work.notePath;
+      await writeWorks(works);
+      await knowledge.reconcile(works);
+    });
+    return send(response, 200, { deleted: true });
+  }
   throw new NoteError(404, '找不到笔记接口');
 }
 
@@ -217,6 +235,9 @@ createServer(async (request, response) => {
       });
       return response.end(zip);
     }
+    if (/^\/api\/knowledge(?:[/?]|$)/.test(request.url)) {
+      return await knowledge.handle(request, response, new URL(request.url, 'http://localhost'));
+    }
     if (request.url === '/api/works' && request.method === 'GET') {
       return send(response, 200, await readWorks());
     }
@@ -229,11 +250,12 @@ createServer(async (request, response) => {
       await queueWrite(async () => {
         const notes = new Map((await readWorks()).map(work => [work.id, work.notePath]));
         await writeWorks(works.map(work => ({ ...work, notePath: notes.get(work.id) })));
+        if ([...notes.keys()].some(id => !works.some(work => work.id === id))) await knowledge.reconcile();
       });
       return send(response, 200, { saved: true });
     }
     const shard = /^\/atlas\/data\/(geometry-\d{1,4}\.json)$/.exec(request.url);
-    const asset = request.method === 'GET' && (assets.get(request.url) ??
+    const asset = request.method === 'GET' && (assets.get(request.url.split('?')[0]) ??
       (shard && [`../atlas-data/${shard[1]}`, 'application/json']));
     if (!asset) return send(response, 404, { error: '页面不存在' });
     const url = new URL(`./public/${asset[0]}`, import.meta.url);

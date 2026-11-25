@@ -48,15 +48,21 @@ export function createNoteDialog(dialog) {
   const image = dialog.querySelector('input[type=file]');
   const controls = Object.fromEntries([...dialog.querySelectorAll('[data-note-action]')]
     .map(button => [button.dataset.noteAction, button]));
+  const related = dialog.querySelector('[data-note-related]');
+  const fields = dialog.querySelector('[data-note-fields]');
   let current;
 
   function dirty() {
-    return dialog.open && current?.editing && editor.value !== current.content;
+    return dialog.open && current?.editing && (editor.value !== current.content || current.metadata?.dirty());
   }
 
   function refresh() {
     const { editing, busy, loaded, revision } = current;
     editor.parentElement.hidden = !loaded || !editing;
+    if (fields) {
+      fields.hidden = !loaded || !editing;
+      fields.disabled = busy;
+    }
     preview.hidden = !loaded || editing;
     controls.edit.hidden = !loaded || editing;
     controls.save.hidden = !loaded || !editing;
@@ -99,24 +105,36 @@ export function createNoteDialog(dialog) {
     dialog.close();
   }
 
-  function open({ title: noteTitle, url, onSaved }) {
+  function open({ title: noteTitle, url, onSaved, draft = false, relatedUrl, metadata, edit = false }) {
     if (dialog.open) return;
-    current = { onSaved, url, noteTitle,
+    current = { onSaved, url, noteTitle, metadata,
       content: '', revision: null, editing: false, busy: false, loaded: false };
     title.textContent = `${noteTitle} · 笔记`;
     editor.value = '';
     preview.replaceChildren();
     image.value = '';
+    if (related) {
+      related.hidden = !relatedUrl;
+      if (relatedUrl) related.href = relatedUrl;
+    }
     refresh();
     dialog.showModal();
     window.addEventListener('beforeunload', warnBeforeUnload);
+    if (draft) {
+      metadata?.load(null);
+      current.loaded = true;
+      showEditor();
+      status.textContent = '';
+      return;
+    }
     void run(async () => {
       const note = await (await noteRequest(current.url)).json();
       current.content = editor.value = note.content;
       current.revision = note.revision;
+      metadata?.load(note);
       current.loaded = true;
       showPreview(note.html);
-      if (note.revision === null) showEditor();
+      if (note.revision === null || edit) showEditor();
       else title.focus();
       status.textContent = '';
     }, '正在打开笔记…');
@@ -138,13 +156,15 @@ export function createNoteDialog(dialog) {
     if (!dialog.open) window.removeEventListener('beforeunload', warnBeforeUnload);
   });
   controls.save.onclick = () => run(async () => {
+    const metadata = current.metadata?.value();
     const note = await (await noteRequest(current.url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: editor.value, revision: current.revision }),
+      body: JSON.stringify({ content: editor.value, revision: current.revision, metadata }),
     })).json();
     current.content = note.content;
     current.revision = note.revision;
+    current.metadata?.load(note);
     current.editing = false;
     showPreview(note.html);
     current.onSaved?.(note);
