@@ -83,23 +83,24 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
     const otherPath = Object.keys(combined).find(name => name.startsWith('2 - ') && name.endsWith('/note.md'));
     assert.equal(Buffer.from(combined[otherPath]).toString(), '第二份笔记');
 
+    const base = '/api/knowledge';
+    const get = async route => {
+      const result = await request(route);
+      assert.equal(result.status, 200);
+      return result.json();
+    };
+    const remove = route => request(route, { method: 'DELETE' });
+    const addTag = async (name, parentId = null) => {
+      const result = await request(base + '/tags', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, parentId }),
+      });
+      assert.equal(result.status, 201);
+      return result.json();
+    };
+    const indexPath = join(root, 'data', 'knowledge', 'index.json');
     await t.test('知识录入、层级标签、双向关联及清理', async () => {
-      const base = '/api/knowledge';
       const a = randomUUID(), b = randomUUID();
       const first = `${base}/${a}`, second = `${base}/${b}`;
-      const get = async route => {
-        const result = await request(route);
-        assert.equal(result.status, 200);
-        return result.json();
-      };
-      const remove = route => request(route, { method: 'DELETE' });
-      const addTag = async (name, parentId = null) => {
-        const result = await request(base + '/tags', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, parentId }),
-        });
-        assert.equal(result.status, 201);
-        return result.json();
-      };
       assert.equal((await put(first, { content: '  ', revision: null })).status, 400);
       const upload = await request(first + '/assets', {
         method: 'POST', headers: { 'Content-Type': 'image/png' }, body: png,
@@ -109,11 +110,13 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       const text = `# 历史材料\n\n![图片](${image})`;
       assert.equal((await put(first, { content: text, revision: null })).status, 200);
       assert.equal((await put(first, { content: '覆盖', revision: null })).status, 409);
-      assert.equal((await put(second, { content: '读书记录', revision: null })).status, 200);
+      const longBody = '读书记录' + '摘'.repeat(140) + '索引末尾词';
+      assert.equal((await put(second, { content: longBody, revision: null })).status, 200);
       assert.match((await get(first)).html, /<h1>历史材料<\/h1>/);
       const files = unzipSync(new Uint8Array(await (await request(first + '/export.zip')).arrayBuffer()));
       assert.equal(Buffer.from(files['note.md']).toString(), text);
       assert.deepEqual(Buffer.from(files[image]), png);
+      assert.deepEqual(Buffer.from(await (await request(first + '/' + image)).arrayBuffer()), png);
       assert.equal((await get(base + '?tag=untagged')).notes.length, 2);
       const parent = await addTag('人文');
       const child = await addTag('历史', parent.id);
@@ -125,6 +128,14 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       };
       assert.equal((await put(first + '/metadata', payload)).status, 200);
       assert.equal((await put(first + '/metadata', payload)).status, 409);
+      const queryTargets = text => get(base + '/targets?q=' + encodeURIComponent(text));
+      assert.deepEqual((await queryTargets('史料摘录')).map(item => item.id), [a]);
+      const [unnamed] = await queryTargets('索引末尾词');
+      assert.equal(unnamed.id, b);
+      assert.equal(unnamed.title, '');
+      assert.equal(unnamed.excerpt, longBody.slice(0, 120));
+      assert.equal(unnamed.content, undefined);
+      assert.equal((await get(first)).related.find(item => item.id === b).excerpt, unnamed.excerpt);
       assert.equal((await get(second)).related[0].id, a);
       assert.equal((await get(base + '?related=work-note:' + id)).notes[0].id, a);
       assert.deepEqual((await get(base + '?tag=' + parent.id)).notes.map(note => note.id), [a]);
@@ -134,7 +145,9 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       const workLinks = `${base}/works/${id}`;
       assert.equal((await put(workLinks + '/' + b)).status, 200);
       assert.equal((await put(workLinks + '/' + b)).status, 200);
-      assert.equal((await get(workLinks)).related.filter(note => note.id === b).length, 1);
+      const reverse = (await get(workLinks)).related.filter(note => note.id === b);
+      assert.equal(reverse.length, 1);
+      assert.equal(reverse[0].excerpt, unnamed.excerpt);
       assert.ok((await get(second)).related.some(item => item.type === 'work' && item.id === id));
       assert.equal((await remove(workLinks + '/' + b)).status, 200);
       assert.deepEqual((await get(second)).related.map(item => item.id), [a]);
@@ -150,17 +163,64 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal((await put(base + '/tags/' + child.id, { name: '史学', parentId: otherParent.id })).status, 200);
       assert.deepEqual((await get(base + '?tag=' + otherParent.id)).notes.map(note => note.id), [a]);
       assert.equal((await remove(base + '/tags/' + child.id)).status, 200);
-      assert.deepEqual((await get(first)).tagIds, [parent.id]);
+      assert.deepEqual((await get(first)).tagIds, [parent.id, otherParent.id]);
       assert.equal((await remove(path)).status, 200);
       assert.deepEqual((await get(first)).related.map(item => item.type).sort(), ['knowledge', 'work']);
       assert.equal((await put('/api/works', works.filter(work => work.id !== id))).status, 200);
       assert.deepEqual((await get(first)).related.map(item => item.type), ['knowledge']);
+      const survivingWork = `${base}/works/${other.id}`;
+      assert.equal((await put(survivingWork + '/' + a)).status, 200);
+      assert.equal((await request(first + '/' + image)).status, 200);
       assert.equal((await remove(first)).status, 200);
       assert.equal((await request(first + '/' + image)).status, 404);
       assert.deepEqual((await get(second)).related, []);
-      const saved = JSON.parse(await readFile(join(root, 'data', 'knowledge', 'index.json'), 'utf8'));
+      assert.deepEqual((await get(survivingWork)).related, []);
+      const saved = JSON.parse(await readFile(indexPath, 'utf8'));
       assert.deepEqual(saved.relations, []);
       assert.equal(saved.notes.length, 1);
+    });
+    await t.test('删除标签原子继承父级，保留后代，并拒绝提升冲突', async () => {
+      const top = await addTag('分类');
+      const middle = await addTag('待删除', top.id);
+      const child = await addTag('下级', middle.id);
+      const leaf = await addTag('末级', child.id);
+      const conflict = await addTag('下级', top.id);
+      const rootConflict = await addTag('下级');
+      const extra = await addTag('其他标签');
+      async function note(tagIds) {
+        const route = `${base}/${randomUUID()}`;
+        assert.equal((await put(route, { content: '保留正文', revision: null,
+          metadata: { title: '', tagIds, related: [], version: null } })).status, 200);
+        return route;
+      }
+      const duplicate = await note([top.id, middle.id, extra.id]);
+      const inherits = await note([middle.id]);
+      const descendant = await note([leaf.id]);
+      const before = await readFile(indexPath, 'utf8');
+      const blocked = await remove(base + '/tags/' + middle.id);
+      assert.equal(blocked.status, 409);
+      assert.match((await blocked.json()).error, /先重命名或移动/);
+      assert.equal(await readFile(indexPath, 'utf8'), before);
+      assert.equal((await remove(base + '/tags/' + conflict.id)).status, 200);
+      assert.equal((await remove(base + '/tags/' + middle.id)).status, 200);
+      assert.deepEqual((await get(duplicate)).tagIds, [top.id, extra.id]);
+      assert.deepEqual((await get(inherits)).tagIds, [top.id]);
+      assert.deepEqual((await get(descendant)).tagIds, [leaf.id]);
+      const snapshot = await get(base);
+      assert.equal(snapshot.tags.find(tag => tag.id === child.id).parentId, top.id);
+      assert.equal(snapshot.tags.find(tag => tag.id === leaf.id).parentId, child.id);
+      assert.equal(snapshot.tags.find(tag => tag.id === top.id).directCount, 2);
+      const beforeTop = await readFile(indexPath, 'utf8');
+      assert.equal((await remove(base + '/tags/' + top.id)).status, 409);
+      assert.equal(await readFile(indexPath, 'utf8'), beforeTop);
+      assert.equal((await remove(base + '/tags/' + rootConflict.id)).status, 200);
+      assert.equal((await remove(base + '/tags/' + top.id)).status, 200);
+      assert.deepEqual((await get(duplicate)).tagIds, [extra.id]);
+      assert.deepEqual((await get(inherits)).tagIds, []);
+      assert.equal((await get(inherits)).content, '保留正文');
+      assert.ok((await get(base + '?tag=untagged')).notes.some(note => inherits.endsWith('/' + note.id)));
+      assert.deepEqual((await get(descendant)).tagIds, [leaf.id]);
+      assert.equal((await get(base)).tags.find(tag => tag.id === child.id).parentId, null);
     });
   } finally {
     if (server && server.exitCode === null && server.signalCode === null) {

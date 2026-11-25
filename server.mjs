@@ -14,6 +14,7 @@ const assets = new Map([
   ['/knowledge', ['knowledge.html', 'text/html']],
   ['/knowledge.mjs', ['knowledge.mjs', 'text/javascript']],
   ['/knowledge.css', ['knowledge.css', 'text/css']],
+  ['/tag-manager.mjs', ['tag-manager.mjs', 'text/javascript']],
   ['/work-knowledge.mjs', ['work-knowledge.mjs', 'text/javascript']],
   ['/', ['index.html', 'text/html']],
   ['/styles.css', ['styles.css', 'text/css']],

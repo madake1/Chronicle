@@ -503,6 +503,7 @@ try {
   if (!response.ok) throw new Error('无法读取本地资料库');
   state.works = await response.json();
   const params = new URLSearchParams(location.search);
+  if (params.get('page') === 'timeline') state.page = 'timeline';
   const work = state.works.find(item => item.id === params.get('work'));
   if (work) state.selected = work.id;
   state.ready = true;

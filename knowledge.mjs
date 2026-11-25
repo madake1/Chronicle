@@ -31,15 +31,19 @@ function tagPaths(tags) {
 function countTags(state) {
   const byId = new Map(state.tags.map(tag => [tag.id, tag.parentId]));
   const counts = new Map();
+  const direct = new Map();
   for (const note of state.notes) {
     const ancestors = new Set();
     for (const id of note.tagIds) {
+      direct.set(id, (direct.get(id) ?? 0) + 1);
       for (let tag = id; tag && !ancestors.has(tag); tag = byId.get(tag)) ancestors.add(tag);
     }
     for (const id of ancestors) counts.set(id, (counts.get(id) ?? 0) + 1);
   }
-  return state.tags.map(tag => ({ ...tag, count: counts.get(tag.id) ?? 0 }));
+  return state.tags.map(tag => ({ ...tag, count: counts.get(tag.id) ?? 0, directCount: direct.get(tag.id) ?? 0 }));
 }
+
+const excerpt = text => text.trim().replace(/\s+/g, ' ').slice(0, 120);
 
 export function createKnowledgeService({ data, readWorks, readJson, readBody, send, queueWrite }) {
   const root = new URL('knowledge/', data);
@@ -64,12 +68,28 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
   }
   function targets(state, works) {
     return new Map([
-      ...state.notes.map(note => ({ type: 'knowledge', id: note.id, title: note.title || '无标题' })),
+      ...state.notes.map(note => ({ type: 'knowledge', id: note.id, title: note.title })),
       ...works.flatMap(work => {
         const entry = { type: 'work', id: work.id, title: work.title };
         return work.notePath ? [entry, { ...entry, type: 'work-note' }] : [entry];
       }),
     ].map(item => [key(item), item]));
+  }
+  async function describeTargets(state, entries, query = '') {
+    const notes = new Map(state.notes.map(note => [note.id, note]));
+    const results = [];
+    for (const entry of entries) {
+      const titleMatches = entry.title.toLowerCase().includes(query);
+      if (entry.type !== 'knowledge' || (entry.title && titleMatches)) {
+        if (titleMatches) results.push(entry);
+        continue;
+      }
+      const text = await content(notes.get(entry.id));
+      if (titleMatches || text.toLowerCase().includes(query)) {
+        results.push({ ...entry, excerpt: excerpt(text) });
+      }
+    }
+    return results;
   }
   function related(state, catalogue, target) {
     return state.relations.flatMap(pair => {
@@ -121,10 +141,12 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       const text = await content(note);
       if (query && !note.title.toLowerCase().includes(query) && !text.toLowerCase().includes(query) &&
           !note.tagIds.some(id => paths.get(id)?.includes(query))) continue;
-      results.push({ ...note, excerpt: text.trim().slice(0, 120) });
+      results.push({ ...note, excerpt: excerpt(text) });
     }
     results.reverse().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-    return send(response, 200, { notes: results, tags: countTags(state), targets: [...catalogue.values()] });
+    const target = catalogue.get(relatedTo);
+    const [relatedTarget] = target ? await describeTargets(state, [target]) : [];
+    return send(response, 200, { notes: results, tags: countTags(state), relatedTarget });
   }
   async function tagRequest(request, response, id) {
     const input = request.method === 'DELETE' ? {} : await readJson(request, 8192);
@@ -132,11 +154,21 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       const state = await read();
       const existing = id ? find(state.tags, id) : null;
       if (request.method === 'DELETE') {
-        for (const tag of state.tags) if (tag.parentId === id) tag.parentId = existing.parentId;
+        const children = state.tags.filter(tag => tag.parentId === id);
+        const names = new Set(state.tags.filter(tag => tag.id !== id && tag.parentId === existing.parentId).map(tag => tag.name));
+        for (const child of children) {
+          if (names.has(child.name)) fail(409, `提升「${child.name}」会造成同级重名，请先重命名或移动标签`);
+          names.add(child.name);
+        }
+        for (const child of children) child.parentId = existing.parentId;
         state.tags = state.tags.filter(tag => tag.id !== id);
-        for (const note of state.notes) note.tagIds = note.tagIds.filter(tagId => tagId !== id);
+        for (const note of state.notes) {
+          if (!note.tagIds.includes(id)) continue;
+          note.tagIds = [...new Set(note.tagIds.flatMap(tagId => tagId === id ? existing.parentId ?? [] : tagId))];
+          note.updatedAt = new Date().toISOString();
+        }
         await write(state);
-        return send(response, 200, { deleted: true });
+        return send(response, 200, { deleted: true, parentId: existing.parentId });
       }
       const name = typeof input?.name === 'string' ? input.name.trim() : '';
       const parentId = input?.parentId ?? null;
@@ -155,6 +187,12 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     const { method } = request;
     const path = url.pathname;
     if (path === '/api/knowledge' && method === 'GET') return list(response, url, await read());
+    if (path === '/api/knowledge/targets' && method === 'GET') {
+      const state = await read();
+      const catalogue = targets(state, await readWorks());
+      const query = url.searchParams.get('q')?.trim().toLowerCase();
+      return send(response, 200, await describeTargets(state, catalogue.values(), query));
+    }
     const workLink = /^\/api\/knowledge\/works\/([a-zA-Z0-9_-]{1,100})(?:\/([a-z0-9-]{36}))?$/.exec(path);
     if (workLink) {
       const [, workId, noteId] = workLink;
@@ -163,7 +201,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
         const state = await read();
         const catalogue = targets(state, await readWorks());
         if (!catalogue.has(work)) fail(404, '找不到作品');
-        return send(response, 200, { related: related(state, catalogue, work) });
+        return send(response, 200, { related: await describeTargets(state, related(state, catalogue, work)) });
       }
       if (noteId && ['PUT', 'DELETE'].includes(method)) {
         return queueWrite(async () => {
@@ -179,7 +217,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
             state.relations = state.relations.filter(pair => !(pair.includes(work) && pair.includes(note)));
             await write(state);
           }
-          return send(response, 200, { related: related(state, catalogue, work) });
+          return send(response, 200, { related: await describeTargets(state, related(state, catalogue, work)) });
         });
       }
     }
@@ -198,7 +236,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       const catalogue = targets(state, await readWorks());
       const links = related(state, catalogue, `knowledge:${id}`);
       return send(response, 200, { ...note, content: text, metadataVersion: metadataVersion(note, links),
-        html: renderNoteMarkdown(text, `${noteUrl}/assets`), related: links });
+        html: renderNoteMarkdown(text, `${noteUrl}/assets`), related: await describeTargets(state, links) });
     }
     if (method === 'GET' && suffix === 'assets' && name) {
       find((await read()).notes, id);
@@ -236,11 +274,11 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
           const links = related(state, catalogue, own);
           applyMetadata(state, catalogue, note, input.metadata, previous ? metadataVersion(previous, links) : null);
         }
+        const links = await describeTargets(state, related(state, catalogue, own));
         await atomicWrite(new URL(`${revision}.md`, await folder(id, true)), input.content);
         if (previous) Object.assign(previous, note);
         else state.notes.push(note);
         await write(state);
-        const links = related(state, catalogue, own);
         return send(response, 200, { ...note, content: input.content, related: links,
           metadataVersion: metadataVersion(note, links), html: renderNoteMarkdown(input.content, `${noteUrl}/assets`) });
       });

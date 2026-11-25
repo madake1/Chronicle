@@ -1,4 +1,5 @@
 import { createNoteDialog, noteRequest } from './note-dialog.mjs';
+import { createTagManager } from './tag-manager.mjs';
 
 const $ = id => document.getElementById(id);
 const base = '/api/knowledge';
@@ -7,9 +8,10 @@ const types = { knowledge: '知识', work: '作品', 'work-note': '作品笔记'
 $('note-dialog').querySelector('.note-editor').after($('metadata-template').content);
 const editor = createNoteDialog($('note-dialog'));
 const entityKey = item => `${item.type}:${item.id}`;
+const entityLabel = item => item.title || item.excerpt || '无标题';
 const collapsedTags = new Set();
 const recordDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' });
-let tags = [], targets = [], selectedTag = '', selectedNote = params.get('note'), metadata;
+let tags = [], selectedTag = '', selectedNote = params.get('note'), metadata;
 let relatedTo = params.get('related'), listVersion = 0, readerVersion = 0;
 
 function el(tag, text, className) {
@@ -97,10 +99,8 @@ async function loadList() {
   const result = await json(`${base}?${query}`);
   if (version !== listVersion) return;
   tags = result.tags;
-  targets = result.targets;
   $('tag-tree').replaceChildren(tags.length ? tree() : el('p', '还没有标签', 'meta'));
-  const relatedTarget = targets.find(item => entityKey(item) === relatedTo);
-  $('list-heading').textContent = relatedTo ? `${relatedTarget?.title ?? '此条目'}的关联知识` :
+  $('list-heading').textContent = relatedTo ? `${result.relatedTarget ? entityLabel(result.relatedTarget) : '此条目'}的关联知识` :
     selectedTag === 'untagged' ? '无标签知识' : tags.find(tag => tag.id === selectedTag)?.name ?? '全部知识';
   $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag));
   $('untagged').setAttribute('aria-pressed', String(selectedTag === 'untagged'));
@@ -194,7 +194,7 @@ async function showNote(id) {
   if (note.related.length) {
     links.append(el('h3', '关联条目'));
     for (const item of note.related) {
-      links.append(button(`${types[item.type]} · ${item.title}`, () => preview(item).catch(report)));
+      links.append(button(`${types[item.type]} · ${entityLabel(item)}`, () => preview(item).catch(report)));
     }
   }
   const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
@@ -210,7 +210,7 @@ async function showNote(id) {
 async function preview(item) {
   const dialog = $('related-preview');
   const body = dialog.querySelector('article');
-  $('related-title').textContent = item.title;
+  $('related-title').textContent = entityLabel(item);
   const jump = $('related-jump');
   const id = encodeURIComponent(item.id);
   if (item.type === 'knowledge') {
@@ -229,28 +229,42 @@ async function preview(item) {
   }
   dialog.showModal();
 }
-function options(control, first, excluded = null) {
-  control.replaceChildren(new Option(first, ''), ...tagPaths().filter(tag => tag.id !== excluded)
-    .map(tag => new Option(tag.path, tag.id)));
+function options(control, first) {
+  control.replaceChildren(new Option(first, ''), ...tagPaths().map(tag => new Option(tag.path, tag.id)));
+}
+function choice(text, key, selected) {
+  const label = el('label');
+  const input = el('input');
+  input.type = 'checkbox';
+  input.checked = selected.has(key);
+  input.onchange = () => input.checked ? selected.add(key) : selected.delete(key);
+  label.append(input, text);
+  return label;
 }
 function metadataChoices() {
   const query = $('tag-search').value.trim().toLowerCase();
-  const targetQuery = $('target-search').value.trim().toLowerCase();
-  function choice(text, key, selected) {
-    const label = el('label');
-    const input = el('input');
-    input.type = 'checkbox';
-    input.checked = selected.has(key);
-    input.onchange = () => input.checked ? selected.add(key) : selected.delete(key);
-    label.append(input, text);
-    return label;
-  }
   $('tag-choices').replaceChildren(...tagPaths().filter(tag => tag.path.toLowerCase().includes(query))
     .map(tag => choice(tag.path, tag.id, metadata.tags)));
-  $('target-choices').replaceChildren(...targets.filter(item => entityKey(item) !== `knowledge:${metadata.note.id}`)
-    .map(item => ({ item, label: `${types[item.type]} · ${item.title}` }))
-    .filter(({ label }) => label.toLowerCase().includes(targetQuery))
-    .map(({ item, label }) => choice(label, entityKey(item), metadata.links)));
+}
+let targetVersion = 0;
+let targetTimer;
+function searchTargets() {
+  clearTimeout(targetTimer);
+  const version = ++targetVersion;
+  if (!$('relation-fields').open) return;
+  const query = new URLSearchParams({ q: $('target-search').value });
+  $('target-choices').replaceChildren(el('p', '正在查找关联条目…', 'meta'));
+  targetTimer = setTimeout(async () => {
+    try {
+      const targets = await json(`${base}/targets?${query}`);
+      if (version !== targetVersion) return;
+      const choices = targets.filter(item => entityKey(item) !== `knowledge:${metadata.note.id}`)
+        .map(item => choice(`${types[item.type]} · ${entityLabel(item)}`, entityKey(item), metadata.links));
+      $('target-choices').replaceChildren(...(choices.length ? choices : [el('p', '没有匹配的关联条目', 'meta')]));
+    } catch (error) {
+      if (version === targetVersion) $('target-choices').textContent = error.message;
+    }
+  }, 140);
 }
 function metadataInput() {
   const related = [...metadata.links].sort().map(value => {
@@ -263,24 +277,18 @@ function loadMetadata(id, note) {
   metadata = { note: note ?? { id, metadataVersion: null }, tags: new Set(note?.tagIds), links: new Set(note?.related?.map(entityKey)) };
   $('metadata-title').value = note?.title ?? '';
   $('tag-fields').open = $('relation-fields').open = false;
+  searchTargets();
   $('tag-search').value = $('target-search').value = $('inline-tag').value = '';
   $('metadata-error').textContent = '';
   options($('inline-parent'), '无上级');
   metadataChoices();
   metadata.initial = JSON.stringify(metadataInput());
 }
-function tagForm() {
-  const id = $('tag-edit').value;
-  const tag = tags.find(tag => tag.id === id);
-  options($('tag-parent'), '无上级', id);
-  $('tag-name').value = tag?.name ?? '';
-  $('tag-parent').value = tag?.parentId ?? '';
-  $('tag-delete').hidden = !tag;
-}
 async function changeTag(id, method, payload) {
   const result = await json(id ? `${base}/tags/${id}` : `${base}/tags`, method, payload);
-  if (method === 'DELETE' && selectedTag === id) selectedTag = '';
+  if (method === 'DELETE' && selectedTag === id) selectedTag = result.parentId ?? '';
   await loadList();
+  if (selectedNote && $('tag-dialog').open) await showNote(selectedNote);
   return result;
 }
 for (const control of document.querySelectorAll('[data-close]')) control.onclick = () => control.closest('dialog').close();
@@ -292,32 +300,11 @@ $('knowledge-search').oninput = () => {
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => void loadList().catch(report), 160);
 };
-$('manage-tags').onclick = () => {
-  options($('tag-edit'), '新建标签');
-  $('tag-overview').replaceChildren(...tagPaths().map(tag => el('li', `${tag.path} · ${tag.count} 条`)));
-  $('tag-error').textContent = '';
-  tagForm();
-  $('tag-dialog').showModal();
-};
-$('tag-edit').onchange = tagForm;
-$('tag-form').onsubmit = async event => {
-  event.preventDefault();
-  const id = $('tag-edit').value;
-  try {
-    await changeTag(id, id ? 'PUT' : 'POST', { name: $('tag-name').value, parentId: $('tag-parent').value || null });
-    $('tag-dialog').close();
-    if (selectedNote) await showNote(selectedNote);
-  } catch (error) { $('tag-error').textContent = error.message; }
-};
-$('tag-delete').onclick = async () => {
-  if (!confirm('删除这个标签？下级标签会上移，知识笔记会保留。')) return;
-  try {
-    await changeTag($('tag-edit').value, 'DELETE');
-    $('tag-dialog').close();
-    if (selectedNote) await showNote(selectedNote);
-  } catch (error) { $('tag-error').textContent = error.message; }
-};
-$('tag-search').oninput = $('target-search').oninput = metadataChoices;
+const tagManager = createTagManager($('tag-dialog'), { paths: tagPaths, changeTag });
+$('manage-tags').onclick = () => tagManager.open();
+$('tag-search').oninput = metadataChoices;
+$('target-search').oninput = searchTargets;
+$('relation-fields').ontoggle = searchTargets;
 $('inline-add').onclick = async () => {
   try {
     const tag = await changeTag('', 'POST', { name: $('inline-tag').value, parentId: $('inline-parent').value || null });
