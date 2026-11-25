@@ -116,6 +116,9 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       const files = unzipSync(new Uint8Array(await (await request(first + '/export.zip')).arrayBuffer()));
       assert.equal(Buffer.from(files['note.md']).toString(), text);
       assert.deepEqual(Buffer.from(files[image]), png);
+      const download = await request(second + '/export.md');
+      assert.match(download.headers.get('content-disposition'), /filename="knowledge\.md"/);
+      assert.equal(await download.text(), longBody);
       assert.deepEqual(Buffer.from(await (await request(first + '/' + image)).arrayBuffer()), png);
       assert.equal((await get(base + '?tag=untagged')).notes.length, 2);
       const parent = await addTag('人文');
@@ -175,9 +178,30 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal((await request(first + '/' + image)).status, 404);
       assert.deepEqual((await get(second)).related, []);
       assert.deepEqual((await get(survivingWork)).related, []);
+      assert.equal((await get(`/api/works/${other.id}/note`)).content, '第二份笔记');
       const saved = JSON.parse(await readFile(indexPath, 'utf8'));
       assert.deepEqual(saved.relations, []);
       assert.equal(saved.notes.length, 1);
+    });
+    await t.test('并发移动和重命名只更新各自字段，保留另一窗口的修改', async () => {
+      const oldParent = await addTag('原父级');
+      const newParent = await addTag('新父级');
+      const tag = await addTag('原标签名', oldParent.id);
+      const route = `${base}/tags/${tag.id}`;
+      const [moved, renamed] = await Promise.all([
+        put(route, { parentId: newParent.id }),
+        put(route, { name: '新标签名' }),
+      ]);
+      assert.equal(moved.status, 200);
+      assert.equal(renamed.status, 200);
+      let current = (await get(base)).tags.find(item => item.id === tag.id);
+      assert.equal(current.name, '新标签名');
+      assert.equal(current.parentId, newParent.id);
+      assert.equal((await put(route, { name: '第二次重命名' })).status, 200);
+      assert.equal((await put(route, { parentId: null })).status, 200);
+      current = (await get(base)).tags.find(item => item.id === tag.id);
+      assert.equal(current.name, '第二次重命名');
+      assert.equal(current.parentId, null);
     });
     await t.test('删除标签原子继承父级，保留后代，并拒绝提升冲突', async () => {
       const top = await addTag('分类');

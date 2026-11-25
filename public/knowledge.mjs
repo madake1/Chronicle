@@ -6,12 +6,13 @@ const base = '/api/knowledge';
 const params = new URLSearchParams(location.search);
 const types = { knowledge: '知识', work: '作品', 'work-note': '作品笔记' };
 $('note-dialog').querySelector('.note-editor').after($('metadata-template').content);
-const editor = createNoteDialog($('note-dialog'));
+const editor = createNoteDialog($('note-dialog'), { entity: '知识', untitledFile: '无标题知识' });
 const entityKey = item => `${item.type}:${item.id}`;
-const entityLabel = item => item.title || item.excerpt || '无标题';
+const entityLabel = item => item.title || item.excerpt || '无标题知识';
 const collapsedTags = new Set();
 const recordDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' });
-let tags = [], selectedTag = '', selectedNote = params.get('note'), metadata;
+let tags = [], selectedTag = '', selectedNote = null, metadata;
+let visibleNotes = new Set();
 let relatedTo = params.get('related'), listVersion = 0, readerVersion = 0;
 
 function el(tag, text, className) {
@@ -81,9 +82,9 @@ function tree(parent = null) {
   return list;
 }
 function browse(tag) {
+  supersedeReaderRequest();
   selectedTag = tag;
   relatedTo = null;
-  closeReader();
   if (mobile.matches) $('tag-index').open = false;
   const url = new URL(location.href);
   url.searchParams.delete('related');
@@ -98,6 +99,8 @@ async function loadList() {
   if ($('knowledge-search').value.trim()) query.set('q', $('knowledge-search').value.trim());
   const result = await json(`${base}?${query}`);
   if (version !== listVersion) return;
+  visibleNotes = new Set(result.notes.map(note => note.id));
+  if (selectedNote && !visibleNotes.has(selectedNote)) closeReader();
   tags = result.tags;
   $('tag-tree').replaceChildren(tags.length ? tree() : el('p', '还没有标签', 'meta'));
   $('list-heading').textContent = relatedTo ? `${result.relatedTarget ? entityLabel(result.relatedTarget) : '此条目'}的关联知识` :
@@ -109,7 +112,7 @@ async function loadList() {
     const row = el('article', null, 'knowledge-row');
     row.dataset.noteId = note.id;
     const open = button('', () => {
-      if (selectedNote === note.id && !$('reader').hidden) closeReader();
+      if (selectedNote === note.id) closeReader();
       else void showNote(note.id).catch(report);
     });
     open.className = 'knowledge-entry';
@@ -129,8 +132,9 @@ async function loadList() {
   });
   const reader = $('reader');
   $('knowledge-list').after(reader);
-  $('knowledge-list').replaceChildren(...(rows.length ? rows : [el('p', '没有符合条件的笔记', 'meta')]));
+  $('knowledge-list').replaceChildren(...(rows.length ? rows : [el('p', '没有符合条件的知识', 'meta')]));
   placeReader();
+  return visibleNotes;
 }
 function placeReader() {
   const reader = $('reader');
@@ -152,10 +156,15 @@ function closeReader() {
   url.searchParams.delete('note');
   history.replaceState(null, '', url);
 }
+function supersedeReaderRequest() {
+  if (selectedNote && $('reader').hidden) closeReader();
+  else ++readerVersion;
+}
 function editBody(note = null) {
   const id = note?.id ?? crypto.randomUUID();
   editor.open({
-    title: note?.title || (note ? '无标题' : '新建知识'),
+    title: note?.title,
+    heading: note ? undefined : '记录知识',
     url: `${base}/${id}`,
     draft: !note,
     edit: true,
@@ -164,14 +173,32 @@ function editBody(note = null) {
       value: metadataInput,
       dirty: () => JSON.stringify(metadataInput()) !== metadata.initial,
     },
-    onSaved: () => void Promise.all([loadList(), showNote(id)]).catch(report),
+    onSaved: async () => {
+      const intent = readerVersion;
+      try {
+        const visible = await loadList();
+        if (visible?.has(id) && intent === readerVersion) await showNote(id);
+      } catch (error) { report(error); }
+    },
   });
 }
-async function showNote(id) {
-  const version = ++readerVersion;
-  const note = await json(`${base}/${id}`);
-  if (version !== readerVersion) return;
+async function showNote(id, { external = false } = {}) {
+  if (!external && !visibleNotes.has(id)) return;
+  if (selectedNote !== id) {
+    $('reader').hidden = true;
+    placeReader();
+  }
   selectedNote = id;
+  const version = ++readerVersion;
+  let note;
+  try {
+    note = await json(`${base}/${id}`);
+  } catch (error) {
+    if (version !== readerVersion) return;
+    closeReader();
+    throw error;
+  }
+  if (version !== readerVersion) return;
   const url = new URL(location.href);
   url.searchParams.set('note', id);
   history.replaceState(null, '', url);
@@ -179,15 +206,16 @@ async function showNote(id) {
   const article = el('article', null, 'note-preview');
   article.innerHTML = note.html;
   const actions = el('div', null, 'knowledge-actions');
-  actions.append(button('编辑笔记', () => editBody(note)),
-    button('删除笔记', async () => {
-      if (!confirm('删除这条知识笔记及其关联？')) return;
+  actions.append(button('编辑知识', () => editBody(note)),
+    button('删除知识', async () => {
+      if (!confirm('删除这条知识及其关联？')) return;
       try {
         await json(`${base}/${id}`, 'DELETE');
         if (selectedNote === id) {
           closeReader();
         }
         await loadList();
+        $('knowledge-status').textContent = '知识已删除';
       } catch (error) { report(error); }
     }));
   const links = el('section', null, 'detail-section');
@@ -199,7 +227,7 @@ async function showNote(id) {
   }
   const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
   $('reader').replaceChildren();
-  if (note.title) $('reader').append(el('h3', note.title));
+  if (note.title || !visibleNotes.has(id)) $('reader').append(el('h3', note.title || '无标题知识'));
   $('reader').append(time);
   if (names.length) $('reader').append(el('p', names.join(' · '), 'meta'));
   $('reader').append(article, actions);
@@ -287,8 +315,8 @@ function loadMetadata(id, note) {
 async function changeTag(id, method, payload) {
   const result = await json(id ? `${base}/tags/${id}` : `${base}/tags`, method, payload);
   if (method === 'DELETE' && selectedTag === id) selectedTag = result.parentId ?? '';
-  await loadList();
-  if (selectedNote && $('tag-dialog').open) await showNote(selectedNote);
+  const visible = await loadList();
+  if (visible?.has(selectedNote) && $('tag-dialog').open) await showNote(selectedNote);
   return result;
 }
 for (const control of document.querySelectorAll('[data-close]')) control.onclick = () => control.closest('dialog').close();
@@ -298,6 +326,8 @@ $('untagged').onclick = () => browse('untagged');
 let searchTimer;
 $('knowledge-search').oninput = () => {
   clearTimeout(searchTimer);
+  ++listVersion;
+  supersedeReaderRequest();
   searchTimer = setTimeout(() => void loadList().catch(report), 160);
 };
 const tagManager = createTagManager($('tag-dialog'), { paths: tagPaths, changeTag });
@@ -327,6 +357,7 @@ $('theme').onclick = () => {
   localStorage.setItem('chronicle-theme', root.dataset.theme);
 };
 try {
-  await loadList();
-  if (selectedNote) await showNote(selectedNote);
+  const visible = await loadList();
+  const linkedNote = params.get('note');
+  if (visible && linkedNote && !selectedNote) await showNote(linkedNote, { external: true });
 } catch (error) { report(error); }

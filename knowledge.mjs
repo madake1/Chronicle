@@ -170,8 +170,9 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
         await write(state);
         return send(response, 200, { deleted: true, parentId: existing.parentId });
       }
-      const name = typeof input?.name === 'string' ? input.name.trim() : '';
-      const parentId = input?.parentId ?? null;
+      if (!input || typeof input !== 'object' || Array.isArray(input)) fail(400, '标签内容无效');
+      const name = Object.hasOwn(input, 'name') ? (typeof input.name === 'string' ? input.name.trim() : '') : existing?.name;
+      const parentId = Object.hasOwn(input, 'parentId') ? input.parentId : existing?.parentId ?? null;
       if (!name || name.length > 100) fail(400, '请输入 1 至 100 个字符的标签名');
       if (parentId !== null) find(state.tags, parentId);
       if (id && descendants(state.tags, id).has(parentId)) fail(400, '标签不能移到自身或下级标签');
@@ -254,17 +255,17 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       const zip = suffix.endsWith('.zip');
       const bytes = await exportNoteContent(await content(note), asset => loadNoteImage(() => folder(id), asset), zip);
       response.writeHead(200, { 'Content-Type': zip ? 'application/zip' : 'text/markdown; charset=utf-8',
-        'Content-Disposition': `attachment; filename="note.${zip ? 'zip' : 'md'}"` });
+        'Content-Disposition': `attachment; filename="knowledge.${zip ? 'zip' : 'md'}"; filename*=UTF-8''${encodeURIComponent('知识条目')}.${zip ? 'zip' : 'md'}` });
       return response.end(bytes);
     }
     if (method === 'PUT' && !suffix) {
       const input = await readJson(request, noteLimit * 6 + 512 * 1024);
       if (typeof input?.content !== 'string' || !input.content.trim()) fail(400, '请填写 Markdown 正文');
-      if (Buffer.byteLength(input.content) > noteLimit) fail(413, '笔记不能超过 512 KB');
+      if (Buffer.byteLength(input.content) > noteLimit) fail(413, '知识正文不能超过 512 KB');
       return queueWrite(async () => {
         const state = await read();
         const previous = state.notes.find(item => item.id === id);
-        if (input.revision !== (previous?.revision ?? null)) fail(409, '笔记已变更，请重新打开后核对');
+        if (input.revision !== (previous?.revision ?? null)) fail(409, '知识已变更，请重新打开后核对');
         const revision = createHash('sha256').update(input.content).digest('hex');
         const now = new Date().toISOString();
         const note = { id, title: '', tagIds: [], createdAt: now, ...previous, revision, updatedAt: now };

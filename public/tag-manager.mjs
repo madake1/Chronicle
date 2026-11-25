@@ -203,8 +203,8 @@ export function createTagManager(dialog, { paths, changeTag }) {
     }
     form.onsubmit = event => {
       event.preventDefault();
-      void save(editing ? tag.id : '', editing ? 'PUT' : 'POST',
-        { name: moving ? tag.name : input.value, parentId }, parentId);
+      const payload = moving ? { parentId } : renaming ? { name: input.value } : { name: input.value, parentId };
+      void save(editing ? tag.id : '', editing ? 'PUT' : 'POST', payload, renaming ? null : parentId);
     };
     input.focus();
   }

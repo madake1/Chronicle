@@ -42,7 +42,7 @@ export function workKnowledgeSection(work) {
     heading.textContent = `关联知识（${related.length}）`;
     entries.replaceChildren(...related.map(note => {
       const item = element('details');
-      const summary = element('summary', note.title || note.excerpt);
+      const summary = element('summary', note.title || note.excerpt || '无标题知识');
       const preview = element('article', undefined, 'note-preview');
       const link = element('a', '打开详情');
       link.href = `/knowledge?note=${encodeURIComponent(note.id)}`;
