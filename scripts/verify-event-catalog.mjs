@@ -1,5 +1,5 @@
 import { mkdir, readFile, readdir } from 'node:fs/promises';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 import { eventRegions, validateEventDataset } from '../public/atlas/event-data.mjs';
 
 const root = new URL('../atlas-data/events-catalog/', import.meta.url);

@@ -1,6 +1,8 @@
 import { createServer } from 'node:http';
 import { mkdir, readFile } from 'node:fs/promises';
-import { atomicWrite, exportNote, exportNotes, imageLimit, loadImage, loadNote, NoteError, noteLimit,
+import { atomicWrite } from './atomic-write.mjs';
+import { NoteError } from './note-files.mjs';
+import { exportNote, exportNotes, imageLimit, loadImage, loadNote, noteLimit,
   notePath, saveImage, saveNote } from './note-storage.mjs';
 import { atlasYears } from './atlas-sources.mjs';
 import { experienceError } from './public/experience.mjs';
@@ -12,6 +14,7 @@ const assets = new Map([
   ['/styles.css', ['styles.css', 'text/css']],
   ['/app.mjs', ['app.mjs', 'text/javascript']],
   ['/notes.mjs', ['notes.mjs', 'text/javascript']],
+  ['/note-dialog.mjs', ['note-dialog.mjs', 'text/javascript']],
   ['/batch-notes.mjs', ['batch-notes.mjs', 'text/javascript']],
   ['/notes.css', ['notes.css', 'text/css']],
   ['/chronology.mjs', ['chronology.mjs', 'text/javascript']],

@@ -1,4 +1,4 @@
-import { noteRequest, saveNoteDownload } from './notes.mjs';
+import { noteRequest, saveNoteDownload } from './note-dialog.mjs';
 
 const dialog = document.querySelector('#batch-notes');
 const controls = Object.fromEntries([...dialog.querySelectorAll('[data-batch]')]

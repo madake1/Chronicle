@@ -1,4 +1,4 @@
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 
 const selected = [
   { id: '579885', name: '雅典', types: '城邦', aliases: ['Athens', 'Athenai'], original: 'Ἀθῆναι', minZoom: 0 },

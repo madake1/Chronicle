@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { mkdir, readFile } from 'node:fs/promises';
 import { promisify } from 'node:util';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 import { mergeEventDatasets } from '../public/atlas/event-data.mjs';
 
 const retrievedOn = process.argv[2];

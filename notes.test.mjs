@@ -12,7 +12,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async () => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'fixtures.json', 'public/experience.mjs']) {
+    for (const name of ['server.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');

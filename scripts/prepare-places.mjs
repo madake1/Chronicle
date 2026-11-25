@@ -1,5 +1,5 @@
 import { readFile, mkdir, readdir } from 'node:fs/promises';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 
 const read = async path => JSON.parse(await readFile(new URL(path, import.meta.url), 'utf8'));
 const output = new URL('../atlas-data/', import.meta.url);

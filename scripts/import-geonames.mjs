@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile } from 'node:fs/promises';
 import { strFromU8, unzipSync } from 'fflate';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 import { preparePlaces } from './prepare-places.mjs';
 
 const root = new URL('../atlas-data/', import.meta.url);

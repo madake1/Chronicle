@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 import { unzipSync } from 'fflate';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 import { atlasSources, atlasYears } from '../atlas-sources.mjs';
 import { buildEncyclopedia } from './atlas-encyclopedia.mjs';
 import { buildAtlasChronology } from './atlas-chronology.mjs';

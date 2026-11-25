@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { mkdir, readFile } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 import { importPlacePack } from './import-place-data.mjs';
 import { preparePlaces } from './prepare-places.mjs';
 

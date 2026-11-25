@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
-import { atomicWrite } from '../note-storage.mjs';
+import { atomicWrite } from '../atomic-write.mjs';
 import { validateEventDataset } from '../public/atlas/event-data.mjs';
 
 export function importNoaaSample(sample, snapshots) {
