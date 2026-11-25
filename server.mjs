@@ -3,6 +3,7 @@ import { mkdir, readFile } from 'node:fs/promises';
 import { atomicWrite, exportNote, exportNotes, imageLimit, loadImage, loadNote, NoteError, noteLimit,
   notePath, saveImage, saveNote } from './note-storage.mjs';
 import { atlasYears } from './atlas-sources.mjs';
+import { experienceError } from './public/experience.mjs';
 
 const dataDirectory = new URL('./data/', import.meta.url);
 const dataFile = new URL('chronicle.json', dataDirectory);
@@ -14,6 +15,7 @@ const assets = new Map([
   ['/batch-notes.mjs', ['batch-notes.mjs', 'text/javascript']],
   ['/notes.css', ['notes.css', 'text/css']],
   ['/chronology.mjs', ['chronology.mjs', 'text/javascript']],
+  ['/experience.mjs', ['experience.mjs', 'text/javascript']],
   ['/atlas', ['atlas/index.html', 'text/html']],
   ['/atlas/atlas.mjs', ['atlas/atlas.mjs', 'text/javascript']],
   ['/atlas/years.mjs', ['atlas/years.mjs', 'text/javascript']],
@@ -95,6 +97,7 @@ function validWork(work) {
     ['未开始', '进行中', '已完成', '已放弃'].includes(work.status) &&
     ['region', 'period', 'basis', 'rating', 'notes', 'links'].every(key =>
       work[key] === undefined || typeof work[key] === 'string') &&
+    (work.experience === undefined || !experienceError(work.experience)) &&
     Array.isArray(work.segments) && work.segments.every(segment =>
       segment && ['point', 'range', 'window'].includes(segment.kind) &&
       ['确定', '推测', '约略'].includes(segment.confidence) &&

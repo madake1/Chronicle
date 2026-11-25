@@ -12,7 +12,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async () => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'fixtures.json']) {
+    for (const name of ['server.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');
@@ -30,7 +30,12 @@ test('作品笔记、图片及导出通过本机 API 往返', async () => {
     const works = await (await request('/api/works')).json();
     const id = 'no-date';
     works.push({ id, title: '无年代作品', type: '小说', status: '未开始', segments: [] });
+    const experience = { startedOn: '2026-10-02', endedOn: '2026-11-02', durationMinutes: 360 };
+    works[0].experience = { ...experience, endedOn: '2026-11-31' };
+    assert.equal((await put('/api/works', works)).status, 400);
+    works[0].experience = experience;
     assert.equal((await put('/api/works', works)).status, 200);
+    assert.deepEqual((await (await request('/api/works')).json())[0].experience, experience);
     const path = `/api/works/${id}/note`;
     assert.equal((await (await request(path)).json()).revision, null);
     const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aQ1sAAAAASUVORK5CYII=', 'base64');

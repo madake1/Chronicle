@@ -63,11 +63,14 @@ h3{font-size:1rem}
 .detail-head{display:flex;justify-content:space-between;align-items:start;gap:.5rem}
 .detail-section{border-top:1px solid var(--line);margin-top:1rem;padding-top:.75rem}
 .detail-section p{margin:.25rem 0;white-space:pre-wrap}
+.experience{padding:.75rem;background:var(--soft);border:0;border-radius:8px}
+.experience button,.review button{margin-top:.45rem}
 .detail-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
 #library{overflow:auto}
 table{width:100%;border-collapse:collapse;text-align:left}
 th,td{padding:.7rem .9rem;border-bottom:1px solid var(--line)}
 th{font-size:.85rem;color:var(--muted);background:var(--soft)}
+#library :is(th,td):nth-child(5){white-space:nowrap;font-variant-numeric:tabular-nums}
 dialog{width:min(670px,calc(100% - 2rem));max-height:90vh;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:1.2rem}
 dialog::backdrop{background:#16241eb0}
 .dialog-head,.form-actions{justify-content:space-between}
