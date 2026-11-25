@@ -30,7 +30,7 @@
       <input id="search" type="search" placeholder="搜索作品名称" aria-label="搜索作品名称">
       <select id="type-filter" aria-label="作品类型"></select>
       <select id="status-filter" aria-label="体验状态"></select>
-      <label id="sort-control" hidden>排序 <select id="sort"><option value="recent">最近体验</option><option value="year">故事年代</option><option value="title">作品名称</option><option value="rating">个人评分</option></select></label>
+      <label id="sort-control" hidden>排序 <select id="sort"><option value="recent">体验日期</option><option value="year">故事年代</option><option value="title">作品名称</option><option value="rating">个人评分</option></select></label>
     </div>
     <p id="notice" role="status" hidden></p>
     <div class="workspace">
@@ -66,13 +66,13 @@
           <legend>体验进度</legend>
           <div class="form-grid">
             <label>开始日期<input name="startedOn" type="date"></label>
-            <label>最近体验<input name="lastExperiencedOn" type="date"></label>
             <label>结束日期<input name="endedOn" type="date"></label>
-            <label>实际时长（分钟）<input name="durationMinutes" type="number" min="0" step="1"></label>
+            <label>体验时长（分钟）<input name="durationMinutes" type="number" min="0" step="1"></label>
           </div>
         </fieldset>
+        <label class="wide">作品简介<textarea name="synopsis" rows="3"></textarea></label>
         <label class="wide">简评<textarea name="notes" rows="3"></textarea></label>
-        <label class="wide">参考链接（每行一个）<textarea name="links" rows="2"></textarea></label>
+        <label class="wide">参考链接（每行一个）<textarea name="links" rows="2" placeholder="[链接名称](https://…)"></textarea></label>
       </div>
       <p id="form-error" role="alert"></p>
       <div class="form-actions"><button type="button" id="cancel">取消</button><button class="primary" id="save">保存作品</button></div>

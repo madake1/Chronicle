@@ -47,9 +47,13 @@ export function ticks(left, right, width) {
   return result;
 }
 
+export function formatSegmentYears({ kind, start, end }) {
+  return kind === 'point' ? formatYear(start) : `${formatYear(start)} — ${formatYear(end)}`;
+}
+
 export function describe(segment) {
-  const { kind, start, end, confidence } = segment;
-  const date = kind === 'point' ? formatYear(start) : `${formatYear(start)} — ${formatYear(end)}`;
+  const { kind, confidence } = segment;
+  const date = formatSegmentYears(segment);
   if (kind === 'window') return `${date}（可能发生范围）`;
   return confidence === '确定' ? date : `${date}（${confidence}）`;
 }

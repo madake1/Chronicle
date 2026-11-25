@@ -95,7 +95,7 @@ function validWork(work) {
     work.id.length > 0 && work.title.trim().length > 0 &&
     ['游戏', '小说', '电影', '电视剧', '其他'].includes(work.type) &&
     ['未开始', '进行中', '已完成', '已放弃'].includes(work.status) &&
-    ['region', 'period', 'basis', 'rating', 'notes', 'links'].every(key =>
+    ['region', 'period', 'basis', 'rating', 'synopsis', 'notes', 'links'].every(key =>
       work[key] === undefined || typeof work[key] === 'string') &&
     (work.experience === undefined || !experienceError(work.experience)) &&
     Array.isArray(work.segments) && work.segments.every(segment =>

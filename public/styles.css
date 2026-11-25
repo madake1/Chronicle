@@ -63,9 +63,8 @@ h3{font-size:1rem}
 .detail-head{display:flex;justify-content:space-between;align-items:start;gap:.5rem}
 .detail-section{border-top:1px solid var(--line);margin-top:1rem;padding-top:.75rem}
 .detail-section p{margin:.25rem 0;white-space:pre-wrap}
-.experience{padding:.75rem;background:var(--soft);border:0;border-radius:8px}
-.experience button,.review button{margin-top:.45rem}
 .detail-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.detail-delete{margin-inline-start:auto}
 #library{overflow:auto}
 table{width:100%;border-collapse:collapse;text-align:left}
 th,td{padding:.7rem .9rem;border-bottom:1px solid var(--line)}

@@ -1,7 +1,7 @@
-import { parseYear, formatYear, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
+import { parseYear, formatYear, formatSegmentYears, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
 import { openNote } from './notes.mjs';
 import { openBatchNotes } from './batch-notes.mjs';
-import { elapsedDays, experienceError, latestExperience } from './experience.mjs';
+import { experienceError } from './experience.mjs';
 
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
@@ -181,10 +181,11 @@ function noteButton(work) {
 function renderLibrary(works) {
   const table = node('table');
   const header = table.createTHead().insertRow();
-  for (const title of ['作品', '笔记', '类型', '体验状态', '最近体验', '故事年代', '评分']) header.append(node('th', title));
+  for (const title of ['作品', '笔记', '类型', '体验状态', '体验时间', '故事年代', '评分']) header.append(node('th', title));
   const body = table.createTBody();
   const comparer = {
-    recent: (a, b) => latestExperience(b.experience).localeCompare(latestExperience(a.experience)),
+    recent: (a, b) => (b.experience?.endedOn ?? b.experience?.startedOn ?? '')
+      .localeCompare(a.experience?.endedOn ?? a.experience?.startedOn ?? ''),
     year: (a, b) => firstYear(a) - firstYear(b),
     title: (a, b) => a.title.localeCompare(b.title, 'zh-CN'),
     rating: (a, b) => (b.rating || -1) - (a.rating || -1),
@@ -194,58 +195,22 @@ function renderLibrary(works) {
     row.classList.toggle('selected', state.selected === work.id);
     row.insertCell().append(button(work.title, () => select(work), 'row-name'));
     row.insertCell().append(noteButton(work));
-    for (const value of [work.type, work.status, latestExperience(work.experience) || '—',
-      work.segments.map(describe).join('；') || '年代未知', work.rating || '—']) {
+    for (const value of [work.type, work.status, experienceDates(work.experience, { compact: true }),
+      work.segments.map(formatSegmentYears).join('；') || '年代未知', work.rating || '—']) {
       row.insertCell().textContent = value;
     }
   }
   $('library').replaceChildren(works.length ? table : node('p', '没有符合条件的作品。', 'empty'));
 }
 
-const experienceFields = ['startedOn', 'lastExperiencedOn', 'endedOn', 'durationMinutes'];
+const experienceFields = ['startedOn', 'endedOn', 'durationMinutes'];
 
-function localToday() {
-  const now = new Date();
-  return [now.getFullYear(), now.getMonth() + 1, now.getDate()]
-    .map((value, index) => String(value).padStart(index === 0 ? 4 : 2, '0')).join('-');
-}
-
-function renderExperience(work) {
-  const { startedOn, endedOn, durationMinutes } = work.experience ?? {};
-  const latest = latestExperience(work.experience);
-  const activity = { 小说: '阅读', 游戏: '游玩', 电影: '观看', 电视剧: '观看' }[work.type] ?? '体验';
-  const section = node('section', undefined, 'detail-section experience');
-  section.append(node('h3', '体验进度'));
-  if (startedOn && endedOn) {
-    section.append(node('p', `${startedOn} – ${endedOn}`),
-      node('p', `历时 ${elapsedDays(startedOn, endedOn)} 天`, 'meta'));
-  } else if (startedOn || endedOn) {
-    section.append(node('p', startedOn ? `${startedOn} 开始` : `${endedOn} 结束`));
-  }
-  if (latest) section.append(node('p', `最近${activity} · ${latest}`, 'meta'));
-  if (durationMinutes !== undefined) section.append(node('p', `实际${activity} · ${durationMinutes} 分钟`, 'meta'));
-  if (work.status !== '已完成' && work.status !== '已放弃' && !endedOn) {
-    const mark = button('记为今天', async () => {
-      const lastExperiencedOn = localToday();
-      const experience = { ...work.experience, lastExperiencedOn };
-      const error = experienceError(experience);
-      if (error) return notify(error);
-      mark.disabled = true;
-      try {
-        const status = work.status === '未开始' ? '进行中' : work.status;
-        await persist(state.works.map(item => item.id === work.id ? { ...item, status, experience } : item));
-        notify(`已记录今天的${activity}`);
-        render();
-        $('detail-title')?.focus({ preventScroll: true });
-      } catch (error) {
-        mark.disabled = false;
-        notify(error.message);
-      }
-    });
-    mark.disabled = latest === localToday();
-    section.append(mark);
-  }
-  return section;
+function experienceDates({ startedOn, endedOn } = {}, { compact = false } = {}) {
+  const start = compact ? startedOn?.slice(2).replaceAll('-', '') : startedOn;
+  const end = compact ? endedOn?.slice(2).replaceAll('-', '') : endedOn;
+  if (start && end) return `${start} – ${end}`;
+  if (start) return `${start} 开始`;
+  return end ? `${end} 结束` : '';
 }
 
 function renderDetails(work) {
@@ -264,40 +229,50 @@ function renderDetails(work) {
   close.setAttribute('aria-label', '关闭详情');
   header.append(title, close);
   panel.append(header, node('p', [work.type, work.status, work.rating && `${work.rating}/10`].filter(Boolean).join(' · '), 'meta'));
-  if (work.experience || !['已完成', '已放弃'].includes(work.status)) panel.append(renderExperience(work));
-  const review = node('section', undefined, 'detail-section review');
-  if (work.notes) review.append(node('h3', '简评'), node('p', work.notes));
-  review.append(noteButton(work));
-  panel.append(review);
-  const context = [work.region, work.period, work.basis].filter(Boolean).join(' · ');
-  const dates = node('section', undefined, 'detail-section');
-  dates.append(node('h3', '故事年代'));
-  if (context) dates.append(node('p', context, 'meta'));
-  if (!work.segments.length) dates.append(node('p', '年代未知'));
-  for (const segment of work.segments) {
-    dates.append(node('p', describe(segment)));
-    if (segment.kind === 'range') dates.append(node('p', `约 ${segment.end - segment.start} 年 · 年份粒度`, 'meta'));
-    if (segment.source) dates.append(node('p', `来源 · ${segment.source}`, 'meta'));
-    dates.append(button('定位此段', () => locate(segment)));
-  }
-  panel.append(dates);
+  const actions = node('div', undefined, 'detail-actions');
+  const introduction = node('section', undefined, 'detail-section');
+  introduction.append(node('h3', '作品简介'));
+  if (work.synopsis) introduction.append(node('p', work.synopsis));
+  const storyYears = work.segments.map(describe).join('；') || '年代未知';
+  const context = [storyYears, work.region, work.period, work.basis].filter(Boolean).join(' · ');
+  introduction.append(node('p', context, 'meta'));
   if (work.links) {
-    const links = node('section', undefined, 'detail-section');
-    links.append(node('h3', '参考链接'));
     for (const value of work.links.split('\n').map(line => line.trim()).filter(Boolean)) {
-      const paragraph = node('p');
-      if (/^https?:\/\//i.test(value)) {
-        const link = node('a', value);
-        link.href = value;
+      const paragraph = node('p', undefined, 'meta');
+      const namedLink = /^\[([^\]]+)\]\((https?:\/\/\S+)\)$/i.exec(value);
+      const href = namedLink?.[2] ?? value;
+      if (/^https?:\/\//i.test(href)) {
+        const link = node('a', namedLink?.[1] ?? href);
+        link.href = href;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
         paragraph.append(link);
       } else paragraph.textContent = value;
-      links.append(paragraph);
+      introduction.append(paragraph);
     }
-    panel.append(links);
   }
-  const actions = node('div', undefined, 'detail-actions');
+  panel.append(introduction);
+  const progress = experienceDates(work.experience);
+  const duration = work.experience?.durationMinutes;
+  if (work.notes || progress || duration !== undefined) {
+    const section = node('section', undefined, 'detail-section');
+    section.append(node('h3', '我的体验'));
+    if (work.notes) section.append(node('p', work.notes));
+    const details = node('p', progress, 'meta');
+    if (duration !== undefined) {
+      const hours = Math.floor(duration / 60);
+      const minutes = duration % 60;
+      const time = hours ? `${hours} 小时 ${minutes} 分钟` : `${minutes} 分钟`;
+      if (progress) details.append(' · ');
+      details.append(node('small', `体验时长 ${time}`));
+    }
+    if (progress || duration !== undefined) section.append(details);
+    panel.append(section);
+  }
+  for (const segment of work.segments) {
+    const label = work.segments.length === 1 ? '定位此段' : `定位：${describe(segment)}`;
+    actions.append(button(label, () => locate(segment)));
+  }
   actions.append(button('编辑作品', () => openEditor(work)), button('删除作品', async () => {
     if (!confirm(`删除《${work.title}》？`)) return;
     try {
@@ -306,7 +281,7 @@ function renderDetails(work) {
       notify('作品已删除');
       render();
     } catch (error) { notify(error.message); }
-  }));
+  }, 'detail-delete'));
   panel.append(actions);
 }
 
@@ -383,7 +358,7 @@ function openEditor(work) {
   $('form-error').textContent = '';
   $('segment-fields').replaceChildren();
   if (work) {
-    for (const name of ['title', 'type', 'status', 'region', 'period', 'basis', 'rating', 'notes', 'links']) {
+    for (const name of ['title', 'type', 'status', 'region', 'period', 'basis', 'rating', 'synopsis', 'notes', 'links']) {
       form.elements.namedItem(name).value = work[name] ?? '';
     }
     for (const name of experienceFields) form.elements.namedItem(name).value = work.experience?.[name] ?? '';
@@ -432,9 +407,10 @@ form.addEventListener('submit', async event => {
   try {
     const fields = Object.fromEntries([...new FormData(form)].map(([name, value]) => [name, value.trim()]));
     if (!fields.title) throw new Error('请输入作品名称');
-    const experience = {};
+    const experience = { ...editing?.experience };
     for (const name of experienceFields) {
       if (fields[name]) experience[name] = name === 'durationMinutes' ? Number(fields[name]) : fields[name];
+      else delete experience[name];
       delete fields[name];
     }
     const error = experienceError(experience);

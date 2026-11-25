@@ -1,17 +1,7 @@
-const dayMs = 86_400_000;
-
 export function isExperienceDate(value) {
   if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value) || value.startsWith('0000')) return false;
   const timestamp = Date.parse(value);
   return Number.isFinite(timestamp) && new Date(timestamp).toISOString().slice(0, 10) === value;
-}
-
-export function latestExperience(experience = {}) {
-  return [experience.startedOn, experience.lastExperiencedOn, experience.endedOn].filter(Boolean).sort().at(-1) ?? '';
-}
-
-export function elapsedDays(start, end) {
-  return (Date.parse(end) - Date.parse(start)) / dayMs;
 }
 
 export function experienceError(experience) {
@@ -21,7 +11,6 @@ export function experienceError(experience) {
     return '请输入有效的体验日期';
   }
   if (startedOn && endedOn && endedOn < startedOn) return '结束日期不能早于开始日期';
-  if (startedOn && lastExperiencedOn && lastExperiencedOn < startedOn) return '最近体验不能早于开始日期';
   if (durationMinutes !== undefined && (!Number.isSafeInteger(durationMinutes) || durationMinutes < 0)) {
     return '实际时长请输入非负整数（分钟）';
   }
