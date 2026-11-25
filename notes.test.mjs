@@ -13,11 +13,15 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'knowledge.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
+    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');
-    server = spawn(process.execPath, ['server.mjs'], { cwd: root, env: { ...process.env, PORT: '0' } });
+    server = spawn(process.execPath, ['server.mjs'], { cwd: root, env: {
+      ...process.env, PORT: '0', CHRONICLE_MODE: 'demo', CHRONICLE_INIT: '1',
+      CHRONICLE_DATA_DIR: join(root, 'data'), CHRONICLE_ATLAS_DIR: join(root, 'atlas-data'),
+      CHRONICLE_LOG_DIR: join(root, 'logs'),
+    } });
     const started = await Promise.race([
       once(server.stdout, 'data'),
       once(server, 'exit').then(() => { throw new Error('临时服务启动失败'); }),

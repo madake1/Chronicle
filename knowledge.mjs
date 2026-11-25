@@ -50,7 +50,13 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
   const index = new URL('index.json', root);
   const blank = () => ({ schemaVersion: 1, notes: [], tags: [], relations: [] });
   async function read() {
-    try { return JSON.parse(await checkedRead(index)); }
+    try {
+      const state = JSON.parse(await checkedRead(index));
+      if (state?.schemaVersion !== 1 || ![state.notes, state.tags, state.relations].every(Array.isArray)) {
+        throw new Error('知识库索引格式无效');
+      }
+      return state;
+    }
     catch (error) { if (error.code === 'ENOENT') return blank(); throw error; }
   }
   async function write(state) {

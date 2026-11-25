@@ -1,6 +1,8 @@
 /data/
 /node_modules/
 /atlas-data/
+/.chronicle-dev/
+/dist/
 
 # 本地认证配置
 .env
