@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chronicle · 个人时空</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/atlas/vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="/spacetime.css">
+  <script type="module" src="/spacetime.mjs"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Chronicle</a>
+    <nav aria-label="主导航">
+      <a class="nav-link" href="/">作品库</a>
+      <a class="nav-link" href="/knowledge">知识库</a>
+      <a class="nav-link" href="/spacetime" aria-current="page">个人时空</a>
+      <a class="nav-link" href="/atlas">历史时空</a>
+    </nav>
+    <button id="theme" type="button">切换主题</button>
+  </header>
+  <main>
+    <div class="heading"><h1>个人时空</h1><span id="count" class="meta" aria-live="polite"></span></div>
+    <div class="filters">
+      <label>视图 <select id="view"><option value="timeline">时间轴</option><option value="map">地图</option><option value="both">时空联动</option></select></label>
+      <label>关键词 <input id="query" type="search"></label>
+      <label>条目 <select id="type"><option value="">全部</option><option value="work">作品</option><option value="knowledge">知识</option></select></label>
+      <label>作品类型 <select id="work-type"><option value="">全部</option><option>游戏</option><option>小说</option><option>电影</option><option>电视剧</option><option>其他</option></select></label>
+      <label>知识标签 <select id="tag"><option value="">全部</option></select></label>
+    </div>
+    <div class="filters">
+      <label>时间筛选 <select id="time"><option value="">不限</option><option value="snapshot">年份快照</option><option value="interval">年代区间</option><option value="cumulative">累计分布</option></select></label>
+      <label id="first-field" hidden>年份 / 起始年 <input id="first" value="1200"></label>
+      <label id="last-field" hidden>结束年 <input id="last" value="1300"></label>
+      <label><input id="unknown" type="checkbox" checked> 年代未知</label>
+      <span id="time-explanation" class="meta"></span>
+    </div>
+    <p id="error" role="alert"></p>
+    <div class="spacetime-layout" id="layout">
+      <section class="panel" id="timeline-panel" aria-label="时间轴">
+        <div class="toolbar">
+          <button id="zoom-in" type="button">放大</button><button id="zoom-out" type="button">缩小</button>
+          <button id="earlier" type="button">较早</button><button id="later" type="button">较晚</button>
+          <button id="fit-all" type="button">适配结果</button>
+          <form id="jump"><input id="jump-year" aria-label="定位年份" placeholder="例如 公元前 1 年" required><button>定位年份</button></form>
+        </div>
+        <div class="timeline-scroll" id="timeline-scroll">
+          <div class="timeline-row axis"><div>条目</div><div id="ruler" class="plot"></div></div>
+          <div id="timeline-rows"></div>
+        </div>
+        <footer class="legend"><span>● 年份</span><span>━ 跨度</span><span>▱ 不确定</span></footer>
+      </section>
+      <section class="panel" id="map-panel" aria-label="个人时空地图" hidden>
+        <div class="toolbar">
+          <label>底图参考年 <input id="reference" value="1200"></label>
+          <label><input id="viewport" type="checkbox"> 仅当前视野（排除无坐标标注）</label>
+          <p class="meta" id="basemap-status" aria-live="polite"></p>
+        </div>
+        <div id="map"></div>
+        <div id="coordinate-list" class="toolbar" hidden></div>
+      </section>
+    </div>
+    <section id="selection" class="panel annotation-selection" aria-label="所选标注" hidden></section>
+    <section id="unknown-panel" class="panel annotation-selection" hidden>
+      <h2>年代未知</h2><div id="unknown-list"></div>
+    </section>
+  </main>
+</body>
+</html>

@@ -14,7 +14,7 @@
     <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
     <nav aria-label="页面">
       <a class="nav-link" href="/">作品库</a>
-      <a class="nav-link" href="/?page=timeline">时间轴</a>
+      <a class="nav-link" href="/spacetime">个人时空</a>
       <a class="nav-link" href="/knowledge" aria-current="page">知识库</a>
       <a class="nav-link" href="/atlas">历史时空</a>
     </nav>
@@ -76,6 +76,10 @@
       <details id="relation-fields"><summary>关联条目</summary>
         <input id="target-search" type="search" placeholder="搜索知识、作品或作品笔记" aria-label="搜索关联对象">
         <div id="target-choices" class="knowledge-choices"></div>
+      </details>
+      <details id="annotation-fields"><summary>时空标注</summary>
+        <div id="note-annotations"></div>
+        <button id="add-note-annotation" type="button">＋ 添加标注</button>
       </details>
       <p id="metadata-error" role="alert"></p>
     </fieldset>

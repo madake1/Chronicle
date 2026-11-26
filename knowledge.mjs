@@ -1,3 +1,4 @@
+import { saveAnnotations } from './spacetime.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { readdir } from 'node:fs/promises';
 import { atomicWrite } from './atomic-write.mjs';
@@ -10,7 +11,7 @@ const key = ({ type, id }) => `${type}:${id}`;
 const fail = (status, message) => { throw new NoteError(status, message); };
 const find = (items, id) => items.find(item => item.id === id) ?? fail(404, '找不到该条目');
 const metadataVersion = (note, links) => createHash('sha256')
-  .update(JSON.stringify([note.title, note.tagIds, links.map(key).sort()])).digest('hex');
+  .update(JSON.stringify([note.title, note.tagIds, links.map(key).sort(), ...(note.annotations ? [note.annotations] : [])])).digest('hex');
 
 function descendants(tags, id) {
   const result = new Set([id]);
@@ -128,13 +129,14 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       fail(400, '标题、标签或关联无效，请刷新后重试');
     }
     const own = `knowledge:${note.id}`;
-    if (input.version !== version) fail(409, '标题、标签或关联已变更，请复制草稿，重新打开后核对');
+    if (input.version !== version) fail(409, '知识元数据已变更，请复制草稿，重新打开后核对');
     const links = new Set();
     for (const item of input.related) {
       if (!kinds.has(item?.type) || typeof item.id !== 'string' || !idPattern.test(item.id) ||
           key(item) === own || !catalogue.has(key(item))) fail(400, '存在无效的关联目标');
       links.add(key(item));
     }
+    if (Object.hasOwn(input, 'annotations')) note.annotations = saveAnnotations(input.annotations);
     state.relations = state.relations.filter(pair => !pair.includes(own));
     for (const link of links) state.relations.push([own, link].sort());
     Object.assign(note, { title: input.title.trim(), tagIds: [...new Set(input.tagIds)], updatedAt: new Date().toISOString() });
@@ -331,5 +333,5 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     }
     fail(404, '找不到知识库接口');
   }
-  return { handle, reconcile };
+  return { read, handle, reconcile };
 }

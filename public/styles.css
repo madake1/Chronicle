@@ -87,3 +87,4 @@ fieldset{min-width:0;border:1px solid var(--line);border-radius:7px}
 #form-error{color:#b24636;margin:.5rem 0}
 @media(max-width:950px){.workspace:has(#details:not([hidden])){grid-template-columns:1fr}}
 @media(max-width:600px){.top{gap:.65rem;flex-wrap:wrap}.brand span{display:none}main{padding-top:1rem}.timeline-row{grid-template-columns:7rem minmax(0,1fr)}.timeline-row>div:first-child{padding-inline:.45rem}.filters>*{max-width:100%}}
+.annotation-picker{grid-column:1/-1;height:15rem;min-width:0;background:var(--soft)}

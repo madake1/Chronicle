@@ -1,3 +1,4 @@
+import { annotationEditor } from './annotation-editor.mjs';
 import { parseYear, formatYear, formatSegmentYears, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
 import { openNote } from './notes.mjs';
 import { openBatchNotes } from './batch-notes.mjs';
@@ -7,7 +8,6 @@ import { workKnowledgeSection } from './work-knowledge.mjs';
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
 const statuses = ['未开始', '进行中', '已完成', '已放弃'];
-const confidences = ['确定', '推测', '约略'];
 const series = ['--game', '--novel', '--film', '--tv', '--muted'];
 const state = { works: [], page: 'library', selected: null, view: [-500, 1550], history: [], ready: false };
 let bounds = timelineBounds();
@@ -44,7 +44,7 @@ function notify(message = '') {
 }
 
 function firstYear(work) {
-  return work.segments.reduce((first, segment) => Math.min(first, segment.start), Infinity);
+  return datedSegments(work).reduce((first, segment) => Math.min(first, segment.start), Infinity);
 }
 
 function filtered() {
@@ -98,16 +98,6 @@ function select(work) {
   $('detail-title')?.focus({ preventScroll: true });
 }
 
-function locate(segment) {
-  state.page = 'timeline';
-  finishWheel();
-  const previous = state.view;
-  state.view = constrainView(fitRange([segment]), bounds);
-  remember(previous);
-  render();
-  document.querySelector('#rows .selected')?.scrollIntoView({ block: 'nearest' });
-}
-
 function drawTimeline(works = filtered()) {
   if (state.page !== 'timeline') return;
   $('back').disabled = !state.history.length;
@@ -128,7 +118,7 @@ function drawTimeline(works = filtered()) {
   }
   $('ruler').replaceChildren();
   grid($('ruler'), true);
-  const dated = works.filter(work => work.segments.length).sort((a, b) => firstYear(a) - firstYear(b));
+  const dated = works.filter(work => datedSegments(work).length).sort((a, b) => firstYear(a) - firstYear(b));
   const rows = document.createDocumentFragment();
   if (!dated.length) rows.append(node('p', '当前筛选下没有可定位的作品，可在作品库查看年代未知的作品。', 'empty'));
   for (const work of dated) {
@@ -138,7 +128,7 @@ function drawTimeline(works = filtered()) {
     label.append(button(work.title, () => select(work), 'row-name'), node('span', work.type, 'row-type'));
     const plot = node('div', undefined, 'plot');
     grid(plot, false);
-    for (const segment of work.segments) {
+    for (const segment of datedSegments(work)) {
       const end = segment.end ?? segment.start;
       if (end < left || segment.start > right) continue;
       const startX = Math.max(0, x(segment.start));
@@ -197,7 +187,7 @@ function renderLibrary(works) {
     row.insertCell().append(button(work.title, () => select(work), 'row-name'));
     row.insertCell().append(noteButton(work));
     for (const value of [work.type, work.status, experienceDates(work.experience, { compact: true }),
-      work.segments.map(formatSegmentYears).join('；') || '年代未知', work.rating || '—']) {
+      datedSegments(work).map(formatSegmentYears).join('；') || '年代未知', work.rating || '—']) {
       row.insertCell().textContent = value;
     }
   }
@@ -234,7 +224,7 @@ function renderDetails(work) {
   const introduction = node('section', undefined, 'detail-section');
   introduction.append(node('h3', '作品简介'));
   if (work.synopsis) introduction.append(node('p', work.synopsis));
-  const storyYears = work.segments.map(describe).join('；') || '年代未知';
+  const storyYears = datedSegments(work).map(describe).join('；') || '年代未知';
   const context = [storyYears, work.region, work.period, work.basis].filter(Boolean).join(' · ');
   introduction.append(node('p', context, 'meta'));
   if (work.links) {
@@ -271,8 +261,13 @@ function renderDetails(work) {
     panel.append(section);
   }
   for (const segment of work.segments) {
-    const label = work.segments.length === 1 ? '定位此段' : `定位：${describe(segment)}`;
-    actions.append(button(label, () => locate(segment)));
+    if (segment.start === undefined && segment.longitude === undefined) continue;
+    const label = segment.start === undefined ? segment.place || '年代未知地点' : describe(segment);
+    const key = `work:${work.id}:${segment.id}`;
+    const link = node('a', `定位：${label}`, 'nav-link');
+    link.href = '/spacetime?annotation=' + encodeURIComponent(key) +
+      (segment.longitude === undefined ? '' : '&view=both');
+    actions.append(link);
   }
   actions.append(button('编辑作品', () => openEditor(work)), button('删除作品', async () => {
     if (!confirm(`删除《${work.title}》？`)) return;
@@ -288,13 +283,13 @@ function renderDetails(work) {
 }
 
 function render() {
-  bounds = timelineBounds(state.works.flatMap(work => work.segments));
+  bounds = timelineBounds(state.works.flatMap(datedSegments));
   state.view = constrainView(state.view, bounds);
   const timeline = state.page === 'timeline';
   $('timeline').hidden = !timeline;
   $('library').hidden = timeline;
   $('sort-control').hidden = timeline;
-  $('page-title').textContent = timeline ? '故事时间轴' : '作品库';
+  $('page-title').textContent = timeline ? '个人时空' : '作品库';
   $('add').disabled = !state.ready;
   $('export-notes').hidden = timeline;
   $('export-notes').disabled = !state.ready;
@@ -303,68 +298,28 @@ function render() {
     else tab.removeAttribute('aria-current');
   }
   const works = filtered();
-  const unknown = works.filter(work => !work.segments.length).length;
+  const unknown = works.filter(work => !datedSegments(work).length).length;
   $('summary').textContent = `${works.length} 部作品${unknown ? ` · ${unknown} 部年代未知` : ''}`;
   renderDetails(state.works.find(work => work.id === state.selected));
   if (timeline) drawTimeline(works);
   else renderLibrary(works);
 }
 
-function field(parent, title, control) {
-  const label = node('label', title);
-  label.append(control);
-  parent.append(label);
-  return control;
-}
-
-function addSegment(segment) {
-  const row = node('div', undefined, 'segment-edit');
-  const kind = field(row, '时间表达', node('select'));
-  kind.append(new Option('年份落点', 'point'), new Option('起止跨度', 'range'), new Option('可能发生范围', 'window'));
-  const confidence = field(row, '可信度', node('select'));
-  options(confidence, confidences);
-  const start = field(row, '年份 / 起始年份', node('input'));
-  const end = field(row, '结束年份', node('input'));
-  const source = field(row, '年代来源', node('input'));
-  start.required = true;
-  start.placeholder = '例如 公元前431';
-  end.placeholder = '例如 1154';
-  kind.value = segment?.kind || 'point';
-  confidence.value = segment?.confidence || '确定';
-  start.value = segment ? formatYear(segment.start) : '';
-  end.value = segment?.end === undefined ? '' : formatYear(segment.end);
-  source.value = segment?.source || '';
-  const sync = () => {
-    end.parentElement.hidden = kind.value === 'point';
-    end.disabled = end.parentElement.hidden;
-    end.required = !end.disabled;
-  };
-  kind.addEventListener('change', sync);
-  sync();
-  row.append(button('移除此段', () => row.remove()));
-  row.read = () => {
-    const value = { kind: kind.value, confidence: confidence.value, start: parseYear(start.value), source: source.value.trim() };
-    if (!end.disabled) {
-      value.end = parseYear(end.value);
-      if (value.end <= value.start) throw new Error('结束年份必须晚于起始年份');
-    }
-    return value;
-  };
-  $('segment-fields').append(row);
-}
+const storyEditor = annotationEditor($('segment-fields'), $('add-segment'));
+const datedSegments = work => work.segments.filter(segment => segment.start !== undefined);
+let version;
 
 function openEditor(work) {
   editing = work;
   form.reset();
   $('edit-title').textContent = work ? '编辑作品' : '新增作品';
   $('form-error').textContent = '';
-  $('segment-fields').replaceChildren();
+  storyEditor.load(work?.segments);
   if (work) {
     for (const name of ['title', 'type', 'status', 'region', 'period', 'basis', 'rating', 'synopsis', 'notes', 'links']) {
       form.elements.namedItem(name).value = work[name] ?? '';
     }
     for (const name of experienceFields) form.elements.namedItem(name).value = work.experience?.[name] ?? '';
-    work.segments.forEach(addSegment);
   }
   $('editor').showModal();
 }
@@ -375,10 +330,11 @@ async function persist(works) {
   try {
     const response = await fetch('/api/works', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'If-Match': version },
       body: JSON.stringify(works),
     });
     if (!response.ok) throw new Error((await response.json()).error);
+    version = response.headers.get('ETag');
     state.works = works;
   } finally { saving = false; }
 }
@@ -394,7 +350,6 @@ for (const tab of document.querySelectorAll('[data-page]')) tab.addEventListener
 });
 $('add').onclick = () => openEditor();
 $('export-notes').onclick = () => openBatchNotes(state.works);
-$('add-segment').onclick = () => addSegment();
 for (const id of ['cancel', 'cancel-top']) $(id).onclick = () => {
   if (!saving) $('editor').close();
 };
@@ -422,7 +377,7 @@ form.addEventListener('submit', async event => {
       ...fields,
       experience: Object.keys(experience).length ? experience : undefined,
       id: editing?.id || crypto.randomUUID(),
-      segments: [...$('segment-fields').children].map(row => row.read()),
+      segments: storyEditor.value(),
     };
     await persist(editing ? state.works.map(item => item.id === work.id ? work : item) : [...state.works, work]);
     state.selected = work.id;
@@ -433,7 +388,7 @@ form.addEventListener('submit', async event => {
   finally { $('save').disabled = false; }
 });
 
-$('fit').onclick = () => setView(fitRange(filtered().flatMap(work => work.segments), 20));
+$('fit').onclick = () => setView(fitRange(filtered().flatMap(datedSegments), 20));
 $('back').onclick = () => {
   finishWheel();
   const previous = state.history.pop();
@@ -499,15 +454,17 @@ $('theme').onclick = () => {
 
 render();
 try {
-  const response = await fetch('/api/works');
+  const response = await fetch('/api/works?annotations=1');
   if (!response.ok) throw new Error('无法读取本地资料库');
+  version = response.headers.get('ETag');
   state.works = await response.json();
   const params = new URLSearchParams(location.search);
   if (params.get('page') === 'timeline') state.page = 'timeline';
   const work = state.works.find(item => item.id === params.get('work'));
   if (work) state.selected = work.id;
+  else if (params.has('work')) notify('该作品已不可用，请刷新个人时空。');
   state.ready = true;
-  state.view = fitRange(state.works.flatMap(work => work.segments), 20);
+  state.view = fitRange(state.works.flatMap(datedSegments), 20);
   render();
   if (work && params.get('note') === '1') noteButton(work).click();
 } catch (error) { notify(error.message); }

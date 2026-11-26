@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chronicle · 作品时间轴</title>
+  <title>Chronicle · 作品库</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/notes.css">
   <script type="module" src="/app.mjs"></script>
@@ -13,7 +13,7 @@
     <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
     <nav aria-label="页面">
       <button data-page="library" aria-current="page">作品库</button>
-      <button data-page="timeline">时间轴</button>
+      <a class="nav-link" href="/spacetime">个人时空</a>
       <a class="nav-link" href="/knowledge">知识库</a>
       <a class="nav-link" href="/atlas">历史时空</a>
     </nav>
@@ -62,7 +62,7 @@
         <label>地区<input name="region"></label><label>历史时期<input name="period"></label>
         <label>历史背景<select name="basis"><option value="">未填写</option><option>真实历史</option><option>历史架空</option><option>完全虚构</option></select></label>
         <label>评分（0–10）<input name="rating" type="number" min="0" max="10" step="0.5"></label>
-        <fieldset class="wide"><legend>故事时间段</legend><p class="meta">留空表示年代未知。</p><div id="segment-fields"></div><button type="button" id="add-segment">＋ 添加时间段</button></fieldset>
+        <fieldset class="wide"><legend>时空标注</legend><div id="segment-fields"></div><button type="button" id="add-segment">＋ 添加标注</button></fieldset>
         <fieldset class="wide">
           <legend>体验进度</legend>
           <div class="form-grid">

@@ -1,0 +1,20 @@
+.spacetime-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.spacetime-layout:has(#map-panel:not([hidden])):has(#timeline-panel:not([hidden])){grid-template-columns:repeat(2,minmax(0,1fr))}
+#map{height:clamp(22rem,55vh,42rem);background:var(--soft)}
+#first,#last,#reference{width:7rem}
+#count{font-variant-numeric:tabular-nums}
+#timeline-scroll{touch-action:pan-y}
+#timeline-scroll .plot{position:relative}
+.st-tick{position:absolute;white-space:nowrap;top:.45rem;transform:translateX(-10%)}
+.st-mark{position:absolute;min-width:12px;height:14px;top:19px;padding:0;background:var(--game);border-color:transparent}
+.st-mark[data-type=knowledge]{background:var(--novel)}
+.st-mark[data-uncertain]{background:transparent;border:2px dashed var(--accent)}
+.st-mark[aria-pressed=true],.spacetime-marker[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:2px}
+#map .spacetime-marker{border-radius:999px;border:2px solid white;background:#245743;color:white;padding:.15rem .46rem}
+#map .spacetime-marker[data-type=knowledge]{background:#71519a}
+#map .spacetime-marker[data-uncertain]{border-style:dashed}
+#map .spacetime-marker[data-unknown]{background:#565e5a}
+.annotation-selection{margin-top:1rem;padding:1rem;display:grid;gap:.5rem}
+#unknown-list,#coordinate-list{display:flex;flex-wrap:wrap;gap:.5rem}
+#spacetime-error:not(:empty),#error:not(:empty){margin-bottom:1rem;color:var(--film)}
+@media(max-width:950px){.spacetime-layout:has(#map-panel:not([hidden])):has(#timeline-panel:not([hidden])){grid-template-columns:minmax(0,1fr)}}

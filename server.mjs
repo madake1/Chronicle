@@ -1,3 +1,4 @@
+import { projectSpacetime, saveAnnotations, validAnnotations, workAnnotations, worksVersion } from './spacetime.mjs';
 import { createServer } from 'node:http';
 import { createKnowledgeService } from './knowledge.mjs';
 import { readFile, mkdir, rm } from 'node:fs/promises';
@@ -25,6 +26,11 @@ const atlasDirectory = asDirectory(config.atlas);
 const dataFile = new URL('chronicle.json', dataDirectory);
 const modeFile = new URL('.chronicle-mode', dataDirectory);
 const assets = new Map([
+  ['/spacetime', ['spacetime.html', 'text/html']],
+  ['/spacetime.mjs', ['spacetime.mjs', 'text/javascript']],
+  ['/spacetime-query.mjs', ['spacetime-query.mjs', 'text/javascript']],
+  ['/spacetime.css', ['spacetime.css', 'text/css']],
+  ['/annotation-editor.mjs', ['annotation-editor.mjs', 'text/javascript']],
   ['/knowledge', ['knowledge.html', 'text/html']],
   ['/knowledge.mjs', ['knowledge.mjs', 'text/javascript']],
   ['/knowledge.css', ['knowledge.css', 'text/css']],
@@ -74,17 +80,24 @@ function queueWrite(action) {
   return result;
 }
 
-async function readWorks() {
+async function readWorksIndex() {
   const saved = JSON.parse(await readFile(dataFile, 'utf8'));
   if (saved?.schemaVersion !== 1 || !Array.isArray(saved.works) ||
       !saved.works.every(validWork) || new Set(saved.works.map(work => work.id)).size !== saved.works.length) {
     throw new Error('作品索引格式无效');
   }
-  return saved.works;
+  return saved;
 }
 
-async function writeWorks(works) {
-  await atomicWrite(dataFile, JSON.stringify({ schemaVersion: 1, works }, null, 2));
+async function readWorks() {
+  return (await readWorksIndex()).works;
+}
+
+let versionedWrites = false;
+
+async function writeWorks(works, versioned = versionedWrites) {
+  await atomicWrite(dataFile, JSON.stringify({ schemaVersion: 1, versionedWrites: versioned || undefined, works }, null, 2));
+  versionedWrites = versioned;
 }
 
 async function readBody(request, limit) {
@@ -120,13 +133,7 @@ function validWork(work) {
     ['region', 'period', 'basis', 'rating', 'synopsis', 'notes', 'links'].every(key =>
       work[key] === undefined || typeof work[key] === 'string') &&
     (work.experience === undefined || !experienceError(work.experience)) &&
-    Array.isArray(work.segments) && work.segments.every(segment =>
-      segment && ['point', 'range', 'window'].includes(segment.kind) &&
-      ['确定', '推测', '约略'].includes(segment.confidence) &&
-      (segment.source === undefined || typeof segment.source === 'string') &&
-      Number.isInteger(segment.start) && segment.start >= -99999 && segment.start <= 100000 &&
-      (segment.kind === 'point' ||
-        (Number.isInteger(segment.end) && segment.end > segment.start && segment.end <= 100000)));
+    validAnnotations(work.segments);
 }
 
 function send(response, status, value) {
@@ -147,7 +154,7 @@ try {
     });
     if (prior.trim() !== config.mode) throw new Error('资料库运行模式不匹配');
   }
-  await readWorks();
+  versionedWrites = Boolean((await readWorksIndex()).versionedWrites);
 } catch (error) {
   throw new Error('资料库无法验证。请核对运行模式和资料目录，并从备份恢复缺失或损坏的索引。', { cause: error });
 }
@@ -288,8 +295,16 @@ const server = createServer(async (request, response) => {
     if (/^\/api\/knowledge(?:[/?]|$)/.test(request.url)) {
       return await knowledge.handle(request, response, new URL(request.url, 'http://localhost'));
     }
-    if (request.url === '/api/works' && request.method === 'GET') {
-      return send(response, 200, await readWorks());
+    if (request.url === '/api/spacetime' && request.method === 'GET') {
+      const [works, { notes, tags }] = await queueWrite(() => Promise.all([readWorks(), knowledge.read()]));
+      return send(response, 200, projectSpacetime(works, notes, tags));
+    }
+    if (['/api/works', '/api/works?annotations=1'].includes(request.url) && request.method === 'GET') {
+      const works = await readWorks();
+      response.setHeader('ETag', worksVersion(works));
+      const result = request.url.endsWith('?annotations=1') ?
+        works.map(work => ({ ...work, segments: workAnnotations(work) })) : works;
+      return send(response, 200, result);
     }
     if (request.url === '/api/works' && request.method === 'PUT') {
       const works = await readJson(request, 2_000_000);
@@ -298,11 +313,30 @@ const server = createServer(async (request, response) => {
         return send(response, 400, { error: '作品字段、年代或 ID 无效' });
       }
       await queueWrite(async () => {
-        const notes = new Map((await readWorks()).map(work => [work.id, work.notePath]));
-        await writeWorks(works.map(work => ({ ...work, notePath: notes.get(work.id) })));
-        if ([...notes.keys()].some(id => !works.some(work => work.id === id))) await knowledge.reconcile();
+        const current = await readWorks();
+        const version = request.headers['if-match'];
+        const protectedLibrary = versionedWrites || [...current, ...works].some(work =>
+          work.segments.some(segment => segment.id || segment.place || segment.description || segment.longitude !== undefined));
+        if ((version !== undefined && version !== worksVersion(current)) ||
+            (version === undefined && protectedLibrary)) {
+          throw new NoteError(409, '作品库已变更，请刷新后重新编辑');
+        }
+        const notes = new Map(current.map(work => [work.id, work.notePath]));
+        const next = works.map(work => ({ ...work, notePath: notes.get(work.id),
+          segments: version === undefined ? work.segments : saveAnnotations(work.segments) }));
+        await writeWorks(next, version !== undefined);
+        response.setHeader('ETag', worksVersion(next));
+        if ([...notes.keys()].some(id => !works.some(work => work.id === id))) await knowledge.reconcile(next);
       });
       return send(response, 200, { saved: true });
+    }
+    if (request.method === 'GET') {
+      const legacy = new URL(request.url, 'http://localhost');
+      if (legacy.pathname === '/' && legacy.searchParams.get('page') === 'timeline' && !legacy.searchParams.has('note')) {
+        const work = legacy.searchParams.get('work');
+        response.writeHead(302, { Location: work ? '/spacetime?work=' + encodeURIComponent(work) : '/spacetime' });
+        return response.end();
+      }
     }
     const shard = /^\/atlas\/data\/(geometry-\d{1,4}\.json)$/.exec(request.url);
     const asset = request.method === 'GET' && (assets.get(request.url.split('?')[0]) ??

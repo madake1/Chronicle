@@ -13,21 +13,25 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
+    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs', 'spacetime.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');
-    server = spawn(process.execPath, ['server.mjs'], { cwd: root, env: {
-      ...process.env, PORT: '0', CHRONICLE_MODE: 'demo', CHRONICLE_INIT: '1',
-      CHRONICLE_DATA_DIR: join(root, 'data'), CHRONICLE_ATLAS_DIR: join(root, 'atlas-data'),
-      CHRONICLE_LOG_DIR: join(root, 'logs'),
-    } });
-    const started = await Promise.race([
-      once(server.stdout, 'data'),
-      once(server, 'exit').then(() => { throw new Error('临时服务启动失败'); }),
-    ]);
-    const url = started[0].toString().match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
-    assert.ok(url);
+    async function start() {
+      server = spawn(process.execPath, ['server.mjs'], { cwd: root, env: {
+        ...process.env, PORT: '0', CHRONICLE_MODE: 'demo', CHRONICLE_INIT: '1',
+        CHRONICLE_DATA_DIR: join(root, 'data'), CHRONICLE_ATLAS_DIR: join(root, 'atlas-data'),
+        CHRONICLE_LOG_DIR: join(root, 'logs'),
+      } });
+      const started = await Promise.race([
+        once(server.stdout, 'data'),
+        once(server, 'exit').then(() => { throw new Error('临时服务启动失败'); }),
+      ]);
+      const address = started[0].toString().match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
+      assert.ok(address);
+      return address;
+    }
+    let url = await start();
     const request = (path, options) => fetch(url + path, options);
     const put = (path, value) => request(path, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value),
@@ -267,6 +271,61 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.ok((await get(base + '?tag=untagged')).notes.some(note => inherits.endsWith('/' + note.id)));
       assert.deepEqual((await get(descendant)).tagIds, [leaf.id]);
       assert.equal((await get(base)).tags.find(tag => tag.id === child.id).parentId, null);
+    });
+    await t.test('个人时空立即反映实体与标注写入，拒绝旧快照', async () => {
+      const route = `${base}/${randomUUID()}`;
+      const original = await request('/api/works?annotations=1');
+      const version = original.headers.get('ETag');
+      const list = await original.json();
+      const work = { id, title: '时空测试作品', type: '小说', status: '未开始', segments: [] };
+      list.push(work);
+      const saveWorks = (items, version) => request('/api/works', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json', 'If-Match': version },
+        body: JSON.stringify(items),
+      });
+      const rows = async () => (await get('/api/spacetime')).rows;
+      const oldRow = (await rows()).find(row => row.entityId === 'work:' + list[0].id);
+      assert.equal(oldRow.id, list[0].segments[0].id);
+      work.segments.push({ id: 'zero', longitude: 0, latitude: 0 }, {
+        id: 'bc', kind: 'point', start: 0, confidence: '确定',
+      });
+      const [first, stale] = await Promise.all([saveWorks(list, version), saveWorks(list, version)]);
+      assert.deepEqual([first.status, stale.status].sort(), [200, 409]);
+      assert.equal((await put('/api/works', list.map(entry => ({ ...entry, segments: [] })))).status, 409);
+      const metadata = { title: '', tagIds: [], related: [{ type: 'work', id }],
+        annotations: [{ id: 'place', longitude: 0, latitude: 0 }], version: null };
+      assert.equal((await put(route, { content: '正文', revision: null, metadata })).status, 200);
+      assert.equal((await rows()).filter(row => row.entityId === 'work:' + id).length, 2);
+      const note = await get(route);
+      const updated = { ...metadata, title: '标题已改', version: note.metadataVersion,
+        annotations: [{ id: 'place', longitude: 80, latitude: 0 }] };
+      assert.equal((await put(route, { content: note.content, revision: note.revision, metadata: updated })).status, 200);
+      assert.equal((await put(route, { content: note.content, revision: note.revision, metadata: { ...metadata, version: note.metadataVersion } })).status, 409);
+      const currentNote = await get(route);
+      const { annotations, ...oldClientMetadata } = updated;
+      oldClientMetadata.version = currentNote.metadataVersion;
+      assert.equal((await put(route, { content: '旧客户端仍可写正文', revision: currentNote.revision,
+        metadata: oldClientMetadata })).status, 200);
+      const row = (await rows()).find(row => row.id === 'place');
+      assert.equal(row.title, '标题已改');
+      assert.equal(row.longitude, 80);
+      assert.equal((await remove(route)).status, 200);
+      assert.ok(!(await rows()).some(row => row.id === 'place'));
+      work.segments.shift();
+      const revision = (first.ok ? first : stale).headers.get('ETag');
+      const saved = await saveWorks(list, revision);
+      assert.equal(saved.status, 200);
+      assert.ok(!(await rows()).some(row => row.id === 'zero'));
+      assert.ok((await rows()).some(row => row.id === 'bc'));
+      assert.equal((await saveWorks(list.filter(entry => entry.id !== id), saved.headers.get('ETag'))).status, 200);
+      assert.ok(!(await rows()).some(row => row.entityId === 'work:' + id));
+      const beforeRestart = await rows();
+      const stopped = once(server, 'exit');
+      server.kill();
+      await stopped;
+      url = await start();
+      assert.deepEqual(await rows(), beforeRestart);
+      assert.equal((await put('/api/works', [])).status, 409);
     });
   } finally {
     if (server && server.exitCode === null && server.signalCode === null) {
