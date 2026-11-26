@@ -11,7 +11,35 @@
 - V4 历史事件随地图年份显示，可按类别和关键词筛选，查看简介、点位和出处。
 - Cliopatria 自由年份地图和 Historical Basemaps 固定快照可切换。海岸线、河流和山地标为现代参照。
 
-## 安装和启动
+## Windows 便携版
+
+解压 Windows x64 程序包到可写目录，双击 `Start-Chronicle.bat`。启动器会验证本机实例，等服务就绪后打开默认浏览器。再次双击会打开正在运行的同一资料库。双击 `Stop-Chronicle.bat` 等待服务写入完成并退出。关浏览器标签页不会停止服务。
+
+程序包内置 Node.js，启动不需要系统 Node.js、npm、Git 或联网。全新解压第一次启动会显式建立空的 `data/`。示例需使用下方的独立开发模式。默认目录安排如下。
+
+| 目录或文件 | 用途 |
+| --- | --- |
+| `app/`、`runtime/` | 程序、生产依赖、Node.js |
+| `data/` | 正式资料库，包括知识、作品、Markdown 和附件 |
+| `atlas-data/` | 单独准备或恢复的历史资料 |
+| `logs/` | 本地日志、启动记录和实例状态 |
+| `version.json` | 源码提交、运行时版本和运行时校验摘要 |
+
+如需使用已有资料或固定其他端口，可在便携目录根创建 `chronicle.config.json`。相对路径以便携目录为基准，也可填写绝对路径。Windows JSON 路径可使用正斜杠。指向已有正式库时，先停止旧实例并核对备份，文件缺失时先恢复。示例配置如下。
+
+```json
+{ "port": 4173, "dataDir": "data", "atlasDir": "atlas-data" }
+```
+
+全新安装使用默认配置即可。显式设置 `dataDir` 时要求该库已存在。遭遇端口占用或已有库缺失、损坏时，检查 `logs/chronicle.log`。如果已存知识正文仍在但知识索引丢失，服务会拒绝启动，需从同一份备份恢复资料。已知为老版本启动的 Chronicle 需要用其原来的方式关闭。只有已验证身份的便携实例可以用便携停止入口关闭。缺少历史资料时仍可使用作品库和知识库，按 [数据源清单](docs/DATA_SOURCES.md) 在开发机准备资料后单独复制或恢复至 `atlas-data/`。
+
+### 构建、升级和恢复
+
+开发机在项目根目录执行 `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-portable.ps1 -Ref HEAD`。构建需要 Git、Node.js/npm 和网络，从指定 Git 提交归档程序文件、用锁文件安装生产依赖，输出版本化目录、ZIP 及 ZIP 的 SHA-256 到 `dist/`。程序包只支持 Windows x64，内置官方 Node.js 24.22.3。构建脚本按固定 SHA-256 核验下载，并保留 Node.js 的许可。程序包不包含个人库、日志、凭据或单独准备的地图资料。
+
+升级前双击停止，等待确认后备份完整资料目录、配置、BAT 入口和版本文件，记录清单与 SHA-256。将新版先解压到另一个空目录，将原安装的 `app/` 和 `runtime/` 改名留存，再从新包复制同名目录、BAT 入口和 `version.json`。保留 `data/`、`atlas-data/`、`logs/` 和配置。若启动失败，关闭新版后把保留的旧程序、运行时和入口恢复原名。数据库缺失或损坏时，先将当前资料另存，再恢复同一快照的整份资料库。保留原始资料与校验记录。
+
+## 源码开发和示例
 
 需要 Node.js 20.19 或更新版本。首次准备地图时需要网络。
 
@@ -21,7 +49,9 @@ npm run atlas:prepare
 npm start
 ```
 
-打开 [http://127.0.0.1:4173](http://127.0.0.1:4173/)，历史地图在 `/atlas`。若设置了 `PORT`，以终端显示的地址为准。启动新版前先关闭原来的 Chronicle 实例。需要对照快照时，首次运行 `npm run atlas:prepare -- --with-comparison`。
+开发模式默认使用 Git 忽略的 `.chronicle-dev/development/` 空库。显式演示使用 `CHRONICLE_MODE=demo` 与 `CHRONICLE_INIT=1`，首次初始化 `.chronicle-dev/demo/` 时写入示例，后续沿用该独立库。正式模式使用 `CHRONICLE_MODE=formal` 和绝对路径 `CHRONICLE_DATA_DIR`。可通过 `CHRONICLE_ATLAS_DIR` 指定绝对历史资料路径。测试使用临时目录。
+
+默认服务是 [http://127.0.0.1:4173](http://127.0.0.1:4173/)，历史地图在 `/atlas`。若设置了 `PORT`，以终端显示地址为准。需要对照快照时，首次运行 `npm run atlas:prepare -- --with-comparison`。
 
 作品和知识库保存在 `data/`。建议停止服务后备份整个目录。地图和外部地点的本地文件在 `atlas-data/`，新装时需按 [数据源清单](docs/DATA_SOURCES.md) 恢复或导入已有资料包。已准备的数据可离线使用。
 

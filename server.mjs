@@ -1,15 +1,29 @@
 import { createServer } from 'node:http';
 import { createKnowledgeService } from './knowledge.mjs';
-import { mkdir, readFile } from 'node:fs/promises';
+import { readFile, mkdir, rm } from 'node:fs/promises';
+import { createHmac, randomBytes } from 'node:crypto';
+import { once } from 'node:events';
+import { pathToFileURL } from 'node:url';
 import { atomicWrite } from './atomic-write.mjs';
 import { NoteError } from './note-files.mjs';
 import { exportNote, exportNotes, imageLimit, loadImage, loadNote, noteLimit,
   notePath, saveImage, saveNote } from './note-storage.mjs';
 import { atlasYears } from './atlas-sources.mjs';
 import { experienceError } from './public/experience.mjs';
+import { asDirectory, configure, locateData, lockData, loopback } from './runtime-config.mjs';
 
-const dataDirectory = new URL('./data/', import.meta.url);
+const config = configure();
+let paths;
+try {
+  paths = await locateData(config, config.initialize || config.mode === 'development' && !process.env.CHRONICLE_DATA_DIR);
+} catch (error) {
+  throw new Error('无法打开指定的资料目录。请核对配置或从备份恢复；全新安装需要显式初始化。', { cause: error });
+}
+const guard = await lockData(paths.identity);
+const dataDirectory = asDirectory(paths.canonical);
+const atlasDirectory = asDirectory(config.atlas);
 const dataFile = new URL('chronicle.json', dataDirectory);
+const modeFile = new URL('.chronicle-mode', dataDirectory);
 const assets = new Map([
   ['/knowledge', ['knowledge.html', 'text/html']],
   ['/knowledge.mjs', ['knowledge.mjs', 'text/javascript']],
@@ -61,16 +75,15 @@ function queueWrite(action) {
 }
 
 async function readWorks() {
-  const saved = await readFile(dataFile, 'utf8').catch(error => {
-    if (error.code !== 'ENOENT') throw error;
-    return null;
-  });
-  return saved === null ? JSON.parse(await readFile(new URL('./fixtures.json', import.meta.url), 'utf8')) :
-    JSON.parse(saved).works;
+  const saved = JSON.parse(await readFile(dataFile, 'utf8'));
+  if (saved?.schemaVersion !== 1 || !Array.isArray(saved.works) ||
+      !saved.works.every(validWork) || new Set(saved.works.map(work => work.id)).size !== saved.works.length) {
+    throw new Error('作品索引格式无效');
+  }
+  return saved.works;
 }
 
 async function writeWorks(works) {
-  await mkdir(dataDirectory, { recursive: true });
   await atomicWrite(dataFile, JSON.stringify({ schemaVersion: 1, works }, null, 2));
 }
 
@@ -121,10 +134,31 @@ function send(response, status, value) {
   response.end(JSON.stringify(value));
 }
 
-const port = Number(process.env.PORT || 4173);
+try {
+  if (paths.newDirectory) {
+    await mkdir(paths.canonical);
+    const works = config.mode === 'demo' ? JSON.parse(await readFile(new URL('./fixtures.json', import.meta.url), 'utf8')) : [];
+    await atomicWrite(modeFile, config.mode);
+    await writeWorks(works);
+  } else {
+    const prior = await readFile(modeFile, 'utf8').catch(error => {
+      if (error.code === 'ENOENT' && config.mode === 'formal') return 'formal';
+      throw error;
+    });
+    if (prior.trim() !== config.mode) throw new Error('资料库运行模式不匹配');
+  }
+  await readWorks();
+} catch (error) {
+  throw new Error('资料库无法验证。请核对运行模式和资料目录，并从备份恢复缺失或损坏的索引。', { cause: error });
+}
 const allowedOrigins = new Set();
+const token = randomBytes(32).toString('hex');
+let stopping = false;
+let address;
 const knowledge = createKnowledgeService({ data: dataDirectory, readWorks, readJson, readBody, send, queueWrite });
-await knowledge.reconcile().catch(error => console.error('知识库关联恢复失败', error.message));
+await knowledge.reconcile().catch(error => {
+  throw new Error('知识库索引无法读取，请从同一份资料备份恢复。', { cause: error });
+});
 
 async function handleNote(request, response, id, suffix, name) {
   const findWork = works => {
@@ -193,17 +227,32 @@ async function handleNote(request, response, id, suffix, name) {
   throw new NoteError(404, '找不到笔记接口');
 }
 
-createServer(async (request, response) => {
+const server = createServer(async (request, response) => {
   try {
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'");
+    if (!allowedOrigins.has(`http://${request.headers.host}`)) return send(response, 403, { error: '仅允许本机访问' });
+    if (request.url === '/_chronicle/instance' && paths.state && !request.headers.origin &&
+        request.headers['sec-fetch-site'] !== 'cross-site') {
+      const challenge = request.headers['x-chronicle-challenge'];
+      if (request.method === 'GET' && /^[a-f0-9]{64}$/.test(challenge ?? '')) {
+        const instance = { app: 'Chronicle', mode: config.mode, identity: paths.identity, pid: process.pid, address };
+        const proof = createHmac('sha256', token).update(challenge + JSON.stringify(instance)).digest('hex');
+        return send(response, 200, { instance, proof });
+      }
+      if (request.method === 'POST' && request.headers.authorization === `Bearer ${token}`) {
+        send(response, 200, { stopping: true });
+        return void stop();
+      }
+    }
+    if (stopping) return send(response, 503, { error: 'Chronicle 正在停止' });
     if (request.method !== 'GET' && (request.headers['sec-fetch-site'] === 'cross-site' ||
         (request.headers.origin && !allowedOrigins.has(request.headers.origin)))) {
       return send(response, 403, { error: '请从 Chronicle 本机页面保存' });
     }
     if (request.method === 'GET' && /^\/api\/atlas\/places\/(meta|detail|search|viewport)(?:\?|$)/.test(request.url)) {
       const { handlePlaceQuery } = await import('./atlas-place-index.mjs');
-      const [code, result] = await handlePlaceQuery(new URL(request.url, 'http://localhost'));
+      const [code, result] = await handlePlaceQuery(new URL(request.url, 'http://localhost'), atlasDirectory);
       return send(response, code, result);
     }
     if (request.method === 'GET' && /^\/api\/atlas\/events(?:\?|$)/.test(request.url)) {
@@ -213,7 +262,7 @@ createServer(async (request, response) => {
         return send(response, 400, { error: '无效的事件时间轴年份' });
       }
       const { readCatalogueYear } = await import('./atlas-event-catalog.mjs');
-      return send(response, 200, await readCatalogueYear(year));
+      return send(response, 200, await readCatalogueYear(year, new URL('events-catalog/', atlasDirectory)));
     }
     const noteRoute = /^\/api\/works\/([a-zA-Z0-9_-]{1,100})\/note(?:\/(assets|export\.md|export\.zip)(?:\/([a-zA-Z0-9.-]+))?)?$/.exec(request.url);
     if (noteRoute) return await handleNote(request, response, ...noteRoute.slice(1));
@@ -259,7 +308,9 @@ createServer(async (request, response) => {
     const asset = request.method === 'GET' && (assets.get(request.url.split('?')[0]) ??
       (shard && [`../atlas-data/${shard[1]}`, 'application/json']));
     if (!asset) return send(response, 404, { error: '页面不存在' });
-    const url = new URL(`./public/${asset[0]}`, import.meta.url);
+    const url = asset[0].startsWith('../atlas-data/')
+      ? new URL(asset[0].slice('../atlas-data/'.length), atlasDirectory)
+      : new URL(`./public/${asset[0]}`, import.meta.url);
     const geography = /\/geography-(?:10|50)\.json$/.test(url.pathname);
     const acceptsGzip = request.headers['accept-encoding']?.split(',').some(encoding => {
       const [name, quality] = encoding.trim().split(/\s*;\s*/);
@@ -285,8 +336,38 @@ createServer(async (request, response) => {
     console.error(error);
     send(response, 500, { error: '无法读取或保存本地资料库' });
   }
-}).listen(port, '127.0.0.1', function () {
-  allowedOrigins.add(`http://127.0.0.1:${this.address().port}`);
-  allowedOrigins.add(`http://localhost:${this.address().port}`);
-  console.log(`Chronicle · http://127.0.0.1:${this.address().port}`);
 });
+
+let stateWritten = false;
+async function stop() {
+  if (stopping) return;
+  stopping = true;
+  try {
+    await new Promise(resolve => server.close(resolve));
+    await pendingWrite;
+    if (stateWritten) await rm(paths.state, { force: true });
+  } catch (error) {
+    console.error('关闭 Chronicle 时出现错误', error);
+    process.exitCode = 1;
+  } finally {
+    guard.close();
+  }
+}
+
+server.listen({ host: loopback, port: config.port, exclusive: true });
+try { await once(server, 'listening'); }
+catch (error) { throw new Error(`Chronicle 端口 ${config.port} 不可用，未切换到其他端口。`, { cause: error }); }
+address = `http://${loopback}:${server.address().port}`;
+allowedOrigins.add(address);
+allowedOrigins.add(`http://localhost:${server.address().port}`);
+if (paths.state) {
+  await mkdir(config.logs, { recursive: true });
+  if (config.mode === 'formal') {
+    await atomicWrite(new URL('installation.json', asDirectory(config.logs)), JSON.stringify({ initialized: true }));
+  }
+  await atomicWrite(pathToFileURL(paths.state), JSON.stringify({ address, pid: process.pid, token }));
+  stateWritten = true;
+}
+process.on('SIGINT', () => void stop());
+process.on('SIGTERM', () => void stop());
+console.log(`Chronicle · ${address}`);

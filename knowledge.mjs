@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { readdir } from 'node:fs/promises';
 import { atomicWrite } from './atomic-write.mjs';
 import { checkedRead, directory, loadNoteImage, NoteError, renderNoteMarkdown, saveNoteImage } from './note-files.mjs';
 import { exportNoteContent, imageLimit, noteLimit } from './note-storage.mjs';
@@ -49,9 +50,32 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
   const root = new URL('knowledge/', data);
   const index = new URL('index.json', root);
   const blank = () => ({ schemaVersion: 1, notes: [], tags: [], relations: [] });
+  async function readIndex() {
+    const state = JSON.parse(await checkedRead(index));
+    if (state?.schemaVersion !== 1 || ![state.notes, state.tags, state.relations].every(Array.isArray)) {
+      throw new Error('知识库索引格式无效');
+    }
+    return state;
+  }
+  async function entries(path) {
+    try { return await readdir(path, { withFileTypes: true }); }
+    catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+  }
   async function read() {
-    try { return JSON.parse(await checkedRead(index)); }
-    catch (error) { if (error.code === 'ENOENT') return blank(); throw error; }
+    try { return await readIndex(); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+    for (const item of await entries(root)) {
+      if (!item.isDirectory() || !/^note-[a-z0-9-]{36}$/.test(item.name)) continue;
+      const files = await entries(new URL(`${item.name}/`, root));
+      if (files.some(file => file.isFile() && /^[a-f0-9]{64}\.md$/.test(file.name))) {
+        try { return await readIndex(); } // A first save may have just published the index.
+        catch (error) {
+          if (error.code !== 'ENOENT') throw error;
+          fail(409, '知识索引缺失，但检测到已存正文。请停止服务，从同一备份恢复知识索引和资料。');
+        }
+      }
+    }
+    return blank();
   }
   async function write(state) {
     await directory(data, true);

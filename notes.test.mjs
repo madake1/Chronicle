@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { cp, mkdtemp, readFile, rm, symlink } from 'node:fs/promises';
+import { cp, mkdtemp, readFile, rename, rm, symlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -13,11 +13,15 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'knowledge.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
+    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');
-    server = spawn(process.execPath, ['server.mjs'], { cwd: root, env: { ...process.env, PORT: '0' } });
+    server = spawn(process.execPath, ['server.mjs'], { cwd: root, env: {
+      ...process.env, PORT: '0', CHRONICLE_MODE: 'demo', CHRONICLE_INIT: '1',
+      CHRONICLE_DATA_DIR: join(root, 'data'), CHRONICLE_ATLAS_DIR: join(root, 'atlas-data'),
+      CHRONICLE_LOG_DIR: join(root, 'logs'),
+    } });
     const started = await Promise.race([
       once(server.stdout, 'data'),
       once(server, 'exit').then(() => { throw new Error('临时服务启动失败'); }),
@@ -98,6 +102,24 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       return result.json();
     };
     const indexPath = join(root, 'data', 'knowledge', 'index.json');
+    await t.test('索引缺失且正文仍在时拒绝读取或重建知识库', async () => {
+      const id = randomUUID();
+      const route = `${base}/${id}`;
+      const original = await (await put(route, { content: '保留这份正文', revision: null })).json();
+      const archived = indexPath + '.backup';
+      await rename(indexPath, archived);
+      try {
+        const missing = await request(base);
+        assert.equal(missing.status, 409);
+        assert.match((await missing.json()).error, /索引缺失.*已存正文/);
+        assert.equal((await put(`${base}/${randomUUID()}`, { content: '不能重建', revision: null })).status, 409);
+        await assert.rejects(readFile(indexPath), { code: 'ENOENT' });
+      } finally {
+        await rename(archived, indexPath);
+      }
+      assert.equal((await get(route)).revision, original.revision);
+      assert.equal((await remove(route)).status, 200);
+    });
     await t.test('知识录入、层级标签、双向关联及清理', async () => {
       const a = randomUUID(), b = randomUUID();
       const first = `${base}/${a}`, second = `${base}/${b}`;

@@ -3,19 +3,14 @@ import { createPlaceSearch, placeAt } from './public/atlas/places.mjs';
 import { sourceYearToAxis } from './public/atlas/years.mjs';
 
 const directory = new URL('./atlas-data/', import.meta.url);
-const placesFile = new URL('place-query-index.json', directory);
-const baseFile = new URL('places.json', directory);
 const originalFile = new URL('./public/atlas/northern-song-places.json', import.meta.url);
 
-async function readIndex(file) {
-  try {
-    return JSON.parse(await readFile(file, 'utf8'));
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-    if (file === placesFile) return readIndex(baseFile);
-    if (file === baseFile) return readIndex(originalFile);
-    throw error;
+async function readIndex(root) {
+  for (const file of [new URL('place-query-index.json', root), new URL('places.json', root)]) {
+    try { return JSON.parse(await readFile(file, 'utf8')); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
   }
+  return JSON.parse(await readFile(originalFile, 'utf8'));
 }
 
 const axisBounds = [-3399, 2024];
@@ -108,23 +103,25 @@ export function createPlaceIndex(index) {
   };
 }
 
-let loading;
-function getIndex() {
-  loading ??= readIndex(placesFile).then(createPlaceIndex).catch(error => {
-    loading = undefined;
-    throw error;
-  });
-  return loading;
+const loading = new Map();
+function getIndex(root) {
+  if (!loading.has(root.href)) {
+    loading.set(root.href, readIndex(root).then(createPlaceIndex).catch(error => {
+      loading.delete(root.href);
+      throw error;
+    }));
+  }
+  return loading.get(root.href);
 }
 
-export async function handlePlaceQuery(url) {
+export async function handlePlaceQuery(url, root = directory) {
   const params = url.searchParams;
   const kind = url.pathname.split('/').at(-1);
-  if (kind === 'meta') return [200, (await getIndex()).meta];
+  if (kind === 'meta') return [200, (await getIndex(root)).meta];
   if (kind === 'detail') {
     const id = params.get('id') ?? '';
     if (!id || id.length > 512) return [400, { error: '无效的地点 ID' }];
-    const detail = (await getIndex()).detail(id);
+    const detail = (await getIndex(root)).detail(id);
     return detail ? [200, detail] : [404, { error: '地点不存在' }];
   }
   const year = Number(params.get('year'));
@@ -134,7 +131,7 @@ export async function handlePlaceQuery(url) {
   if (kind === 'search') {
     const query = (params.get('q') ?? '').trim();
     if (!query || query.length > 120) return [400, { error: '请输入有效的地名' }];
-    return [200, (await getIndex()).search(query, year)];
+    return [200, (await getIndex(root)).search(query, year)];
   }
   const keys = ['west', 'south', 'east', 'north', 'zoom'];
   const values = Object.fromEntries(keys.map(key => [key, Number(params.get(key))]));
@@ -144,5 +141,5 @@ export async function handlePlaceQuery(url) {
       south < -90 || north > 90 || north <= south || zoom < -2 || zoom > 24) {
     return [400, { error: '无效的地图视野' }];
   }
-  return [200, (await getIndex()).viewport({ year, ...values })];
+  return [200, (await getIndex(root)).viewport({ year, ...values })];
 }

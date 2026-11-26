@@ -5,10 +5,9 @@ const defaultDirectory = new URL('./atlas-data/events-catalog/', import.meta.url
 const recentPacks = new Map();
 const read = async (directory, file) => {
   const url = new URL(file, directory);
-  const key = file.endsWith('holdbacks.json') ? file : file.split('/')[0];
+  const key = directory.href + (file.endsWith('holdbacks.json') ? file : file.split('/')[0]);
   const load = async () => JSON.parse(await readFile(url, 'utf8'));
   try {
-    if (directory !== defaultDirectory) return await load();
     const { mtimeMs, size } = await stat(url);
     const previous = recentPacks.get(key);
     if (previous?.file === file && previous.mtimeMs === mtimeMs && previous.size === size) {

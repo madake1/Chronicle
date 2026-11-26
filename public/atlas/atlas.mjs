@@ -503,4 +503,6 @@ async function initialize() {
   });
 }
 
-initialize().catch(error => { status.textContent = `地图加载失败：${error.message}`; });
+initialize().catch(error => {
+  status.textContent = `地图资料无法加载：${error.message}。请按 README 恢复已准备的 atlas-data 资料包后刷新。`;
+});
