@@ -16,8 +16,12 @@
 .topic-card[data-cover=umber] .topic-cover{background-color:#886549}
 .topic-card-overview{color:var(--muted);line-height:1.4;font-size:.9rem;overflow-wrap:anywhere;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.topic-breadcrumb{margin:.3rem 0 1rem;color:var(--muted);font-size:.88rem}
-.topic-breadcrumb:empty,.topic-status:empty{display:none}
+.topic-status:empty{display:none}
+.topic-back{display:inline-block;color:var(--muted);text-decoration:none;font-size:.9rem;padding:.3rem 0}
+.topic-back:hover{text-decoration:underline;color:var(--accent)}
+.topic-index>.topic-back{display:block;border-bottom:1px solid var(--line);padding-bottom:.65rem;margin-bottom:.65rem}
+.topic-index summary{overflow-wrap:anywhere}
+.topic-recovery{gap:1rem}
 .topic-status{margin:.6rem 0;color:var(--film)}
 .topic-layout{display:grid;grid-template-columns:minmax(11rem,15rem) minmax(0,1fr);gap:1.1rem;align-items:start}
 .topic-index{position:sticky;top:.75rem;padding:1rem;max-height:calc(100dvh - 1.5rem);overflow:auto}
@@ -83,6 +87,7 @@
 .topic-menu>summary::-webkit-details-marker{display:none}
 .topic-menu-items{position:absolute;top:calc(100% + .2rem);right:0;z-index:3;display:grid;gap:.15rem;min-width:max-content;
   padding:.28rem;border:1px solid var(--line);border-radius:7px;background:var(--panel);box-shadow:0 5px 16px #10191124}
+.topic-menu:not([open])>.topic-menu-items{display:none}
 .topic-menu-items button{border:0;text-align:start;padding:.35rem .5rem}
 .topic-menu-items .topic-danger{color:var(--film)}
 .topic-editing{padding-top:0}
@@ -105,6 +110,7 @@
 .draft-gap>summary::after{content:'';flex:1;border-top:1px solid var(--line)}
 .draft-gap:not([open])>summary:not(:hover):not(:focus-visible)::after{opacity:.48}
 .draft-gap .topic-menu-items{left:0;right:auto;width:max-content}
+.draft-paper>.draft-gap:last-child .topic-menu-items{top:auto;bottom:calc(100% + .2rem)}
 @media(max-width:700px){
   .topic-layout{grid-template-columns:minmax(0,1fr);gap:.7rem}
   .topic-index{position:static;max-height:none}

@@ -34,34 +34,45 @@
 #related-preview{padding:1rem}
 .knowledge-choices{max-height:11rem;overflow:auto}
 [data-note-fields] label{display:grid;gap:.3rem;margin:.5rem 0}
-#tag-dialog{width:min(640px,calc(100% - 1.5rem));height:92dvh;max-height:92dvh;padding:clamp(.85rem,3vw,1.5rem)}
+#tag-dialog{width:min(900px,calc(100% - 1.5rem));height:min(780px,92dvh);max-height:92dvh;padding:clamp(.85rem,2vw,1.4rem)}
 #tag-dialog[open]{display:flex;flex-direction:column;overflow:hidden}
-#tag-dialog > :not(#tag-management-tree){flex:none}
-.tag-manager-toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin:.85rem 0 .45rem}
+#tag-dialog>.dialog-head,.tag-manager-toolbar,#tag-management-status{flex:none}
+.tag-manager-toolbar{display:flex;flex-wrap:wrap;gap:.5rem;margin:.85rem 0 .75rem}
 .tag-manager-toolbar input{flex:1 1 12rem;min-width:0}
-#tag-management-actions{padding:.6rem .75rem;background:var(--soft);border-radius:8px;margin-top:.55rem}
-#tag-management-selection{font-weight:650;overflow-wrap:anywhere;margin-bottom:.35rem}
-.tag-selected-actions{display:flex;gap:.35rem;flex-wrap:wrap}
-.tag-selected-actions button{padding:.28rem .5rem}
-.tag-selected-actions [data-tag-action=delete]{margin-inline-start:auto}
-#tag-management-editor{max-height:47dvh;overflow:auto}
-#tag-management-tree{flex:1;min-height:0;overflow:auto;margin-top:.65rem}
-#tag-management-status:not(:empty){margin-top:.65rem;color:var(--accent)}
+.tag-manager-panes{display:grid;grid-template-columns:minmax(16rem,.9fr) minmax(0,1.1fr);gap:1rem;flex:1;min-height:0}
+.tag-manager-tree-pane,.tag-manager-detail-pane{display:flex;flex-direction:column;min-height:0;min-width:0;
+  padding:.8rem;border:1px solid var(--line);border-radius:9px}
+.tag-manager-tree-pane>.meta{font-size:.88rem;margin:.18rem 0 .45rem}
+#tag-management-tree{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.tag-manager-detail-pane{overflow:auto;overscroll-behavior:contain}
+#tag-management-back{display:none}
+#tag-management-selection,#tag-management-path{overflow-wrap:anywhere}
+#tag-management-count{margin:.3rem 0 .8rem}
+.tag-selected-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+.tag-selected-actions [data-tag-action=delete]{color:var(--film)}
+#tag-management-status{min-height:1.4rem;margin-top:.55rem;color:var(--accent)}
 .tag-management-level{list-style:none;margin:0;padding-inline-start:clamp(.4rem,2vw,1rem)}
 #tag-management-tree > ul{padding:0}
-.tag-management-row{display:grid;grid-template-columns:1.5rem minmax(0,1fr) max-content;align-items:center;gap:.4rem;min-height:2.55rem;padding-inline-end:.55rem;border-radius:7px}
-.tag-management-row button{border-color:transparent;background:transparent}
+.tag-management-row{display:grid;grid-template-columns:2rem minmax(0,1fr) max-content;align-items:center;gap:.2rem;
+  min-height:2.7rem;padding-inline-end:.5rem;border-radius:7px}
+.tag-management-row button{border-color:transparent;background:transparent;min-height:2.45rem}
 .tag-management-row:has([aria-pressed=true]){background:var(--soft);color:var(--accent)}
 .tag-management-name{grid-column:2;text-align:start;overflow-wrap:anywhere;white-space:normal;padding:.3rem .45rem}
 .tag-management-toggle{padding:.2rem}
 .tag-parent-options [aria-pressed=true]{background:var(--soft);color:var(--accent)}
-.tag-management-form{display:grid;gap:.55rem;margin:.75rem 0;padding:.8rem;background:var(--soft);border-radius:8px}
+.tag-management-form{display:grid;gap:.65rem;margin:0}
 .tag-management-form label{display:grid;gap:.3rem}
 .tag-management-form input{width:100%}
 .tag-management-form .knowledge-actions{justify-content:flex-end}
 .tag-management-form [role=alert]:empty{display:none}
-.tag-parent-options{display:grid;max-height:10rem;overflow:auto}
-.tag-parent-options button{text-align:start;white-space:normal}
+.tag-parent-options{display:grid;gap:.2rem}
+.tag-parent-options button{text-align:start;white-space:normal;overflow-wrap:anywhere}
+@media(max-width:700px){
+  .tag-manager-panes{grid-template-columns:minmax(0,1fr)}
+  #tag-dialog[data-pane=tree] .tag-manager-detail-pane,
+  #tag-dialog[data-pane=detail] .tag-manager-tree-pane{display:none}
+  #tag-management-back{display:block;align-self:flex-start;margin-bottom:.65rem}
+}
 [data-note-fields]{min-width:0;padding:.75rem;margin:.65rem 0;border:1px solid var(--line);border-radius:7px}
 [data-note-fields] details{border-top:1px solid var(--line);padding:.5rem 0}
 [data-note-fields] summary{cursor:pointer}
@@ -75,7 +86,7 @@
   .knowledge-index{position:static;padding:.65rem .9rem}
 }
 .record-heading{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
-.record-heading #manage-tags{border:0;width:auto;background:transparent;color:var(--muted);font-size:.88rem;padding:.3rem .4rem}
+.record-heading #manage-tags{border:1px solid var(--line);width:auto;background:var(--panel);color:var(--ink);font-size:1rem;padding:.36rem .58rem}
 .knowledge-index .record-navigation{margin:0 0 .75rem;padding-bottom:.55rem;border-bottom:1px solid var(--line)}
 #tag-tree{margin-top:.5rem}
 .knowledge-list-heading{justify-content:space-between;flex-wrap:wrap}

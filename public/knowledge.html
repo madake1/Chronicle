@@ -51,24 +51,37 @@
     </div>
     </div>
   </main>
-  <dialog id="tag-dialog" aria-labelledby="tag-heading">
-    <div class="dialog-head"><h2 id="tag-heading">管理标签</h2><button type="button" data-close aria-label="关闭">×</button></div>
+  <dialog id="tag-dialog" aria-labelledby="tag-heading" data-pane="tree">
+    <div class="dialog-head">
+      <h2 id="tag-heading">管理标签</h2><button id="tag-management-close" type="button" aria-label="关闭">×</button>
+    </div>
     <div class="tag-manager-toolbar">
       <input id="tag-management-search" type="search" aria-label="搜索标签名称或路径" placeholder="搜索标签名称或路径">
-      <button id="new-root-tag" class="primary" type="button">＋ 新建顶级标签</button>
+      <button id="new-root-tag" type="button">＋ 新建顶级标签</button>
     </div>
-    <p class="meta">知识数量含下级并去重</p>
-    <div id="tag-management-actions" hidden>
-      <p id="tag-management-selection"></p>
-      <div class="tag-selected-actions" role="group" aria-label="选中标签的操作">
-        <button type="button" data-tag-action="child">添加子标签</button>
-        <button type="button" data-tag-action="rename">重命名</button>
-        <button type="button" data-tag-action="move">移动</button>
-        <button type="button" data-tag-action="delete">删除</button>
-      </div>
+    <div class="tag-manager-panes">
+      <section class="tag-manager-tree-pane" aria-labelledby="tag-tree-heading">
+        <h3 id="tag-tree-heading">标签树</h3>
+        <p class="meta">知识数量含下级并去重</p>
+        <div id="tag-management-tree" tabindex="0"></div>
+      </section>
+      <section class="tag-manager-detail-pane" aria-label="标签详情">
+        <button id="tag-management-back" type="button">← 返回标签树</button>
+        <p id="tag-management-empty" class="meta">从标签树选择一个标签，或在上方新建顶级标签。</p>
+        <div id="tag-management-actions" hidden>
+          <h3 id="tag-management-selection"></h3>
+          <p id="tag-management-path" class="meta"></p>
+          <p id="tag-management-count" class="meta"></p>
+          <div class="tag-selected-actions" role="group" aria-label="选中标签的操作">
+            <button type="button" data-tag-action="child">添加子标签</button>
+            <button type="button" data-tag-action="rename">重命名</button>
+            <button type="button" data-tag-action="move">移动</button>
+            <button type="button" data-tag-action="delete">删除</button>
+          </div>
+        </div>
+        <div id="tag-management-editor"></div>
+      </section>
     </div>
-    <div id="tag-management-editor"></div>
-    <div id="tag-management-tree"></div>
     <p id="tag-management-status" role="status"></p>
   </dialog>
   <template id="metadata-template">

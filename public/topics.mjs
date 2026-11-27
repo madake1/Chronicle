@@ -16,29 +16,6 @@ const labeled = (text, control) => {
   return label;
 };
 
-function toolsMenu(label, controls, className = '') {
-  const menu = element('details', null, 'topic-menu ' + className);
-  const trigger = element('summary', label);
-  const panel = element('div', null, 'topic-menu-items');
-  panel.append(...controls);
-  panel.addEventListener('click', event => {
-    if (!event.target.closest('button,a')) return;
-    menu.open = false;
-    if (document.activeElement === document.body) trigger.focus({ preventScroll: true });
-  });
-  menu.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || !menu.open) return;
-    menu.open = false;
-    trigger.focus();
-    event.stopPropagation();
-  });
-  menu.addEventListener('focusout', event => {
-    if (event.relatedTarget && !menu.contains(event.relatedTarget)) menu.open = false;
-  });
-  menu.append(trigger, panel);
-  return menu;
-}
-
 function dialog(title, canClose = () => true) {
   const pane = element('dialog', null, 'topic-dialog');
   const heading = element('div', null, 'dialog-head');
@@ -137,10 +114,55 @@ export async function mountTopics(root, params, editKnowledge) {
   const status = element('p', '', 'topic-status');
   status.setAttribute('role', 'alert');
   const report = error => { status.textContent = error.message; };
-  const breadcrumb = element('nav', null, 'topic-breadcrumb');
-  breadcrumb.setAttribute('aria-label', '专题路径');
   const body = element('div');
-  root.append(breadcrumb, status, body);
+  root.append(status, body);
+  const backToShelf = () => {
+    const control = link('← 返回专题书架', topicHref());
+    control.className = 'topic-back';
+    return control;
+  };
+
+  let activeMenu;
+  function closeMenu(focus = false) {
+    if (!activeMenu) return;
+    const { menu, trigger } = activeMenu;
+    activeMenu = undefined;
+    menu.open = false;
+    if (focus) trigger.focus({ preventScroll: true });
+  }
+  function toolsMenu(label, controls, className = '') {
+    const menu = element('details', null, 'topic-menu ' + className);
+    const trigger = element('summary', label);
+    const panel = element('div', null, 'topic-menu-items');
+    panel.append(...controls);
+    trigger.onclick = event => {
+      event.preventDefault();
+      const wasOpen = activeMenu?.menu === menu;
+      closeMenu();
+      if (!wasOpen) {
+        menu.open = true;
+        activeMenu = { menu, trigger };
+      }
+    };
+    panel.addEventListener('click', event => {
+      // Capture before a menu action opens another dialog or replaces its block.
+      if (event.target.closest('button,a')) closeMenu(true);
+    }, { capture: true });
+    menu.append(trigger, panel);
+    return menu;
+  }
+  document.addEventListener('click', event => {
+    if (activeMenu && !activeMenu.menu.contains(event.target)) closeMenu();
+  }, { capture: true });
+  document.addEventListener('focusin', event => {
+    if (activeMenu && !activeMenu.menu.contains(event.target)) closeMenu();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !activeMenu) return;
+    event.preventDefault();
+    closeMenu(true);
+  });
+  window.addEventListener('pagehide', () => closeMenu());
 
   window.addEventListener('beforeunload', event => {
     if (!dirty) return;
@@ -401,6 +423,7 @@ export async function mountTopics(root, params, editKnowledge) {
       return menu;
     }
     function renderBlocks(focusIndex) {
+      closeMenu();
       const next = [];
       units.forEach((block, index) => {
         if (!views.has(block.id)) views.set(block.id, makeUnit(block));
@@ -429,6 +452,7 @@ export async function mountTopics(root, params, editKnowledge) {
     }));
     container.classList.add('topic-editing');
     status.textContent = '';
+    closeMenu();
     tools.append(status);
     container.replaceChildren(tools, title, paper);
     renderBlocks();
@@ -448,14 +472,15 @@ export async function mountTopics(root, params, editKnowledge) {
 
   function renderDetail() {
     editorObserver?.disconnect();
-    breadcrumb.after(status);
-    breadcrumb.replaceChildren(link('知识专题', topicHref()), element('span', ' / '), link(topic.title, topicHref(topic.id)));
-    if (topic.article) breadcrumb.append(element('span', ' / ' + topic.article.title));
+    closeMenu();
+    root.prepend(status);
     const layout = element('div', null, 'topic-layout');
     const side = element('aside', null, 'panel topic-index');
     const index = element('details');
     index.open = !matchMedia('(max-width: 700px)').matches;
-    index.append(element('summary', '文章目录'));
+    const directoryLabel = element('summary', topic.title);
+    directoryLabel.setAttribute('aria-label', topic.title + '的文章目录');
+    index.append(directoryLabel);
     const links = element('ol');
     for (const item of topic.articles) {
       const row = element('li');
@@ -493,7 +518,7 @@ export async function mountTopics(root, params, editKnowledge) {
       pane.append(form);
       pane.showModal();
     }));
-    side.append(index);
+    side.append(backToShelf(), index);
     const reading = element('section', null, 'panel topic-reading');
     const header = element('header', null, 'reading-heading');
     const toolbar = element('div', null, 'topic-tools reading-tools');
@@ -591,6 +616,10 @@ export async function mountTopics(root, params, editKnowledge) {
     }
   } catch (error) {
     report(error);
-    breadcrumb.replaceChildren(link('返回知识专题', topicHref()), ...(articleId && topicId ? [link('返回专题', topicHref(topicId))] : []));
+    const recovery = element('nav', null, 'topic-recovery');
+    recovery.setAttribute('aria-label', '专题返回');
+    recovery.append(backToShelf());
+    if (articleId && topicId) recovery.append(link('返回专题概述', topicHref(topicId)));
+    body.replaceChildren(recovery);
   }
 }
