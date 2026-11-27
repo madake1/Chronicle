@@ -76,3 +76,29 @@ fieldset{min-width:0;border:1px solid var(--line);border-radius:7px}
   .top[data-app-shell] nav{grid-row:2;grid-column:1/-1;gap:.15rem}
   .top[data-app-shell] .nav-link{padding:.35rem .55rem;font-size:.9rem}
 }
+
+.atlas-river-label, .atlas-place-label {
+  font: 600 .83rem/1.25 system-ui, sans-serif;
+  white-space: nowrap;
+  text-shadow: -1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff;
+}
+.atlas-river-label { color: #1f6177; pointer-events: none; }
+.atlas-place-label {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  color: #23372f;
+  padding: .18rem .15rem .18rem 0;
+  background: transparent;
+  border-color: transparent;
+}
+.atlas-place-label::before {
+  content: '';
+  width: .55rem;
+  height: .55rem;
+  border: 1px solid #fff;
+  background: #33473e;
+  border-radius: 50%;
+}
+.atlas-place-label.has-role::before { background: #9e2f26; }
+.atlas-place-label.has-role { color: #73241e; }

@@ -84,7 +84,8 @@ export function createAtlasData(index, readData) {
       type: 'FeatureCollection',
       features: [...target.byVisual.values()].map(item => ({
         type: 'Feature',
-        properties: { visual: item.visual, name: item.record.name },
+        properties: { visual: item.visual, name: item.record.name,
+          label: index.names?.[index.history.byRecord?.[item.record.sourceIndex]]?.name ?? item.record.name },
         geometry: loaded.get(item.shard)[item.geometry],
       })),
     };

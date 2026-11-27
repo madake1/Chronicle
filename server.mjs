@@ -27,6 +27,7 @@ const dataFile = new URL('chronicle.json', dataDirectory);
 const modeFile = new URL('.chronicle-mode', dataDirectory);
 const assets = new Map([
   ['/app-shell.mjs', ['app-shell.mjs', 'text/javascript']],
+  ['/map-reference.mjs', ['map-reference.mjs', 'text/javascript']],
   ['/timeline-layout.mjs', ['timeline-layout.mjs', 'text/javascript']],
   ['/spacetime', ['spacetime.html', 'text/html']],
   ['/spacetime.mjs', ['spacetime.mjs', 'text/javascript']],

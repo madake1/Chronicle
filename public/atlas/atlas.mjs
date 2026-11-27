@@ -5,7 +5,7 @@ import { readPlaceApi } from './place-api.mjs';
 import { bindPlaceSearch } from './places.mjs';
 import { bindMapSources } from './comparison.mjs';
 import { sourceYearToAxis, zoomYears } from './years.mjs';
-import { addGeographicLabels, addGeographicDetail } from './geography.mjs';
+import { addGeographicLabels, addGeographicDetail, physicalMapLayers } from './geography.mjs';
 import { bindEvents } from './events.mjs';
 import { mergeEventDatasets } from './event-data.mjs';
 
@@ -176,8 +176,7 @@ async function initialize() {
     name: '北宋历史地点（近似点位）', version: 'v1.1', source: '/atlas/northern-song-places.json',
     license: 'CC0-1.0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
   } });
-  const riverPaint = { 'line-color': '#438498', 'line-opacity': 0.72,
-    'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.65, 6, 1.25] };
+  const [majorRivers, detailRivers, lakeLayer] = physicalMapLayers(ocean);
   const data = createAtlasData(chronology, readData);
   const initial = 1;
   let activeFrame = data.frame(initial);
@@ -208,16 +207,14 @@ async function initialize() {
         { id: 'polity-fill', type: 'fill', source: 'polities', paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.79 } },
         { id: 'comparison-fill', type: 'fill', source: 'comparison', layout: { visibility: 'none' },
           paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.66 } },
-        { id: 'major-rivers', type: 'line', source: 'rivers', minzoom: 2, maxzoom: 4,
-          filter: ['<=', ['get', 'rank'], 3], paint: riverPaint },
-        { id: 'detail-rivers', type: 'line', source: 'rivers', minzoom: 4, paint: riverPaint },
+        majorRivers, detailRivers,
         { id: 'comparison-line', type: 'line', source: 'comparison', layout: { visibility: 'none' },
           paint: { 'line-color': '#675342', 'line-width': 0.8 } },
         { id: 'polity-line', type: 'line', source: 'polities', paint: { 'line-color': '#755236', 'line-width': 0.8 } },
         { id: 'polity-highlight', type: 'line', source: 'polities',
           filter: ['==', ['get', 'visual'], ''],
           paint: { 'line-color': '#152b25', 'line-width': 3 } },
-        { id: 'lakes', type: 'fill', source: 'lakes', paint: { 'fill-color': ocean } },
+        lakeLayer,
       ],
     },
   });
@@ -230,7 +227,9 @@ async function initialize() {
     updateGeography(year);
     events?.updateYear(year);
   }
-  if (manifest.geography) addGeographicDetail(map, readData, { land, lakes, rivers }, updateGeography);
+  if (manifest.geography) addGeographicDetail(map, readData, { land, lakes, rivers }, updateGeography, {
+    terrainVisible: () => document.querySelector('#atlas-show-terrain').checked,
+  });
   let active = initial;
   let loaded = false;
   let requested = initial;

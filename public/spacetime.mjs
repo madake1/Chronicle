@@ -1,4 +1,6 @@
 import { LngLatBounds, Map as MapLibre, Marker, NavigationControl, setWorkerUrl } from '/atlas/vendor/maplibre-gl.mjs';
+import { createReferenceLabels } from './map-reference.mjs';
+import { addGeographicDetail, physicalMapLayers } from './atlas/geography.mjs';
 import { createAtlasData } from './atlas/data.mjs';
 import { constrainView, describe, formatYear, parseYear, timelineBounds, zoomView } from './chronology.mjs';
 import { matchingAnnotations, timeFilter } from './spacetime-query.mjs';
@@ -15,7 +17,7 @@ const empty = { type: 'FeatureCollection', features: [] };
 let data = { rows: [], tags: [] };
 let rows = [], markers = [], selected, map, atlas, mapFailed = false, fitOnRefresh = true;
 let viewYears = [1000, 1500], limits = timelineBounds();
-let basemapVersion = 0;
+let basemapVersion = 0, references;
 const layers = {
   work: { revision: 0, rows: [], status: 'idle' },
   knowledge: { revision: 0, rows: [], tags: [], status: 'idle' },
@@ -89,7 +91,7 @@ function showCluster(items, panel, origin, canZoom = false) {
   function appendBatch() {
     const end = Math.min(items.length, visible + 30);
     list.append(...items.slice(visible, end).map(row => button(
-      `${typeName(row)} · ${name(row)} · ${dated(row) ? describe(row) : '年代未知'}`,
+      `${typeName(row)} · ${name(row)} · ${dated(row) ? describe(row) : '年代未知'}${row.place ? ' · ' + row.place : ''}`,
       () => select(row, origin),
     )));
     visible = end;
@@ -212,8 +214,10 @@ async function drawBasemap() {
   const revision = ++basemapVersion;
   const status = $('basemap-status');
   const layer = map.getSource('history');
-  await layer.setData(empty);
+  void references?.setHistory(undefined);
+  status.textContent = '正在读取底图参考年…';
   try {
+    await layer.setData(empty);
     const year = parseYear($('reference').value);
     const source = await atlas;
     if (revision !== basemapVersion) return;
@@ -222,7 +226,9 @@ async function drawBasemap() {
     const features = await source.data.features(source.data.frame(year));
     if (revision !== basemapVersion) return;
     await layer.setData(features);
-    if (revision === basemapVersion) status.textContent = `底图参考年 · ${formatYear(year)}`;
+    if (revision !== basemapVersion) return;
+    status.textContent = `底图参考年 · ${formatYear(year)}`;
+    void references?.setHistory(year, features.features);
   } catch (error) { if (revision === basemapVersion) status.textContent = error.message; }
 }
 
@@ -230,25 +236,33 @@ function initMap() {
   if (map || mapFailed) return;
   try {
     setWorkerUrl('/atlas/vendor/maplibre-gl-worker.mjs');
-    map = new MapLibre({ container: 'map', center: [15, 25], zoom: 1.4, renderWorldCopies: false, style: {
-      version: 8, sources: { land: { type: 'geojson', data: empty }, history: { type: 'geojson', data: empty } },
+    const ocean = '#aac9d7';
+    const physical = ['land', 'lakes', 'rivers'];
+    map = new MapLibre({ container: 'map', center: [15, 25], zoom: 1.4, renderWorldCopies: false,
+      dragRotate: false, touchPitch: false, style: {
+      version: 8, sources: Object.fromEntries([...physical, 'history'].map(id => [id, { type: 'geojson', data: empty }])),
       layers: [
-        { id: 'ocean', type: 'background', paint: { 'background-color': '#aac9d7' } },
+        { id: 'ocean', type: 'background', paint: { 'background-color': ocean } },
         { id: 'land', type: 'fill', source: 'land', paint: { 'fill-color': '#e9e4d4' } },
         { id: 'history', type: 'fill', source: 'history', paint: { 'fill-color': '#b08d6c', 'fill-opacity': .55, 'fill-outline-color': '#715943' } },
+        ...physicalMapLayers(ocean),
       ],
     } });
     atlas = readAtlas('chronology.json').then(index => ({ bounds: index.bounds, data: createAtlasData(index, readAtlas) }), () => null);
     map.addControl(new NavigationControl());
     map.on('load', () => {
       mapReady = true;
-      void readAtlas('land.geojson').then(land => map.getSource('land').setData(land)).catch(() => {});
+      references = createReferenceLabels(map, Marker, {
+        onStatus: message => { $('place-reference-status').textContent = message; },
+      });
+      void loadPhysicalReferences(physical);
       void drawBasemap();
       syncMarkers();
     });
     map.on('moveend', () => {
       if ($('viewport').checked) render();
       else syncMarkers();
+      void references?.refresh();
     });
   } catch {
     mapFailed = true;
@@ -257,6 +271,30 @@ function initMap() {
     $('basemap-status').textContent = '地图无法启动，可在坐标列表查看匹配标注。';
     $('viewport').disabled = true;
   }
+}
+
+async function loadPhysicalReferences(names) {
+  const missing = [];
+  const entries = await Promise.all(names.map(async name => {
+    try {
+      const data = await readAtlas(name + '.geojson');
+      await map.getSource(name).setData(data);
+      return [name, data];
+    } catch {
+      missing.push(name);
+      return [name, empty];
+    }
+  }));
+  const initial = Object.fromEntries(entries);
+  const status = $('physical-reference-status');
+  status.textContent = missing.length === names.length ? '自然地理资料缺失' :
+    missing.length ? '部分自然地理资料缺失，保留可用参照' : '';
+  references.updatePhysical(initial.rivers);
+  if (missing.length === names.length) return;
+  const update = addGeographicDetail(map, readAtlas, initial, references, {
+    onStatus: message => { status.textContent = message || (missing.length ? '部分基础自然地理资料缺失' : ''); },
+  });
+  void update();
 }
 
 function fitMap(points) {
@@ -284,6 +322,7 @@ function syncMarkers() {
     fitMap(points);
     if (markers.length) return;
   }
+  const occupied = [];
   for (const { key, rows: items } of groupMapPoints(points, map)) {
     const first = items[0];
     const element = button(items.length > 1 ? String(items.length) : first.entityType === 'knowledge' ? '◆' : '●', () => {
@@ -298,10 +337,13 @@ function syncMarkers() {
     element.setAttribute('aria-pressed', items.some(row => row.key === selected));
     element.setAttribute('aria-label', items.length > 1 ? `展开 ${items.length} 条地图标注` : `${typeName(first)} · ${name(first)}`);
     const pin = items.find(row => row.key === selected) ?? first;
-    markers.push(new Marker({ element }).setLngLat([pin.longitude, pin.latitude]).addTo(map));
+    const position = [pin.longitude, pin.latitude];
+    markers.push(new Marker({ element }).setLngLat(position).addTo(map));
+    occupied.push(position);
     if (groupOpen === key) showCluster(items, list, 'map');
   }
   list.hidden = !list.childElementCount;
+  references?.setPersonalPositions(occupied);
 }
 
 function render() {

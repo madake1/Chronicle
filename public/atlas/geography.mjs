@@ -162,7 +162,7 @@ function appendPlaceSources(content, place, currentRole) {
   }
 }
 
-function riverAnchors(rivers) {
+export function riverAnchors(rivers) {
   const anchors = [];
   for (const { geometry, properties } of rivers.features) {
     if (!properties.name) continue;
@@ -177,11 +177,41 @@ function riverAnchors(rivers) {
   return anchors.sort((a, b) => a.rank - b.rank);
 }
 
+export function labelSpace(map, points = []) {
+  const { clientWidth: width, clientHeight: height } = map.getCanvas();
+  const bounds = map.getBounds();
+  const used = points.map(position => {
+    const { x, y } = map.project(position);
+    return { left: x - 21, right: x + 21, y };
+  });
+  return (position, label, centered = false) => {
+    if (!bounds.contains(position)) return false;
+    const { x, y } = map.project(position);
+    const size = Math.max(26, [...label].reduce((n, character) => n + (character.codePointAt(0) > 255 ? 12 : 8), 12));
+    const left = x - (centered ? size / 2 : 8);
+    const right = left + size;
+    if (left < 0 || right > width || y < 14 || y > height - 14 ||
+        used.some(box => left < box.right && right > box.left && Math.abs(y - box.y) < 24)) return false;
+    used.push({ left, right, y });
+    return true;
+  };
+}
+
+export function physicalMapLayers(ocean) {
+  const paint = { 'line-color': '#438498', 'line-opacity': 0.72,
+    'line-width': ['interpolate', ['linear'], ['zoom'], 2, 0.65, 6, 1.25] };
+  return [
+    { id: 'major-rivers', type: 'line', source: 'rivers', minzoom: 2, maxzoom: 4,
+      filter: ['<=', ['get', 'rank'], 3], paint },
+    { id: 'detail-rivers', type: 'line', source: 'rivers', minzoom: 4, paint },
+    { id: 'lakes', type: 'fill', source: 'lakes', paint: { 'fill-color': ocean } },
+  ];
+}
+
 export function addGeographicLabels(map, rivers, Marker, onPlaceOpen) {
   let anchors = riverAnchors(rivers);
   let mountains = [];
   const markers = new Map();
-  const canvas = map.getCanvas();
   let year;
   let detailRequest = 0;
   let viewportRequest = 0;
@@ -235,22 +265,8 @@ export function addGeographicLabels(map, rivers, Marker, onPlaceOpen) {
 
   function render() {
     const zoom = map.getZoom();
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const bounds = map.getBounds();
-    const used = [];
+    const reserve = labelSpace(map);
     const next = new Set();
-
-    function reserve(position, label) {
-      if (!bounds.contains(position)) return false;
-      const { x, y } = map.project(position);
-      const left = x - 8;
-      const right = x + Math.max(26, label.length * 10 + 8);
-      if (left < 0 || right > width || y < 14 || y > height - 14 ||
-          used.some(box => left < box.right && right > box.left && Math.abs(y - box.y) < 22)) return false;
-      used.push({ left, right, y });
-      return true;
-    }
 
     function add(key, position, makeMarker) {
       next.add(key);
@@ -355,7 +371,10 @@ export function geographyScale(zoom) {
   return zoom >= 4.5 ? 10 : zoom >= 2.5 ? 50 : 110;
 }
 
-export function addGeographicDetail(map, readData, initial, labels) {
+export function addGeographicDetail(map, readData, initial, labels, {
+  terrainVisible = () => true,
+  onStatus = message => { if (message) console.warn(message); },
+} = {}) {
   const cache = new Map([[110, Promise.resolve(initial)]]);
   let applied = 110;
   let request = 0;
@@ -372,15 +391,15 @@ export function addGeographicDetail(map, readData, initial, labels) {
       }));
     }
     if (scale !== 110 && !mountainRequest) {
-      mountainRequest = readData('mountains.json').catch(error => {
+      mountainRequest = readData('mountains.json').catch(() => {
         mountainRequest = undefined;
-        console.warn('山脉参考图层加载失败', error);
         return null;
       });
     }
     try {
       const [layers, mountains] = await Promise.all([cache.get(scale), mountainRequest]);
       if (current !== request) return;
+      onStatus(mountains === null && scale !== 110 ? '山脉参照缺失' : '');
       if (scale === applied && mountains === appliedMountains) return;
       if (scale !== applied) {
         for (const name of ['land', 'lakes', 'rivers']) map.getSource(name).setData(layers[name]);
@@ -389,15 +408,16 @@ export function addGeographicDetail(map, readData, initial, labels) {
       if (mountains && !map.getSource('mountains')) {
         map.addSource('mountains', { type: 'geojson', data: mountains.areas });
         map.addLayer({ id: 'mountains', type: 'fill', source: 'mountains', minzoom: 3,
-          layout: { visibility: document.querySelector('#atlas-show-terrain').checked ? 'visible' : 'none' },
+          layout: { visibility: terrainVisible() ? 'visible' : 'none' },
           paint: { 'fill-color': '#8a785b', 'fill-opacity': 0.20 } }, 'major-rivers');
       }
       appliedMountains = mountains;
       labels.updatePhysical(layers.rivers, mountains?.labels ?? []);
-    } catch (error) {
-      console.warn('自然地理参考图层加载失败', error);
+    } catch {
+      if (current === request) onStatus('详细自然地理资料缺失，保留可用参照');
     }
   }
   map.on('load', update);
   map.on('zoomend', update);
+  return update;
 }
