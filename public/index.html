@@ -3,22 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Chronicle · 作品时间轴</title>
+  <title>Chronicle · 作品库</title>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/notes.css">
+  <script type="module" src="/app-shell.mjs"></script>
   <script type="module" src="/app.mjs"></script>
 </head>
 <body>
-  <header class="top">
-    <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
-    <nav aria-label="页面">
-      <button data-page="library" aria-current="page">作品库</button>
-      <button data-page="timeline">时间轴</button>
-      <a class="nav-link" href="/knowledge">知识库</a>
-      <a class="nav-link" href="/atlas">历史时空</a>
-    </nav>
-    <button id="theme" class="quiet" aria-label="切换主题">切换主题</button>
-  </header>
+  <header class="top" data-app-shell></header>
   <main>
     <div class="heading">
       <div><h1 id="page-title">作品库</h1><p id="summary"></p></div>
@@ -31,24 +23,10 @@
       <input id="search" type="search" placeholder="搜索作品名称" aria-label="搜索作品名称">
       <select id="type-filter" aria-label="作品类型"></select>
       <select id="status-filter" aria-label="体验状态"></select>
-      <label id="sort-control" hidden>排序 <select id="sort"><option value="recent">体验日期</option><option value="year">故事年代</option><option value="title">作品名称</option><option value="rating">个人评分</option></select></label>
+      <label id="sort-control">排序 <select id="sort"><option value="recent">体验日期</option><option value="year">故事年代</option><option value="title">作品名称</option><option value="rating">个人评分</option></select></label>
     </div>
     <p id="notice" role="status" hidden></p>
     <div class="workspace">
-      <section id="timeline" class="panel" aria-label="故事时间轴" hidden>
-        <div class="toolbar">
-          <form id="jump"><input name="year" placeholder="例如 公元前431" aria-label="定位年份" required><button>定位年份</button></form>
-          <div class="controls">
-            <button id="back">上一视图</button><button id="fit">适应全部</button>
-            <button id="out" aria-label="缩小">−</button><button id="in" aria-label="放大">＋</button>
-          </div>
-        </div>
-        <div class="timeline-scroll">
-          <div id="axis" class="timeline-row axis"><div>作品</div><div id="ruler" class="plot"></div></div>
-          <div id="rows"></div>
-        </div>
-        <footer class="legend"><span>━ 故事跨度</span><span>◆ 年份 / 短跨度</span><span>▱ 可能发生范围</span><span id="visible-span"></span><span class="hint">滚轮缩放 · 拖动平移</span></footer>
-      </section>
       <section id="library" class="panel" aria-label="作品库"></section>
       <aside id="details" class="panel" aria-label="作品详情" hidden></aside>
     </div>
@@ -62,7 +40,7 @@
         <label>地区<input name="region"></label><label>历史时期<input name="period"></label>
         <label>历史背景<select name="basis"><option value="">未填写</option><option>真实历史</option><option>历史架空</option><option>完全虚构</option></select></label>
         <label>评分（0–10）<input name="rating" type="number" min="0" max="10" step="0.5"></label>
-        <fieldset class="wide"><legend>故事时间段</legend><p class="meta">留空表示年代未知。</p><div id="segment-fields"></div><button type="button" id="add-segment">＋ 添加时间段</button></fieldset>
+        <fieldset class="wide"><legend>时空标注</legend><div id="segment-fields"></div><button type="button" id="add-segment">＋ 添加标注</button></fieldset>
         <fieldset class="wide">
           <legend>体验进度</legend>
           <div class="form-grid">

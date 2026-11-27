@@ -1,3 +1,4 @@
+import { annotationEditor } from './annotation-editor.mjs';
 import { createNoteDialog, noteRequest } from './note-dialog.mjs';
 import { createTagManager } from './tag-manager.mjs';
 
@@ -171,7 +172,10 @@ function editBody(note = null) {
     metadata: {
       load: value => loadMetadata(id, value),
       value: metadataInput,
-      dirty: () => JSON.stringify(metadataInput()) !== metadata.initial,
+      dirty: () => {
+        try { return JSON.stringify(metadataInput()) !== metadata.initial; }
+        catch { return true; }
+      },
     },
     onSaved: async () => {
       const intent = readerVersion;
@@ -294,16 +298,20 @@ function searchTargets() {
     }
   }, 140);
 }
+const noteAnnotations = annotationEditor($('note-annotations'), $('add-note-annotation'));
+
 function metadataInput() {
   const related = [...metadata.links].sort().map(value => {
     const [type, id] = value.split(':');
     return { type, id };
   });
-  return { title: $('metadata-title').value, tagIds: [...metadata.tags].sort(), related, version: metadata.note.metadataVersion };
+  return { title: $('metadata-title').value, tagIds: [...metadata.tags].sort(), related, annotations: noteAnnotations.value(), version: metadata.note.metadataVersion };
 }
 function loadMetadata(id, note) {
   metadata = { note: note ?? { id, metadataVersion: null }, tags: new Set(note?.tagIds), links: new Set(note?.related?.map(entityKey)) };
   $('metadata-title').value = note?.title ?? '';
+  noteAnnotations.load(note?.annotations);
+  $('annotation-fields').open = false;
   $('tag-fields').open = $('relation-fields').open = false;
   searchTargets();
   $('tag-search').value = $('target-search').value = $('inline-tag').value = '';
@@ -349,13 +357,6 @@ function syncTagIndex() { $('tag-index').open = !mobile.matches; }
 syncTagIndex();
 mobile.addEventListener('change', syncTagIndex);
 
-const root = document.documentElement;
-root.dataset.theme = localStorage.getItem('chronicle-theme') ||
-  (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-$('theme').onclick = () => {
-  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('chronicle-theme', root.dataset.theme);
-};
 try {
   const visible = await loadList();
   const linkedNote = params.get('note');

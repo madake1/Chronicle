@@ -54,7 +54,7 @@
 | [Natural Earth](https://www.naturalearthdata.com/about/terms-of-use/) | 全球现代地理；1:110m 陆地／湖泊 127／24，1:50m 陆地／湖泊／河流 1,420／412／359，1:10m 为 11／1,355／385，山脉 3 条；已下载并导入 | `atlas:prepare` 获取 `raw/natural-earth-v5.1.2-*`，生成各精度地理索引 | v5.1.2，Public Domain；只作现代地理参照 |
 | [Historical Basemaps](https://github.com/aourednik/historical-basemaps/tree/4b5039e50d8d2464b065bd76ad6086cd4597108d) | 全球离散历史快照；前 2000、前 500、1200 年分别为 145／189／286 个要素；已下载并导入三张 | `atlas:prepare -- --with-comparison`；`raw/*-world_*.geojson`、`comparison*.geojson` 与上游许可 | 固定提交 `4b5039e`；仓库 GPL-3.0，部分图来自改编，项目仅本地下载，不随仓库分发；夏朝是来源重建示意 |
 | [Wikipedia](https://www.wikipedia.org/) / [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) | 全球各时期政权名称和关联；已下载索引并导入，2,641 个分组有中文名，2,735 个有百科链接 | `atlas:prepare -- --refresh-encyclopedia` 调官方 API；`atlas-encyclopedia.json` 和手工补充 `atlas-polity-aliases.json` | 本地快照于 2026-11-22 核查；Wikidata 结构化数据 CC0；Wikipedia 只保存名称与链接 |
-| 本机作品及笔记 | 用户内容，数量随使用变化；`fixtures.json` 仅首次无作品索引时回退 | `data/chronicle.json`；笔记、图片同在 `data/` | 私有数据，备份优先级最高 |
+| 本机作品及笔记 | 用户内容，数量随使用变化；`fixtures.json` 仅用于显式初始化示例库 | `data/chronicle.json`；笔记、图片同在 `data/` | 私有数据，备份优先级最高 |
 
 ## 历史事件（V4）
 

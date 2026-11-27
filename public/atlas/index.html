@@ -7,16 +7,11 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/atlas/vendor/maplibre-gl.css">
   <link rel="stylesheet" href="/atlas/atlas.css">
+  <script type="module" src="/app-shell.mjs"></script>
   <script type="module" src="/atlas/atlas.mjs"></script>
 </head>
 <body>
-  <header class="top">
-    <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
-    <nav aria-label="页面">
-      <a class="nav-link" href="/">作品库</a>
-      <a class="nav-link" href="/atlas" aria-current="page">历史时空</a>
-    </nav>
-  </header>
+  <header class="top" data-app-shell></header>
   <main>
     <div class="heading">
       <div><h1>历史时空</h1><p class="meta">按年份探索历史疆界、地点和事件。</p></div>

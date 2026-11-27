@@ -1,0 +1,83 @@
+.spacetime{padding-top:clamp(1rem,2.5vw,2rem)}
+.spacetime-heading,.space-controls,.timeline-tools,.map-tools,.timeline-footer,.advanced-fields,.layer-controls,.timeline-actions{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.spacetime-heading{justify-content:space-between;margin-bottom:1rem}
+.spacetime-heading h1{letter-spacing:-.055em}
+#count{font-size:.88rem;font-variant-numeric:tabular-nums;margin-top:.15rem}
+.segmented{display:inline-flex;gap:2px;padding:3px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+.segmented button{border:0;text-align:center;background:transparent;padding:.42rem .85rem}
+.segmented button[aria-pressed=true]{background:var(--accent);color:var(--panel)}
+.space-controls{margin-bottom:.6rem}
+#query{width:min(100%,25rem);flex:0 1 25rem}
+.layer-controls label{display:flex;align-items:center;gap:.28rem;border:1px solid var(--line);border-radius:999px;background:var(--panel);padding:.35rem .65rem;cursor:pointer;white-space:nowrap}
+.work-layer span{color:var(--game)}
+.knowledge-layer span{color:var(--novel)}
+#layer-status{font-size:.86rem}
+.advanced{margin:.4rem 0 .8rem}
+.advanced summary{cursor:pointer;color:var(--accent);font-size:.9rem;width:fit-content}
+.advanced-fields{margin-top:.45rem;padding:.65rem;background:var(--panel);border:1px solid var(--line);border-radius:10px;font-size:.9rem}
+#first,#last,#reference{width:7rem}
+.spacetime-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}
+.spacetime-layout:has(#map-panel:not([hidden])):has(#timeline-panel:not([hidden])){grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.timeline-tools,.map-tools,.timeline-footer{padding:.65rem .8rem}
+.timeline-tools,.map-tools{border-bottom:1px solid var(--line)}
+.timeline-tools{justify-content:space-between}
+.timeline-actions{gap:.28rem}
+.timeline-actions button,.timeline-tools #jump button{padding:.32rem .6rem;font-size:.88rem}
+.timeline-tools #jump input{padding:.32rem .5rem;font-size:.88rem;width:9rem}
+.timeline-footer{border-top:1px solid var(--line);font-size:.75rem;justify-content:space-between;gap:.25rem .7rem}
+#timeline{position:relative;overflow:hidden;min-height:195px;isolation:isolate;touch-action:pan-y;cursor:grab;
+  background:linear-gradient(180deg,var(--soft),var(--panel) 48%,var(--panel));}
+#timeline:active{cursor:grabbing;user-select:none}
+.space-grid,.main-axis,.axis-label,.time-stem,.time-point,.time-span,.time-card,.time-cluster{position:absolute}
+.space-grid{height:100%;width:1px;background:var(--line);pointer-events:none}
+.space-grid.minor{opacity:.4}
+.main-axis{height:2px;background:var(--accent);pointer-events:none;opacity:.75}
+.axis-label{font-size:.68rem;color:var(--muted);white-space:nowrap;pointer-events:none;background:var(--panel);padding:0 .2rem}
+.time-item,.time-cluster.work{--series:var(--game)}
+.time-item.knowledge,.time-cluster.knowledge{--series:var(--novel)}
+.time-stem{width:1px;background:var(--series);opacity:.43;pointer-events:none}
+.time-point{width:8px;height:8px;border-radius:50%;transform:translate(-50%,-37%);background:var(--series);pointer-events:none}
+.knowledge .time-point{border-radius:1px;transform:translate(-50%,-37%) rotate(45deg)}
+.time-span{height:4px;background:var(--series);border-radius:3px;pointer-events:none}
+.time-span.uncertain{height:0;background:none;border-top:3px dashed var(--series)}
+.time-point.uncertain{background:var(--panel);border:1px dashed var(--series)}
+.time-card{padding:.27rem .45rem;text-align:left;border-left:3px solid var(--series);
+  display:grid;align-content:center;gap:0;height:41px;font-size:.8rem;line-height:1.2;box-shadow:0 2px 6px #101b1320}
+.time-card strong,.time-card small{display:block;overflow:hidden;text-overflow:ellipsis}
+.time-card small{color:var(--muted);margin-top:.18rem}
+.time-card[aria-pressed=true],.spacetime-marker[aria-pressed=true]{outline:2px solid var(--accent);outline-offset:2px}
+.time-item.selected .time-stem{width:2px;opacity:1}
+.time-item.selected .time-point,.time-item.selected .time-span{filter:drop-shadow(0 0 3px var(--series))}
+.time-cluster{font-size:.78rem;padding:.16rem .5rem;color:var(--series);border-color:var(--series);z-index:1}
+.time-empty{position:absolute;inset:1.2rem auto auto 1rem;font-size:.9rem}
+#map-panel{display:flex;flex-direction:column}
+#map{height:clamp(21rem,54vh,38rem);min-height:20rem;background:var(--soft);flex:1 0 auto}
+.map-tools{font-size:.88rem}
+#map .spacetime-marker{border-radius:999px;border:2px solid white;background:#245743;color:white;padding:.18rem .48rem;font-weight:bold}
+#map .spacetime-marker[data-type=knowledge]{background:#71519a}
+#map .spacetime-marker[data-type=mixed]{background:linear-gradient(125deg,#245743 47%,#71519a 53%)}
+#map .spacetime-marker[data-uncertain]{border-style:dashed}
+#map .spacetime-marker[data-unknown]{background:#565e5a}
+.annotation-selection{margin-top:1rem;padding:.8rem;display:flex;gap:.5rem .75rem;flex-wrap:wrap;align-items:center}
+.annotation-selection h2,.annotation-selection p{flex-basis:100%}
+.annotation-choices{display:flex;flex-wrap:wrap;gap:.35rem;width:100%}
+.annotation-choices button{font-size:.86rem;white-space:normal;text-align:left}
+#coordinate-list{padding:.65rem}
+#error:not(:empty){margin-bottom:.75rem;color:var(--film)}
+@media(max-width:950px){.spacetime-layout:has(#map-panel:not([hidden])):has(#timeline-panel:not([hidden])){grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.spacetime-heading{gap:.5rem}.space-controls{gap:.4rem}#query{flex-basis:100%}#map{min-height:18rem}}
+.time-item.selected .time-point,.time-item.selected .time-span{z-index:1}
+.layer-controls input{accent-color:var(--accent)}
+/* MapLibre's inline SVG icons are blocked by the app's image policy. */
+#map .maplibregl-ctrl-icon{background-image:none;display:grid;place-items:center;color:#213b30;font:700 18px/1 system-ui}
+#map .maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon::after{content:"+"}
+#map .maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon::after{content:"−"}
+#map .maplibregl-ctrl-compass .maplibregl-ctrl-icon::after{content:"↑"}
+.reference-label{pointer-events:none!important;z-index:0;user-select:none}
+.reference-polity{font:650 .78rem/1.25 system-ui,sans-serif;white-space:nowrap;color:#553822;
+  text-shadow:0 1px #fff,1px 0 #fff,-1px 0 #fff,0 -1px #fff}
+.reference-label.atlas-place-label{font-size:.74rem}
+.reference-label.atlas-river-label{font-size:.72rem}
+#map .spacetime-marker{z-index:1}
+.map-tools p:empty{display:none}
+.reference-label[data-catalog-name]{text-decoration:underline dotted;text-underline-offset:.18em}

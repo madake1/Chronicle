@@ -38,7 +38,7 @@ test('便携启动、模式隔离、同库独占、停止和崩溃恢复', { tim
   let foreign;
   let verifiedPid;
   try {
-    for (const name of ['server.mjs', 'runtime-config.mjs', 'portable-launch.mjs', 'atomic-write.mjs', 'knowledge.mjs',
+    for (const name of ['server.mjs', 'runtime-config.mjs', 'portable-launch.mjs', 'atomic-write.mjs', 'knowledge.mjs', 'spacetime.mjs',
       'note-files.mjs', 'note-storage.mjs', 'atlas-sources.mjs', 'fixtures.json', 'public/experience.mjs', 'public/index.html']) {
       await cp(new URL(name, import.meta.url), join(app, name));
     }

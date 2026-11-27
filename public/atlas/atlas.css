@@ -102,31 +102,6 @@
 #atlas-history-list li[aria-current] { background: var(--soft); }
 #atlas-history-list button { margin-top: .25rem; padding: .2rem .45rem; white-space: normal; }
 
-#atlas-map .atlas-river-label, #atlas-map .atlas-place-label {
-  font: 600 .83rem/1.25 system-ui, sans-serif;
-  white-space: nowrap;
-  text-shadow: -1px 0 #fff, 1px 0 #fff, 0 -1px #fff, 0 1px #fff;
-}
-#atlas-map .atlas-river-label { color: #1f6177; pointer-events: none; }
-#atlas-map .atlas-place-label {
-  display: flex;
-  align-items: center;
-  gap: .25rem;
-  color: #23372f;
-  padding: .18rem .15rem .18rem 0;
-  background: transparent;
-  border-color: transparent;
-}
-#atlas-map .atlas-place-label::before {
-  content: '';
-  width: .55rem;
-  height: .55rem;
-  border: 1px solid #fff;
-  background: #33473e;
-  border-radius: 50%;
-}
-#atlas-map .atlas-place-label.has-role::before { background: #9e2f26; }
-#atlas-map .atlas-place-label.has-role { color: #73241e; }
 .atlas-place-panel {
   position: absolute;
   z-index: 2;
