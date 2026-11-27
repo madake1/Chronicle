@@ -7,12 +7,19 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/notes.css">
   <link rel="stylesheet" href="/knowledge.css">
+  <link rel="stylesheet" href="/topics.css">
   <script type="module" src="/app-shell.mjs"></script>
   <script type="module" src="/knowledge.mjs"></script>
 </head>
 <body>
   <header class="top" data-app-shell></header>
   <main class="knowledge-main">
+    <nav class="knowledge-subnav" aria-label="知识库子板块">
+      <a class="nav-link" id="records-nav" aria-current="page" href="/knowledge">知识记录</a>
+      <a class="nav-link" id="topics-nav" href="/knowledge?section=topics">知识专题</a>
+    </nav>
+    <section id="topics-area" hidden></section>
+    <div id="records-area">
     <div class="knowledge-heading">
       <h1>知识库</h1>
       <input id="knowledge-search" type="search" aria-label="搜索标题、正文或标签" placeholder="搜索标题、正文或标签">
@@ -23,7 +30,8 @@
       <aside class="panel knowledge-panel knowledge-index" aria-label="标签索引">
        <details id="tag-index" open>
         <summary>标签索引</summary>
-        <div class="knowledge-actions"><button id="all" type="button">全部知识</button><button id="untagged" type="button">无标签知识</button></div>
+        <div class="knowledge-actions"><button id="all" type="button">全部知识</button><button id="untagged" type="button">无标签知识</button><button id="unfiled" type="button">未收录知识</button></div>
+        <details class="topic-filter"><summary>按专题筛选</summary><label>专题 <select id="record-topic"><option value="">全部专题</option></select></label></details>
         <div id="tag-tree"></div>
         <button id="manage-tags" type="button">管理标签</button>
        </details>
@@ -33,6 +41,7 @@
         <div id="knowledge-list"></div>
         <section id="reader" aria-label="知识详情" hidden></section>
       </section>
+    </div>
     </div>
   </main>
   <dialog id="tag-dialog" aria-labelledby="tag-heading">

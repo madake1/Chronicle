@@ -34,7 +34,7 @@ export async function checkedRead(file) {
 markdown.renderer.rules.image = (tokens, index, options, env, self) => {
   const token = tokens[index];
   const name = assetReference.exec(token.attrGet('src'))?.[1];
-  if (!name || !assetName.test(name)) return markdown.utils.escapeHtml(token.content);
+  if (!env.assetsUrl || !name || !assetName.test(name)) return markdown.utils.escapeHtml(token.content);
   token.attrSet('src', `${env.assetsUrl}/${name}`);
   return renderImage(tokens, index, options, env, self);
 };

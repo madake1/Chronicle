@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { cp, mkdtemp, readFile, rename, rm, symlink } from 'node:fs/promises';
+import { cp, mkdtemp, readFile, rename, rm, symlink, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -13,7 +13,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs', 'spacetime.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
+    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs','topics.mjs', 'spacetime.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');
@@ -342,6 +342,106 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       url = await start();
       assert.deepEqual(await rows(), beforeRestart);
       assert.equal((await put('/api/works', [])).status, 409);
+    });
+    await t.test('专题引用、失效占位、版本保护、时空范围及恢复', async () => {
+      const topicApi = '/api/topics';
+      const write = (path, method, data) => request(path, { method, headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data) });
+      const create = async (path, data) => {
+        const response = await write(path, 'POST', data);
+        assert.ok(response.ok, await response.clone().text());
+        return response.json();
+      };
+      const noteId = randomUUID();
+      const secondId = randomUUID();
+      const tag = await addTag('专题回归标签');
+      for (const note of [noteId, secondId]) {
+        assert.equal((await put(base + '/' + note, { content: '用于专题引用的 Markdown',
+          revision: null, metadata: { title: '', tagIds: [tag.id], related: [], version: null,
+            annotations: [{ kind: 'point', start: 0, confidence: '确定', longitude: 0, latitude: 0 }] } })).status, 200);
+      }
+      assert.deepEqual(await get(topicApi), { topics: [] });
+      const work = (await get('/api/works'))[0];
+      const topic = await create(topicApi, { title: '测试专题', workIds: [work.id] });
+      const url = topicApi + '/' + topic.id;
+      const first = await create(url + '/articles', { title: '第一篇', version: topic.version });
+      const second = await create(url + '/articles', { title: '第二篇', version: first.version });
+      const article = url + '/articles/' + first.id;
+      const other = url + '/articles/' + second.id;
+      const markdown = { id: randomUUID(), type: 'markdown', markdown: '**正文** <script>alert(1)</script>' };
+      const block = { id: randomUUID(), type: 'knowledge', knowledgeId: noteId, hint: '' };
+      const repeat = { ...block, id: randomUUID() };
+      assert.equal((await put(article, { version: second.version, blocks: [markdown, block, repeat] })).status, 200);
+      let detail = await get(url + '?article=' + first.id);
+      assert.equal(detail.article.blocks[0].id, markdown.id);
+      assert.match(detail.article.blocks[0].html, /<strong>正文<\/strong>/);
+      assert.doesNotMatch(detail.article.blocks[0].html, /<script>/);
+      assert.equal(detail.knowledge.length, 1);
+      assert.equal(detail.article.blocks[1].deleted, false);
+      assert.equal((await put(article, { version: second.version, title: '旧窗口' })).status, 409);
+      const membership = await get(base + '/' + noteId + '/topics');
+      assert.equal(membership.references.length, 2);
+      assert.equal(membership.impact.articles, 1);
+      const unfiled = async () => (await get(base + '?topic=unfiled&tag=' + tag.id + '&q=Markdown')).notes.map(note => note.id);
+      assert.deepEqual(await unfiled(), [secondId]);
+      const joined = await create(other + '/references', { version: detail.version, knowledgeId: noteId });
+      assert.equal((await request(base + '/' + noteId + '?topicImpact=' + membership.impact.version, { method: 'DELETE' })).status, 409);
+      detail = await get(url + '?article=' + first.id);
+      assert.equal(detail.version, joined.version);
+      const scoped = '/api/spacetime?topic=' + topic.id + '&article=' + first.id;
+      assert.equal((await get(scoped + '&layer=knowledge')).rows[0].entityId, 'knowledge:' + noteId);
+      assert.ok((await get(scoped + '&layer=work')).rows.every(row => row.entityId === 'work:' + work.id));
+      assert.equal((await request('/api/spacetime?topic=' + randomUUID())).status, 404);
+      const after = await get(base + '/' + noteId + '/topics');
+      assert.equal(after.impact.articles, 2);
+      assert.equal((await request(base + '/' + noteId + '?topicImpact=' + after.impact.version, { method: 'DELETE' })).status, 200);
+      assert.deepEqual((await get(scoped + '&layer=knowledge')).rows, []);
+      detail = await get(url + '?article=' + first.id);
+      assert.deepEqual(detail.article.blocks.slice(1).map(block => [block.id, block.deleted]), [[block.id, true], [repeat.id, true]]);
+      assert.equal((await write(other + '/references', 'POST', { version: detail.version, knowledgeId: noteId })).status, 409);
+      assert.equal((await put(article, { version: detail.version, blocks: [block, markdown] })).status, 200);
+      detail = await get(url + '?article=' + first.id);
+      const replacement = { ...block, knowledgeId: secondId };
+      assert.equal((await put(article, { version: detail.version, blocks: [replacement, markdown] })).status, 200);
+      assert.deepEqual(await unfiled(), []);
+      detail = await get(url + '?article=' + first.id);
+      assert.equal(detail.article.blocks[0].id, block.id);
+      assert.equal((await put(url + '/order', { version: detail.version, articleIds: [second.id, first.id] })).status, 200);
+      const snapshot = await get(url + '?article=' + first.id);
+      const topicIndexPath = join(root, 'data', 'topics.json');
+      const originalIndex = await readFile(topicIndexPath);
+      const closed = once(server, 'exit');
+      server.kill();
+      await closed;
+      await writeFile(topicIndexPath, '{broken');
+      // Starting the program still allows the underlying knowledge to be read.
+      server = undefined;
+      const restored = await start();
+      const bad = await fetch(restored + topicApi);
+      assert.equal(bad.status, 500);
+      assert.equal((await fetch(restored + topicApi, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: '不得覆盖坏索引' }) })).status, 500);
+      assert.equal(await readFile(topicIndexPath, 'utf8'), '{broken');
+      await writeFile(topicIndexPath, originalIndex);
+      const recovered = await (await fetch(restored + url + '?article=' + first.id)).json();
+      assert.deepEqual(recovered.article.blocks, snapshot.article.blocks);
+      const stored = JSON.parse(originalIndex).topics[0].articles.find(item => item.id === first.id).blocks.find(item => item.type === 'markdown');
+      const bodyPath = join(root, 'data', 'topics', stored.revision + '.md');
+      await rename(bodyPath, bodyPath + '.backup');
+      assert.equal((await fetch(restored + url + '?article=' + first.id)).status, 500);
+      await rename(bodyPath + '.backup', bodyPath);
+      await rename(topicIndexPath, topicIndexPath + '.backup');
+      assert.equal((await fetch(restored + topicApi)).status, 500);
+      await rename(topicIndexPath + '.backup', topicIndexPath);
+      const removed = await fetch(restored + article, { method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: recovered.version }) });
+      assert.equal(removed.status, 200);
+      const remainingUnfiled = await (await fetch(restored + base + '?topic=unfiled&tag=' + tag.id)).json();
+      assert.ok(remainingUnfiled.notes.some(note => note.id === secondId));
+      assert.equal((await fetch(restored + url, { method: 'DELETE', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ version: (await removed.json()).version }) })).status, 200);
+      assert.equal((await fetch(restored + base + '/' + secondId)).status, 200);
+      assert.equal((await fetch(restored + scoped)).status, 404);
     });
   } finally {
     if (server && server.exitCode === null && server.signalCode === null) {

@@ -1,3 +1,5 @@
+import { link, readerBar, restoreReading } from './knowledge-reader.mjs';
+import { chooseArticle, mountTopics, topicHref } from './topics.mjs';
 import { annotationEditor } from './annotation-editor.mjs';
 import { createNoteDialog, noteRequest } from './note-dialog.mjs';
 import { createTagManager } from './tag-manager.mjs';
@@ -5,6 +7,8 @@ import { createTagManager } from './tag-manager.mjs';
 const $ = id => document.getElementById(id);
 const base = '/api/knowledge';
 const params = new URLSearchParams(location.search);
+const topicsMode = params.get('section') === 'topics';
+let selectedTopic = params.get('topic') ?? '';
 const types = { knowledge: '知识', work: '作品', 'work-note': '作品笔记' };
 $('note-dialog').querySelector('.note-editor').after($('metadata-template').content);
 const editor = createNoteDialog($('note-dialog'), { entity: '知识', untitledFile: '无标题知识' });
@@ -12,7 +16,7 @@ const entityKey = item => `${item.type}:${item.id}`;
 const entityLabel = item => item.title || item.excerpt || '无标题知识';
 const collapsedTags = new Set();
 const recordDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' });
-let tags = [], selectedTag = '', selectedNote = null, metadata;
+let tags = [], selectedTag = params.get('tag') ?? '', selectedNote = null, metadata;
 let visibleNotes = new Set();
 let relatedTo = params.get('related'), listVersion = 0, readerVersion = 0;
 
@@ -89,6 +93,10 @@ function browse(tag) {
   if (mobile.matches) $('tag-index').open = false;
   const url = new URL(location.href);
   url.searchParams.delete('related');
+  if (selectedTag) url.searchParams.set('tag', selectedTag);
+  else url.searchParams.delete('tag');
+  if (selectedTopic) url.searchParams.set('topic', selectedTopic);
+  else url.searchParams.delete('topic');
   history.replaceState(null, '', url);
   void loadList().catch(report);
 }
@@ -97,6 +105,7 @@ async function loadList() {
   const query = new URLSearchParams();
   if (selectedTag) query.set('tag', selectedTag);
   if (relatedTo) query.set('related', relatedTo);
+  if (selectedTopic) query.set('topic', selectedTopic);
   if ($('knowledge-search').value.trim()) query.set('q', $('knowledge-search').value.trim());
   const result = await json(`${base}?${query}`);
   if (version !== listVersion) return;
@@ -106,14 +115,17 @@ async function loadList() {
   $('tag-tree').replaceChildren(tags.length ? tree() : el('p', '还没有标签', 'meta'));
   $('list-heading').textContent = relatedTo ? `${result.relatedTarget ? entityLabel(result.relatedTarget) : '此条目'}的关联知识` :
     selectedTag === 'untagged' ? '无标签知识' : tags.find(tag => tag.id === selectedTag)?.name ?? '全部知识';
-  $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag));
+  if (selectedTopic === 'unfiled') $('list-heading').textContent += ' · 未收录知识';
+  else if (selectedTopic) $('list-heading').textContent += ' · 专题筛选';
+  $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag && !selectedTopic));
+  $('unfiled').setAttribute('aria-pressed', String(selectedTopic === 'unfiled'));
   $('untagged').setAttribute('aria-pressed', String(selectedTag === 'untagged'));
   $('list-count').textContent = `${result.notes.length} 条`;
   const rows = result.notes.map(note => {
     const row = el('article', null, 'knowledge-row');
     row.dataset.noteId = note.id;
     const open = button('', () => {
-      if (selectedNote === note.id) closeReader();
+      if (selectedNote === note.id) closeReader(true);
       else void showNote(note.id).catch(report);
     });
     open.className = 'knowledge-entry';
@@ -146,7 +158,8 @@ function placeReader() {
     if (isOpen) row.append(reader);
   }
 }
-function closeReader() {
+function closeReader(restore = false) {
+  const original = document.querySelector(`[data-note-id="${CSS.escape(selectedNote ?? '')}"] .knowledge-entry`);
   ++readerVersion;
   selectedNote = null;
   const reader = $('reader');
@@ -156,12 +169,13 @@ function closeReader() {
   const url = new URL(location.href);
   url.searchParams.delete('note');
   history.replaceState(null, '', url);
+  if (restore) restoreReading(original);
 }
 function supersedeReaderRequest() {
   if (selectedNote && $('reader').hidden) closeReader();
   else ++readerVersion;
 }
-function editBody(note = null) {
+function editBody(note = null, onSave) {
   const id = note?.id ?? crypto.randomUUID();
   editor.open({
     title: note?.title,
@@ -177,7 +191,12 @@ function editBody(note = null) {
         catch { return true; }
       },
     },
-    onSaved: async () => {
+    onSaved: async saved => {
+      if (onSave) {
+        $('note-dialog').close();
+        try { await onSave(saved); } catch (error) { report(error); }
+        return;
+      }
       const intent = readerVersion;
       try {
         const visible = await loadList();
@@ -209,19 +228,41 @@ async function showNote(id, { external = false } = {}) {
   const time = el('p', `记录于 ${recordDate.format(new Date(note.createdAt))}`, 'meta');
   const article = el('article', null, 'note-preview');
   article.innerHTML = note.html;
-  const actions = el('div', null, 'knowledge-actions');
-  actions.append(button('编辑知识', () => editBody(note)),
+  const topics = el('section', null, 'detail-section');
+  const topicList = el('div', null, 'knowledge-memberships');
+  topics.append(el('h3', '所属专题'), topicList, button('加入专题文章', () => {
+    void chooseArticle(id, renderMembership);
+  }));
+  async function renderMembership() {
+    try {
+      const { references } = await json(`${base}/${id}/topics`);
+      if (version !== readerVersion) return;
+      const counts = new Map();
+      const displayed = new Map();
+      for (const item of references) counts.set(item.articleId, (counts.get(item.articleId) ?? 0) + 1);
+      topicList.replaceChildren(...references.map(item => {
+        const next = (displayed.get(item.articleId) ?? 0) + 1;
+        displayed.set(item.articleId, next);
+        const suffix = counts.get(item.articleId) > 1 ? ` · 引用 ${next}` : '';
+        return link(`${item.topicTitle} / ${item.articleTitle}${suffix}`, topicHref(item.topicId, item.articleId, item.blockId));
+      }));
+      if (!references.length) topicList.append(el('span', '未收录', 'meta'));
+    } catch (error) {
+      if (version === readerVersion) topicList.textContent = error.message;
+    }
+  }
+  const actions = [button('编辑知识', () => editBody(note)),
+    button('关闭', () => closeReader(true)),
     button('删除知识', async () => {
-      if (!confirm('删除这条知识及其关联？')) return;
       try {
-        await json(`${base}/${id}`, 'DELETE');
-        if (selectedNote === id) {
-          closeReader();
-        }
+        const { impact } = await json(`${base}/${id}/topics`);
+        if (!confirm(`删除这条知识？它被 ${impact.topics} 个专题的 ${impact.articles} 篇文章引用，${impact.references} 处引用将保留已删除占位。`)) return;
+        await json(`${base}/${id}?topicImpact=${impact.version}`, 'DELETE');
+        if (selectedNote === id) closeReader();
         await loadList();
         $('knowledge-status').textContent = '知识已删除';
       } catch (error) { report(error); }
-    }));
+    })];
   const links = el('section', null, 'detail-section');
   if (note.related.length) {
     links.append(el('h3', '关联条目'));
@@ -231,10 +272,11 @@ async function showNote(id, { external = false } = {}) {
   }
   const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
   $('reader').replaceChildren();
-  if (note.title || !visibleNotes.has(id)) $('reader').append(el('h3', note.title || '无标题知识'));
+  $('reader').append(readerBar(note.title, actions));
   $('reader').append(time);
   if (names.length) $('reader').append(el('p', names.join(' · '), 'meta'));
-  $('reader').append(article, actions);
+  $('reader').append(article, topics);
+  void renderMembership();
   if (note.related.length) $('reader').append(links);
   $('reader').hidden = false;
   placeReader();
@@ -329,13 +371,24 @@ async function changeTag(id, method, payload) {
 }
 for (const control of document.querySelectorAll('[data-close]')) control.onclick = () => control.closest('dialog').close();
 $('new-note').onclick = () => editBody();
-$('all').onclick = () => browse('');
+$('all').onclick = () => { selectedTopic = ''; browse(''); $('record-topic').value = ''; };
+$('unfiled').onclick = () => {
+  selectedTopic = selectedTopic === 'unfiled' ? '' : 'unfiled';
+  $('record-topic').value = '';
+  browse(selectedTag);
+};
+$('record-topic').onchange = () => { selectedTopic = $('record-topic').value; browse(selectedTag); };
 $('untagged').onclick = () => browse('untagged');
 let searchTimer;
 $('knowledge-search').oninput = () => {
   clearTimeout(searchTimer);
   ++listVersion;
   supersedeReaderRequest();
+  const url = new URL(location.href);
+  const query = $('knowledge-search').value.trim();
+  if (query) url.searchParams.set('q', query);
+  else url.searchParams.delete('q');
+  history.replaceState(null, '', url);
   searchTimer = setTimeout(() => void loadList().catch(report), 160);
 };
 const tagManager = createTagManager($('tag-dialog'), { paths: tagPaths, changeTag });
@@ -357,8 +410,35 @@ function syncTagIndex() { $('tag-index').open = !mobile.matches; }
 syncTagIndex();
 mobile.addEventListener('change', syncTagIndex);
 
-try {
-  const visible = await loadList();
-  const linkedNote = params.get('note');
-  if (visible && linkedNote && !selectedNote) await showNote(linkedNote, { external: true });
-} catch (error) { report(error); }
+if (topicsMode) {
+  $('records-area').hidden = true;
+  $('topics-area').hidden = false;
+  $('records-nav').removeAttribute('aria-current');
+  $('topics-nav').setAttribute('aria-current', 'page');
+  void mountTopics($('topics-area'), params, async (note, done) => {
+    try {
+      tags = (await json(base + '/tags')).tags;
+      editBody(note, done);
+    } catch (error) {
+      const status = $('topics-area').querySelector('[role=alert]');
+      status.textContent = error.message;
+    }
+  });
+} else {
+  $('knowledge-search').value = params.get('q') ?? '';
+  const filter = $('record-topic');
+  filter.closest('details').ontoggle = async event => {
+    if (!event.target.open) return;
+    try {
+      const { topics } = await json('/api/topics');
+      filter.replaceChildren(new Option('全部专题', ''), ...topics.map(item => new Option(item.title, item.id)));
+      filter.value = selectedTopic === 'unfiled' ? '' : selectedTopic;
+    } catch (error) { report(error); }
+  };
+  if (selectedTopic && selectedTopic !== 'unfiled') filter.closest('details').open = true;
+  try {
+    const visible = await loadList();
+    const linkedNote = params.get('note');
+    if (visible && linkedNote && !selectedNote) await showNote(linkedNote, { external: true });
+  } catch (error) { report(error); }
+}

@@ -24,9 +24,22 @@ const layers = {
 };
 const enabled = layer => $(layer + '-layer').checked;
 let groupOpen, drag, timelineFrame, choiceFrame, fitMapPending = true, mapReady = false;
-const initialWork = new URLSearchParams(location.search).get('work');
-let initialSelection = new URLSearchParams(location.search).get('annotation') ??
-  (initialWork && 'work:' + initialWork);
+const locationParams = new URLSearchParams(location.search);
+const initialWork = locationParams.get('work');
+let initialSelection = locationParams.get('annotation') ?? (initialWork && 'work:' + initialWork);
+const scopeParams = new URLSearchParams();
+for (const key of ['topic', 'article']) {
+  if (locationParams.has(key)) scopeParams.set(key, locationParams.get(key));
+}
+const scoped = scopeParams.size > 0;
+if (scoped) {
+  $('topic-scope').hidden = false;
+  $('topic-scope-label').textContent = '正在读取专题范围…';
+  $('topic-scope-back').href = '/knowledge?section=topics&' + scopeParams;
+  if (scopeParams.has('article')) $('topic-scope-back').textContent = '返回文章';
+  $('knowledge-layer').checked = true;
+  $('work-layer').checked = false;
+}
 let recentTimeMode = '';
 let missingDeepLink = false;
 let view = 'timeline';
@@ -445,10 +458,13 @@ async function loadLayer(layer) {
   if (state.status !== 'ready') state.status = 'loading';
   updateData();
   try {
-    const response = await fetch('/api/spacetime?layer=' + layer, { cache: 'no-store', signal: controller.signal });
-    if (!response.ok) throw new Error('无法读取个人时空');
+    const query = new URLSearchParams(scopeParams);
+    query.set('layer', layer);
+    const response = await fetch('/api/spacetime?' + query, { cache: 'no-store', signal: controller.signal });
     const result = await response.json();
+    if (!response.ok) throw new Error(result.error || '无法读取个人时空');
     if (revision !== state.revision) return;
+    if (scoped) $('topic-scope-label').textContent = '当前范围 · ' + result.scope.title;
     const changed = state.status !== 'ready';
     Object.assign(state, { ...result, status: 'ready' });
     if (changed) fitOnRefresh = true;
@@ -459,6 +475,7 @@ async function loadLayer(layer) {
     updateData();
   } catch (error) {
     if (revision !== state.revision || error.name === 'AbortError') return;
+    if (scoped) $('topic-scope-label').textContent = '范围不可用 · ' + error.message;
     Object.assign(state, { rows: [], tags: [], status: 'error' });
     updateData();
   }
