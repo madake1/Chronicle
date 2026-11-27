@@ -1,5 +1,5 @@
 import { annotationEditor } from './annotation-editor.mjs';
-import { parseYear, formatYear, formatSegmentYears, ticks, describe, zoomView, constrainView, timelineBounds } from './chronology.mjs';
+import { describe, formatSegmentYears } from './chronology.mjs';
 import { openNote } from './notes.mjs';
 import { openBatchNotes } from './batch-notes.mjs';
 import { experienceError } from './experience.mjs';
@@ -8,15 +8,9 @@ import { workKnowledgeSection } from './work-knowledge.mjs';
 const $ = id => document.getElementById(id);
 const types = ['游戏', '小说', '电影', '电视剧', '其他'];
 const statuses = ['未开始', '进行中', '已完成', '已放弃'];
-const series = ['--game', '--novel', '--film', '--tv', '--muted'];
-const state = { works: [], page: 'library', selected: null, view: [-500, 1550], history: [], ready: false };
-let bounds = timelineBounds();
-const scroll = document.querySelector('.timeline-scroll');
+const state = { works: [], selected: null, ready: false };
 const form = $('edit-form');
 let editing;
-let dragging;
-let wheelStart;
-let wheelTimer;
 let saving = false;
 
 function node(tag, text, className) {
@@ -55,101 +49,10 @@ function filtered() {
     (!type || work.type === type) && (!status || work.status === status));
 }
 
-function fitRange(segments, minimum = 5) {
-  if (!segments.length) return [-500, 1550];
-  let left = Infinity;
-  let right = -Infinity;
-  for (const segment of segments) {
-    left = Math.min(left, segment.start);
-    right = Math.max(right, segment.end ?? segment.start);
-  }
-  const padding = Math.max(minimum, (right - left) * 0.08);
-  return [left - padding, right + padding];
-}
-
-function remember(view) {
-  if (view[0] === state.view[0] && view[1] === state.view[1]) return;
-  state.history.push(view);
-  if (state.history.length > 40) state.history.shift();
-}
-
-function finishWheel() {
-  clearTimeout(wheelTimer);
-  if (wheelStart) remember(wheelStart);
-  wheelStart = undefined;
-  $('back').disabled = !state.history.length;
-}
-
-function setView(view, record = true) {
-  if (record) finishWheel();
-  const previous = state.view;
-  state.view = constrainView(view, bounds);
-  if (record) remember(previous);
-  drawTimeline();
-}
-
-function zoom(factor, fraction, record = true) {
-  setView(zoomView(state.view, factor, fraction, bounds), record);
-}
-
 function select(work) {
   state.selected = work.id;
   render();
   $('detail-title')?.focus({ preventScroll: true });
-}
-
-function drawTimeline(works = filtered()) {
-  if (state.page !== 'timeline') return;
-  $('back').disabled = !state.history.length;
-  const width = $('ruler').clientWidth;
-  if (!width) return;
-  const [left, right] = state.view;
-  $('visible-span').textContent = `当前视野约 ${Math.round(right - left).toLocaleString('zh-CN')} 年`;
-  const x = year => (year - left) / (right - left) * width;
-  const years = ticks(left, right, width);
-  function grid(plot, axis) {
-    for (const year of years) {
-      const line = node('div', undefined, axis ? 'tick' : 'gridline');
-      const position = x(year);
-      line.style.left = `${position}px`;
-      if (axis && position < width - 85) line.append(node('span', formatYear(year)));
-      plot.append(line);
-    }
-  }
-  $('ruler').replaceChildren();
-  grid($('ruler'), true);
-  const dated = works.filter(work => datedSegments(work).length).sort((a, b) => firstYear(a) - firstYear(b));
-  const rows = document.createDocumentFragment();
-  if (!dated.length) rows.append(node('p', '当前筛选下没有可定位的作品，可在作品库查看年代未知的作品。', 'empty'));
-  for (const work of dated) {
-    const row = node('div', undefined, 'timeline-row');
-    row.classList.toggle('selected', state.selected === work.id);
-    const label = node('div');
-    label.append(button(work.title, () => select(work), 'row-name'), node('span', work.type, 'row-type'));
-    const plot = node('div', undefined, 'plot');
-    grid(plot, false);
-    for (const segment of datedSegments(work)) {
-      const end = segment.end ?? segment.start;
-      if (end < left || segment.start > right) continue;
-      const startX = Math.max(0, x(segment.start));
-      const endX = Math.min(width, x(end));
-      const length = endX - startX;
-      const mark = button('', () => select(work), 'mark');
-      mark.title = `${work.title} · ${describe(segment)}`;
-      mark.setAttribute('aria-label', mark.title);
-      mark.dataset.kind = length < 6 ? 'point' : segment.kind;
-      if (segment.confidence !== '确定' || segment.kind === 'window') mark.dataset.uncertain = '';
-      mark.style.left = `${(startX + endX) / 2}px`;
-      mark.style.width = `${Math.max(24, length)}px`;
-      mark.style.setProperty('--length', `${length}px`);
-      mark.style.setProperty('--series', `var(${series[types.indexOf(work.type)] || '--muted'})`);
-      mark.append(node('span', undefined, 'glyph'));
-      plot.append(mark);
-    }
-    row.append(label, plot);
-    rows.append(row);
-  }
-  $('rows').replaceChildren(rows);
 }
 
 function noteButton(work) {
@@ -278,31 +181,18 @@ function renderDetails(work) {
       render();
     } catch (error) { notify(error.message); }
   }, 'detail-delete'));
-  if (state.page === 'library') panel.append(workKnowledgeSection(work));
+  panel.append(workKnowledgeSection(work));
   panel.append(actions);
 }
 
 function render() {
-  bounds = timelineBounds(state.works.flatMap(datedSegments));
-  state.view = constrainView(state.view, bounds);
-  const timeline = state.page === 'timeline';
-  $('timeline').hidden = !timeline;
-  $('library').hidden = timeline;
-  $('sort-control').hidden = timeline;
-  $('page-title').textContent = timeline ? '个人时空' : '作品库';
   $('add').disabled = !state.ready;
-  $('export-notes').hidden = timeline;
   $('export-notes').disabled = !state.ready;
-  for (const tab of document.querySelectorAll('[data-page]')) {
-    if (tab.dataset.page === state.page) tab.setAttribute('aria-current', 'page');
-    else tab.removeAttribute('aria-current');
-  }
   const works = filtered();
   const unknown = works.filter(work => !datedSegments(work).length).length;
   $('summary').textContent = `${works.length} 部作品${unknown ? ` · ${unknown} 部年代未知` : ''}`;
   renderDetails(state.works.find(work => work.id === state.selected));
-  if (timeline) drawTimeline(works);
-  else renderLibrary(works);
+  renderLibrary(works);
 }
 
 const storyEditor = annotationEditor($('segment-fields'), $('add-segment'));
@@ -344,10 +234,6 @@ options($('status-filter'), statuses, '全部状态');
 options(form.elements.namedItem('type'), types);
 options(form.elements.namedItem('status'), statuses);
 for (const id of ['search', 'type-filter', 'status-filter', 'sort']) $(id).addEventListener('input', render);
-for (const tab of document.querySelectorAll('[data-page]')) tab.addEventListener('click', () => {
-  state.page = tab.dataset.page;
-  render();
-});
 $('add').onclick = () => openEditor();
 $('export-notes').onclick = () => openBatchNotes(state.works);
 for (const id of ['cancel', 'cancel-top']) $(id).onclick = () => {
@@ -388,70 +274,6 @@ form.addEventListener('submit', async event => {
   finally { $('save').disabled = false; }
 });
 
-$('fit').onclick = () => setView(fitRange(filtered().flatMap(datedSegments), 20));
-$('back').onclick = () => {
-  finishWheel();
-  const previous = state.history.pop();
-  if (previous) setView(previous, false);
-};
-$('out').onclick = () => zoom(1.5, 0.5);
-$('in').onclick = () => zoom(1 / 1.5, 0.5);
-$('jump').onsubmit = event => {
-  event.preventDefault();
-  try {
-    const center = parseYear(new FormData(event.currentTarget).get('year'));
-    if (center < bounds[0] || center > bounds[1]) {
-      throw new Error(`当前时间轴范围为 ${formatYear(bounds[0])}至${formatYear(bounds[1])}`);
-    }
-    const radius = (state.view[1] - state.view[0]) / 2;
-    setView([center - radius, center + radius]);
-    notify();
-  } catch (error) { notify(error.message); }
-};
-scroll.addEventListener('wheel', event => {
-  const plot = event.target.closest('.plot');
-  if (!plot || !event.deltaY) return;
-  event.preventDefault();
-  const rect = plot.getBoundingClientRect();
-  wheelStart ||= state.view;
-  const units = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? rect.width : 1;
-  zoom(Math.exp(Math.max(-0.7, Math.min(0.7, event.deltaY * units * .004))),
-    (event.clientX - rect.left) / rect.width, false);
-  clearTimeout(wheelTimer);
-  wheelTimer = setTimeout(finishWheel, 180);
-}, { passive: false });
-scroll.addEventListener('pointerdown', event => {
-  const plot = event.target.closest('.plot');
-  if (!plot || event.target.closest('button') || event.button !== 0) return;
-  finishWheel();
-  dragging = { id: event.pointerId, x: event.clientX, width: plot.clientWidth, start: state.view };
-  scroll.classList.add('dragging');
-  scroll.setPointerCapture(event.pointerId);
-});
-scroll.addEventListener('pointermove', event => {
-  if (dragging?.id !== event.pointerId) return;
-  const [left, right] = dragging.start;
-  const width = right - left;
-  const offset = (dragging.x - event.clientX) / dragging.width * width;
-  setView([left + offset, right + offset], false);
-});
-scroll.addEventListener('lostpointercapture', event => {
-  if (dragging?.id !== event.pointerId) return;
-  remember(dragging.start);
-  dragging = undefined;
-  scroll.classList.remove('dragging');
-  $('back').disabled = !state.history.length;
-});
-new ResizeObserver(() => drawTimeline()).observe($('ruler'));
-
-const root = document.documentElement;
-root.dataset.theme = localStorage.getItem('chronicle-theme') ||
-  (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-$('theme').onclick = () => {
-  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('chronicle-theme', root.dataset.theme);
-};
-
 render();
 try {
   const response = await fetch('/api/works?annotations=1');
@@ -459,12 +281,10 @@ try {
   version = response.headers.get('ETag');
   state.works = await response.json();
   const params = new URLSearchParams(location.search);
-  if (params.get('page') === 'timeline') state.page = 'timeline';
   const work = state.works.find(item => item.id === params.get('work'));
   if (work) state.selected = work.id;
   else if (params.has('work')) notify('该作品已不可用，请刷新个人时空。');
   state.ready = true;
-  state.view = fitRange(state.works.flatMap(datedSegments), 20);
   render();
   if (work && params.get('note') === '1') noteButton(work).click();
 } catch (error) { notify(error.message); }

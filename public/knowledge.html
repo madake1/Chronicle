@@ -7,19 +7,11 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/notes.css">
   <link rel="stylesheet" href="/knowledge.css">
+  <script type="module" src="/app-shell.mjs"></script>
   <script type="module" src="/knowledge.mjs"></script>
 </head>
 <body>
-  <header class="top">
-    <a class="brand" href="/">Chronicle<span>个人作品档案</span></a>
-    <nav aria-label="页面">
-      <a class="nav-link" href="/">作品库</a>
-      <a class="nav-link" href="/spacetime">个人时空</a>
-      <a class="nav-link" href="/knowledge" aria-current="page">知识库</a>
-      <a class="nav-link" href="/atlas">历史时空</a>
-    </nav>
-    <button id="theme" class="quiet" type="button">切换主题</button>
-  </header>
+  <header class="top" data-app-shell></header>
   <main class="knowledge-main">
     <div class="knowledge-heading">
       <h1>知识库</h1>

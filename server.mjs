@@ -26,6 +26,8 @@ const atlasDirectory = asDirectory(config.atlas);
 const dataFile = new URL('chronicle.json', dataDirectory);
 const modeFile = new URL('.chronicle-mode', dataDirectory);
 const assets = new Map([
+  ['/app-shell.mjs', ['app-shell.mjs', 'text/javascript']],
+  ['/timeline-layout.mjs', ['timeline-layout.mjs', 'text/javascript']],
   ['/spacetime', ['spacetime.html', 'text/html']],
   ['/spacetime.mjs', ['spacetime.mjs', 'text/javascript']],
   ['/spacetime-query.mjs', ['spacetime-query.mjs', 'text/javascript']],
@@ -295,8 +297,15 @@ const server = createServer(async (request, response) => {
     if (/^\/api\/knowledge(?:[/?]|$)/.test(request.url)) {
       return await knowledge.handle(request, response, new URL(request.url, 'http://localhost'));
     }
-    if (request.url === '/api/spacetime' && request.method === 'GET') {
-      const [works, { notes, tags }] = await queueWrite(() => Promise.all([readWorks(), knowledge.read()]));
+    if (/^\/api\/spacetime(?:\?|$)/.test(request.url) && request.method === 'GET') {
+      const layer = new URL(request.url, 'http://localhost').searchParams.get('layer');
+      if (layer !== null && !['work', 'knowledge', 'both'].includes(layer)) {
+        return send(response, 400, { error: '未知的个人时空图层' });
+      }
+      const [works, { notes, tags }] = await queueWrite(() => Promise.all([
+        layer === 'knowledge' ? [] : readWorks(),
+        layer === 'work' ? { notes: [], tags: [] } : knowledge.read(),
+      ]));
       return send(response, 200, projectSpacetime(works, notes, tags));
     }
     if (['/api/works', '/api/works?annotations=1'].includes(request.url) && request.method === 'GET') {

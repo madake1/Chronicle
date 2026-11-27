@@ -357,13 +357,6 @@ function syncTagIndex() { $('tag-index').open = !mobile.matches; }
 syncTagIndex();
 mobile.addEventListener('change', syncTagIndex);
 
-const root = document.documentElement;
-root.dataset.theme = localStorage.getItem('chronicle-theme') ||
-  (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-$('theme').onclick = () => {
-  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('chronicle-theme', root.dataset.theme);
-};
 try {
   const visible = await loadList();
   const linkedNote = params.get('note');

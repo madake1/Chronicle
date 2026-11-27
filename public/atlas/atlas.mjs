@@ -26,9 +26,6 @@ const ocean = '#dfe9ec';
 const palette = ['#4f9587', '#c98d4e', '#8b78a9', '#5b87b1', '#b95d6c', '#879b51',
   '#b47b9b', '#777fa5', '#a48262', '#478ca2', '#9a685e', '#aaa25d'];
 
-document.documentElement.dataset.theme = localStorage.getItem('chronicle-theme') ||
-  (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-
 async function readData(name, signal) {
   const response = await fetch(`/atlas/data/${name}`, { signal });
   if (!response.ok) throw new Error('地图数据尚未准备，请运行 npm run atlas:prepare');

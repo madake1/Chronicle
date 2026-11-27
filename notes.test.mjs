@@ -284,6 +284,11 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
         body: JSON.stringify(items),
       });
       const rows = async () => (await get('/api/spacetime')).rows;
+      assert.deepEqual((await get('/api/spacetime?layer=knowledge')).rows, []);
+      assert.deepEqual((await get('/api/spacetime?layer=work')).tags, []);
+      assert.equal((await request('/api/spacetime?layer=bad')).status, 400);
+      assert.equal((await request('/?page=timeline&work=one', { redirect: 'manual' })).headers.get('location'), '/spacetime?work=one');
+
       const oldRow = (await rows()).find(row => row.entityId === 'work:' + list[0].id);
       assert.equal(oldRow.id, list[0].segments[0].id);
       work.segments.push({ id: 'zero', longitude: 0, latitude: 0 }, {
@@ -296,6 +301,9 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
         annotations: [{ id: 'place', longitude: 0, latitude: 0 }], version: null };
       assert.equal((await put(route, { content: '正文', revision: null, metadata })).status, 200);
       assert.equal((await rows()).filter(row => row.entityId === 'work:' + id).length, 2);
+      assert.ok((await get('/api/spacetime?layer=work')).rows.every(row => row.entityType === 'work'));
+      assert.deepEqual((await get('/api/spacetime?layer=knowledge')).rows.map(row => row.id), ['place']);
+
       const note = await get(route);
       const updated = { ...metadata, title: '标题已改', version: note.metadataVersion,
         annotations: [{ id: 'place', longitude: 80, latitude: 0 }] };
