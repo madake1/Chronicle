@@ -518,11 +518,6 @@ export async function mountTopics(root, params, editKnowledge) {
       }
       if (!article.blocks.length) text.append(element('p', '这篇文章还是空的。点击「编辑文章」开始写作。', 'meta'));
       reading.append(text);
-      const adjacent = element('nav', null, 'article-turn');
-      adjacent.setAttribute('aria-label', '相邻文章');
-      if (at > 0) adjacent.append(link('← ' + topic.articles[at - 1].title, topicHref(topicId, order[at - 1])));
-      if (at < order.length - 1) adjacent.append(link(topic.articles[at + 1].title + ' →', topicHref(topicId, order[at + 1])));
-      if (adjacent.childElementCount) reading.append(adjacent);
       if (blockId && !article.blocks.some(block => block.id === blockId)) status.textContent = '该引用已移除。';
     } else {
       const deletion = action('删除专题', () => {

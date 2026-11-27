@@ -67,12 +67,10 @@
 .reading-tools>a,.reading-tools>button,.reading-tools .topic-menu>summary{
   color:var(--muted);background:transparent;border:0;padding:.26rem .48rem;font-size:.83rem;text-decoration:none}
 .reading-tools>a:hover,.reading-tools>button:hover{color:var(--accent);text-decoration:underline}
-.article-text,.article-turn{max-width:69ch}
+.article-text{max-width:69ch}
 .article-text .note-preview{font-size:1.03rem;line-height:1.86;margin:1.15rem 0}
 .article-text .note-preview>p{margin:.65rem 0 1rem}
 .article-text .note-preview h2{margin-top:1.2rem}
-.article-turn{justify-content:space-between;margin-top:2rem;border-top:1px solid var(--line);padding-top:.78rem;font-size:.88rem}
-.article-turn a{overflow-wrap:anywhere}
 .frontispiece{padding:1rem 0 1.15rem 1.15rem;border-inline-start:3px solid var(--accent);margin-top:.85rem}
 .frontispiece[data-cover=stone]{border-color:#728485}
 .frontispiece[data-cover=umber]{border-color:#A77751}
