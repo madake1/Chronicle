@@ -392,7 +392,9 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal((await put(base + '/' + secondId, { content: '## 可读标题\n\n![附件](./assets/test.png)\n\n**正文** 与 [链接](https://example.com) Markdown',
         revision: savedNote.revision })).status, 200);
       const filtered = await get(base + '?collection=unfiled&tag=' + tag.id + '&q=assets/test.png');
-      assert.equal(filtered.notes.find(note => note.id === secondId).excerpt, '可读标题 正文 与 链接 Markdown');
+      const excerpt = filtered.notes.find(note => note.id === secondId).excerpt;
+      assert.equal(excerpt.replace(/\s+/g, ' '), '可读标题 正文 与 链接 Markdown');
+      assert.equal(excerpt, '可读标题\n正文 与 链接 Markdown');
 
       const joined = await create(other + '/references', { version: detail.version, knowledgeId: noteId });
       assert.equal((await request(base + '/' + noteId + '?topicImpact=' + membership.impact.version, { method: 'DELETE' })).status, 409);

@@ -57,7 +57,7 @@ export function markdownExcerpt(content, limit = 120) {
       text = token.content;
     }
     const readable = text.trim().replace(/\s+/g, ' ');
-    if (readable) excerpt += (excerpt ? ' ' : '') + readable;
+    if (readable) excerpt += (excerpt ? '\n' : '') + readable;
     if (Array.from(excerpt).length >= limit) break;
   }
   return Array.from(excerpt).slice(0, limit).join('');

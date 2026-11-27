@@ -1,4 +1,4 @@
-import { link, readerBar, restoreReading } from './knowledge-reader.mjs';
+import { closeToolMenu, link, readerBar, restoreReading, toolsMenu } from './knowledge-reader.mjs';
 import { chooseArticle, mountTopics, topicHref } from './topics.mjs';
 import { annotationEditor } from './annotation-editor.mjs';
 import { createNoteDialog, noteRequest } from './note-dialog.mjs';
@@ -22,6 +22,7 @@ let revealLinkedTag = params.has('tag');
 const recordDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' });
 let tags = [], selectedTag = params.get('tag') ?? '', selectedNote = null, metadata;
 let visibleNotes = new Set();
+let pendingNote;
 let relatedTo = params.get('related'), listVersion = 0, readerVersion = 0;
 
 function el(tag, text, className) {
@@ -164,54 +165,71 @@ async function loadList() {
     row.dataset.noteId = note.id;
     const open = button('', () => {
       if (selectedNote === note.id) closeReader(true);
+      else if (pendingNote === note.id) supersedeReaderRequest();
       else void showNote(note.id).catch(report);
     });
     open.className = 'knowledge-entry';
     open.setAttribute('aria-expanded', String(note.id === selectedNote && !$('reader').hidden));
     open.setAttribute('aria-controls', 'reader');
-    if (note.title) open.append(el('strong', note.title));
-    open.append(el('span', note.excerpt, 'knowledge-excerpt'));
-    row.append(open);
+    const text = el('span', null, 'knowledge-entry-text');
+    if (note.title) text.append(el('strong', note.title));
+    if (note.excerpt) text.append(el('span', note.excerpt, 'knowledge-excerpt'));
+    open.append(text);
     const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
-    const footer = el('div', null, 'entry-meta');
+    const footer = el('span', null, 'entry-meta');
     for (const name of names) footer.append(el('span', name, 'knowledge-tag'));
     const time = el('time', recordDate.format(new Date(note.createdAt)), 'meta');
     time.dateTime = note.createdAt;
     footer.append(time);
-    row.append(footer);
+    text.append(footer);
+    row.append(open);
     return row;
   });
   const reader = $('reader');
+  const focus = reader.contains(document.activeElement) ? document.activeElement : null;
+  closeToolMenu();
   $('knowledge-list').after(reader);
   $('knowledge-list').replaceChildren(...(rows.length ? rows : [el('p', '没有符合条件的知识', 'meta')]));
   placeReader();
+  if (!reader.hidden && focus?.isConnected) focus.focus({ preventScroll: true });
   return visibleNotes;
+}
+function noteEntry(id) {
+  return document.querySelector(`[data-note-id="${CSS.escape(id ?? '')}"] .knowledge-entry`);
 }
 function placeReader() {
   const reader = $('reader');
-  $('knowledge-list').after(reader);
+  let attached = false;
   for (const row of $('knowledge-list').children) {
-    const isOpen = !reader.hidden && row.dataset.noteId === selectedNote;
-    row.querySelector('.knowledge-entry')?.setAttribute('aria-expanded', String(isOpen));
-    if (isOpen) row.append(reader);
+    const control = row.querySelector('.knowledge-entry');
+    if (!control) continue;
+    const expanded = !reader.hidden && row.dataset.noteId === selectedNote;
+    row.classList.toggle('knowledge-row-open', expanded);
+    control.setAttribute('aria-expanded', String(expanded));
+    control.hidden = expanded;
+    if (expanded) {
+      if (reader.parentElement !== row) row.append(reader);
+      attached = true;
+    }
   }
+  if (!attached && reader.previousElementSibling !== $('knowledge-list')) $('knowledge-list').after(reader);
 }
 function closeReader(restore = false) {
-  const original = document.querySelector(`[data-note-id="${CSS.escape(selectedNote ?? '')}"] .knowledge-entry`);
+  const original = noteEntry(selectedNote);
   ++readerVersion;
-  selectedNote = null;
+  selectedNote = pendingNote = null;
+  closeToolMenu();
   const reader = $('reader');
   reader.hidden = true;
-  $('knowledge-list').after(reader);
   placeReader();
   const url = new URL(location.href);
   url.searchParams.delete('note');
   history.replaceState(null, '', url);
-  if (restore) restoreReading(original);
+  if (restore) restoreReading(original ?? $('list-heading'));
 }
 function supersedeReaderRequest() {
-  if (selectedNote && $('reader').hidden) closeReader();
-  else ++readerVersion;
+  pendingNote = null;
+  ++readerVersion;
 }
 function editBody(note = null, onSave) {
   const id = note?.id ?? crypto.randomUUID();
@@ -245,25 +263,30 @@ function editBody(note = null, onSave) {
 }
 async function showNote(id, { external = false } = {}) {
   if (!external && !visibleNotes.has(id)) return;
-  if (selectedNote !== id) {
-    $('reader').hidden = true;
-    placeReader();
-  }
-  selectedNote = id;
+  pendingNote = id;
+  $('knowledge-status').textContent = '';
   const version = ++readerVersion;
   let note;
   try {
     note = await json(`${base}/${id}`);
   } catch (error) {
     if (version !== readerVersion) return;
-    closeReader();
+    pendingNote = null;
+    if (external && !selectedNote) closeReader();
     throw error;
   }
   if (version !== readerVersion) return;
+  const reader = $('reader');
+  const moveFocus = document.activeElement === noteEntry(id) ||
+    (reader.contains(document.activeElement) && !reader.hidden);
+  selectedNote = id;
+  pendingNote = null;
+  closeToolMenu();
   const url = new URL(location.href);
   url.searchParams.set('note', id);
   history.replaceState(null, '', url);
-  const time = el('p', `记录于 ${recordDate.format(new Date(note.createdAt))}`, 'meta');
+  const time = el('time', `记录于 ${recordDate.format(new Date(note.createdAt))}`, 'meta');
+  time.dateTime = note.createdAt;
   const article = el('article', null, 'note-preview');
   article.innerHTML = note.html;
   const topics = el('section', null, 'detail-section');
@@ -274,7 +297,7 @@ async function showNote(id, { external = false } = {}) {
   async function renderMembership() {
     try {
       const { references } = await json(`${base}/${id}/topics`);
-      if (version !== readerVersion) return;
+      if (!reader.contains(topicList) || reader.hidden) return;
       const counts = new Map();
       const displayed = new Map();
       for (const item of references) counts.set(item.articleId, (counts.get(item.articleId) ?? 0) + 1);
@@ -286,12 +309,13 @@ async function showNote(id, { external = false } = {}) {
       }));
       if (!references.length) topicList.append(el('span', '未收录', 'meta'));
     } catch (error) {
-      if (version === readerVersion) topicList.textContent = error.message;
+      if (reader.contains(topicList) && !reader.hidden) topicList.textContent = error.message;
     }
   }
-  const actions = [button('编辑知识', () => editBody(note)),
-    button('关闭', () => closeReader(true)),
-    button('删除知识', async () => {
+  const close = button('收起', () => closeReader(true));
+  close.setAttribute('aria-controls', 'reader');
+  close.setAttribute('aria-expanded', 'true');
+  const remove = button('删除知识', async () => {
       try {
         const { impact } = await json(`${base}/${id}/topics`);
         if (!confirm(`删除这条知识？它被 ${impact.topics} 个专题的 ${impact.articles} 篇文章引用，${impact.references} 处引用将保留已删除占位。`)) return;
@@ -300,7 +324,8 @@ async function showNote(id, { external = false } = {}) {
         await loadList();
         $('knowledge-status').textContent = '知识已删除';
       } catch (error) { report(error); }
-    })];
+    });
+  const actions = [button('编辑知识', () => editBody(note)), toolsMenu('更多', [remove]), close];
   const links = el('section', null, 'detail-section');
   if (note.related.length) {
     links.append(el('h3', '关联条目'));
@@ -309,15 +334,18 @@ async function showNote(id, { external = false } = {}) {
     }
   }
   const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
-  $('reader').replaceChildren();
-  $('reader').append(readerBar(note.title, actions));
-  $('reader').append(time);
-  if (names.length) $('reader').append(el('p', names.join(' · '), 'meta'));
-  $('reader').append(article, topics);
-  void renderMembership();
-  if (note.related.length) $('reader').append(links);
-  $('reader').hidden = false;
+  const header = readerBar(note.title, actions);
+  const heading = header.querySelector('h3');
+  heading.tabIndex = -1;
+  const meta = el('div', null, 'entry-meta reader-meta');
+  for (const name of names) meta.append(el('span', name, 'knowledge-tag'));
+  meta.append(time);
+  reader.replaceChildren(header, meta, article, topics);
+  if (note.related.length) reader.append(links);
+  reader.hidden = false;
   placeReader();
+  if (moveFocus || (external && document.activeElement === document.body)) restoreReading(heading);
+  void renderMembership();
 }
 async function preview(item) {
   const dialog = $('related-preview');

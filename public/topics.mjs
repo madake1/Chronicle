@@ -1,4 +1,4 @@
-import { action, element, link, readerBar, readJson, restoreReading } from './knowledge-reader.mjs';
+import { action, closeToolMenu, element, link, readerBar, readJson, restoreReading, toolsMenu } from './knowledge-reader.mjs';
 
 const api = '/api/topics';
 export function topicHref(topic, article, block) {
@@ -121,48 +121,6 @@ export async function mountTopics(root, params, editKnowledge) {
     control.className = 'topic-back';
     return control;
   };
-
-  let activeMenu;
-  function closeMenu(focus = false) {
-    if (!activeMenu) return;
-    const { menu, trigger } = activeMenu;
-    activeMenu = undefined;
-    menu.open = false;
-    if (focus) trigger.focus({ preventScroll: true });
-  }
-  function toolsMenu(label, controls, className = '') {
-    const menu = element('details', null, 'topic-menu ' + className);
-    const trigger = element('summary', label);
-    const panel = element('div', null, 'topic-menu-items');
-    panel.append(...controls);
-    trigger.onclick = event => {
-      event.preventDefault();
-      const wasOpen = activeMenu?.menu === menu;
-      closeMenu();
-      if (!wasOpen) {
-        menu.open = true;
-        activeMenu = { menu, trigger };
-      }
-    };
-    panel.addEventListener('click', event => {
-      // Capture before a menu action opens another dialog or replaces its block.
-      if (event.target.closest('button,a')) closeMenu(true);
-    }, { capture: true });
-    menu.append(trigger, panel);
-    return menu;
-  }
-  document.addEventListener('click', event => {
-    if (activeMenu && !activeMenu.menu.contains(event.target)) closeMenu();
-  }, { capture: true });
-  document.addEventListener('focusin', event => {
-    if (activeMenu && !activeMenu.menu.contains(event.target)) closeMenu();
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || !activeMenu) return;
-    event.preventDefault();
-    closeMenu(true);
-  });
-  window.addEventListener('pagehide', () => closeMenu());
 
   window.addEventListener('beforeunload', event => {
     if (!dirty) return;
@@ -423,7 +381,7 @@ export async function mountTopics(root, params, editKnowledge) {
       return menu;
     }
     function renderBlocks(focusIndex) {
-      closeMenu();
+      closeToolMenu();
       const next = [];
       units.forEach((block, index) => {
         if (!views.has(block.id)) views.set(block.id, makeUnit(block));
@@ -452,7 +410,7 @@ export async function mountTopics(root, params, editKnowledge) {
     }));
     container.classList.add('topic-editing');
     status.textContent = '';
-    closeMenu();
+    closeToolMenu();
     tools.append(status);
     container.replaceChildren(tools, title, paper);
     renderBlocks();
@@ -472,15 +430,13 @@ export async function mountTopics(root, params, editKnowledge) {
 
   function renderDetail() {
     editorObserver?.disconnect();
-    closeMenu();
+    closeToolMenu();
     root.prepend(status);
     const layout = element('div', null, 'topic-layout');
-    const side = element('aside', null, 'panel topic-index');
-    const index = element('details');
-    index.open = !matchMedia('(max-width: 700px)').matches;
-    const directoryLabel = element('summary', topic.title);
-    directoryLabel.setAttribute('aria-label', topic.title + '的文章目录');
-    index.append(directoryLabel);
+    const side = element('aside', null, 'topic-index');
+    const index = element('nav', null, 'panel topic-directory');
+    index.setAttribute('aria-label', '文章目录');
+    index.append(element('h2', topic.title));
     const links = element('ol');
     for (const item of topic.articles) {
       const row = element('li');

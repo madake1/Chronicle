@@ -39,3 +39,50 @@ export async function readJson(url, method = 'GET', payload) {
   }
   return response.json();
 }
+
+let activeMenu, listening = false;
+export function closeToolMenu(focus = false) {
+  if (!activeMenu) return;
+  const { menu, trigger } = activeMenu;
+  activeMenu = undefined;
+  menu.open = false;
+  if (focus) trigger.focus({ preventScroll: true });
+}
+export function toolsMenu(label, controls, className = '') {
+  listenForToolMenuDismissal();
+  const menu = element('details', null, 'topic-menu ' + className);
+  const trigger = element('summary', label);
+  const panel = element('div', null, 'topic-menu-items');
+  panel.append(...controls);
+  trigger.onclick = event => {
+    event.preventDefault();
+    const wasOpen = activeMenu?.menu === menu;
+    closeToolMenu();
+    if (!wasOpen) {
+      menu.open = true;
+      activeMenu = { menu, trigger };
+    }
+  };
+  panel.addEventListener('click', event => {
+    // Capture before a menu action opens another dialog or replaces its block.
+    if (event.target.closest('button,a')) closeToolMenu(true);
+  }, { capture: true });
+  menu.append(trigger, panel);
+  return menu;
+}
+function listenForToolMenuDismissal() {
+  if (listening) return;
+  listening = true;
+  document.addEventListener('click', event => {
+    if (activeMenu && !activeMenu.menu.contains(event.target)) closeToolMenu();
+  }, { capture: true });
+  document.addEventListener('focusin', event => {
+    if (activeMenu && !activeMenu.menu.contains(event.target)) closeToolMenu();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !activeMenu) return;
+    event.preventDefault();
+    closeToolMenu(true);
+  });
+  window.addEventListener('pagehide', () => closeToolMenu());
+}
