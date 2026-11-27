@@ -312,6 +312,21 @@ export async function mountTopics(root, params, editKnowledge) {
         paper.querySelector('.draft-gap summary');
       restoreReading(focus);
     }
+    function positionDraftMenu(menu) {
+      menu.addEventListener('toggle', () => {
+        if (!menu.open) return;
+        const panel = menu.querySelector('.topic-menu-items');
+        const trigger = menu.querySelector('summary').getBoundingClientRect();
+        const frame = container.getBoundingClientRect();
+        const ceiling = Math.max(0, frame.top, tools.getBoundingClientRect().bottom);
+        const floor = Math.min(window.innerHeight, frame.bottom);
+        const above = trigger.top - ceiling - 8;
+        const below = floor - trigger.bottom - 8;
+        const opensAbove = panel.scrollHeight + 2 > below && above > below;
+        menu.classList.toggle('draft-menu-above', opensAbove);
+        panel.style.maxHeight = Math.max(0, opensAbove ? above : below) + 'px';
+      });
+    }
     function makeUnit(block) {
       const unit = element('section', null, 'editor-unit');
       unit.dataset.blockId = block.id;
@@ -356,6 +371,7 @@ export async function mountTopics(root, params, editKnowledge) {
         }, editKnowledge)));
       }
       const menu = toolsMenu('⋯', controls, 'draft-block-menu');
+      positionDraftMenu(menu);
       unit.append(menu);
       const trigger = menu.querySelector('summary');
       target ??= trigger;
@@ -377,6 +393,7 @@ export async function mountTopics(root, params, editKnowledge) {
           type: 'knowledge', knowledgeId: item.id, hint: item.title || '',
         }), editKnowledge)),
       ], 'draft-gap');
+      positionDraftMenu(menu);
       menu.querySelector('summary').setAttribute('aria-label', '在位置 ' + (index + 1) + ' 插入内容');
       return menu;
     }

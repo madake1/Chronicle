@@ -111,7 +111,8 @@
 .draft-gap>summary::after{content:'';flex:1;border-top:1px solid var(--line)}
 .draft-gap:not([open])>summary:not(:hover):not(:focus-visible)::after{opacity:.48}
 .draft-gap .topic-menu-items{left:0;right:auto;width:max-content}
-.draft-paper>.draft-gap:last-child .topic-menu-items{top:auto;bottom:calc(100% + .2rem)}
+.draft-paper .topic-menu-items{overflow-y:auto;overscroll-behavior:contain}
+.draft-paper .draft-menu-above>.topic-menu-items{top:auto;bottom:calc(100% + .2rem)}
 @media(max-width:700px){
   .topic-layout{grid-template-columns:minmax(0,1fr);gap:.7rem}
   .topic-index{position:static}
