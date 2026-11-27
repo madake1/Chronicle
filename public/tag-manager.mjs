@@ -237,23 +237,59 @@ export function createTagManager(dialog, { paths, changeTag }) {
       input.setAttribute('aria-label', '搜索可选上级标签');
       const choices = element('div', undefined, 'tag-parent-options');
       const selectedParent = element('p', '', 'meta');
-      function showChoices() {
-        const query = input.value.trim().toLowerCase();
-        selectedParent.textContent = `目标位置 · ${byId.get(parentId)?.path ?? '顶层'}`;
-        const matches = allowed.filter(item => item.path.toLowerCase().includes(query));
-        const destinations = [{ id: null, path: '顶层（无上级）' }, ...matches];
-        choices.replaceChildren(...destinations.map(item => {
-          const control = button(item.path, () => {
-            parentId = item.id;
-            showChoices();
-            choices.querySelector('[aria-pressed=true]')?.focus();
-          });
-          control.setAttribute('aria-pressed', String(item.id === parentId));
-          return control;
-        }));
-        if (!matches.length && query) choices.append(element('p', '没有匹配的上级标签', 'meta'));
+      const groups = new Map();
+      for (const item of allowed) {
+        if (!groups.has(item.parentId)) groups.set(item.parentId, []);
+        groups.get(item.parentId).push(item);
       }
-      input.oninput = showChoices;
+      const expanded = new Set();
+      function showChoices(focusSelected = false) {
+        const query = input.value.trim().toLowerCase();
+        const visible = new Set();
+        if (query) {
+          for (const item of allowed) {
+            if (!item.path.toLowerCase().includes(query)) continue;
+            for (let ancestor = item; ancestor && !visible.has(ancestor.id); ancestor = byId.get(ancestor.parentId)) {
+              visible.add(ancestor.id);
+            }
+          }
+        }
+        selectedParent.textContent = `目标位置 · ${byId.get(parentId)?.path ?? '顶层'}`;
+        const top = button('顶层（无上级）', () => { parentId = null; showChoices(true); });
+        top.setAttribute('aria-pressed', String(parentId === null));
+        function level(id) {
+          const list = element('ul', undefined, 'tag-parent-level');
+          for (const item of groups.get(id) ?? []) {
+            if (query && !visible.has(item.id)) continue;
+            const row = element('li');
+            const hasChildren = (groups.get(item.id) ?? []).some(child => !query || visible.has(child.id));
+            const open = hasChildren && (Boolean(query) || expanded.has(item.id));
+            const control = button(item.name, () => {
+              parentId = item.id;
+              if (hasChildren && !query) {
+                if (open) expanded.delete(item.id);
+                else expanded.add(item.id);
+              }
+              showChoices(true);
+            });
+            control.setAttribute('aria-pressed', String(item.id === parentId));
+            if (hasChildren) {
+              control.setAttribute('aria-expanded', String(open));
+              const indicator = element('span', open ? '▾' : '▸', 'tag-parent-indicator');
+              indicator.setAttribute('aria-hidden', 'true');
+              control.prepend(indicator);
+            }
+            row.append(control);
+            if (open) row.append(level(item.id));
+            list.append(row);
+          }
+          return list;
+        }
+        choices.replaceChildren(top, level(null));
+        if (query && !visible.size) choices.append(element('p', '没有匹配的上级标签', 'meta'));
+        if (focusSelected) choices.querySelector('[aria-pressed=true]')?.focus({ preventScroll: true });
+      }
+      input.oninput = () => showChoices();
       error.before(input, selectedParent, choices);
       showChoices();
     } else {

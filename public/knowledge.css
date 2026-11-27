@@ -78,6 +78,10 @@
 .tag-management-form [role=alert]:empty{display:none}
 .tag-parent-options{display:grid;gap:.2rem}
 .tag-parent-options button{text-align:start;white-space:normal;overflow-wrap:anywhere}
+.tag-parent-level{list-style:none;margin:0;padding:0;display:grid;gap:.2rem}
+.tag-parent-level .tag-parent-level{padding-inline-start:.75rem;margin-top:.2rem}
+.tag-parent-level button{width:100%}
+.tag-parent-indicator{display:inline-block;width:1.1em;color:var(--muted)}
 @media(max-width:700px){
   .tag-manager-panes{grid-template-columns:minmax(0,1fr)}
   #tag-dialog[data-pane=tree] .tag-manager-detail-pane,
