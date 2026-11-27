@@ -5,7 +5,7 @@ const hash = value => createHash('sha256').update(JSON.stringify(value)).digest(
 // Note pointers are preserved from the latest index on every work save.
 export const worksVersion = works => '"' + hash(works.map(({ notePath, ...work }) => work)) + '"';
 
-export function validAnnotation(item) {
+export function validAnnotation(item, { legacyWork = false } = {}) {
   if (!item || typeof item !== 'object') return false;
   const { id, kind, start, end, confidence, longitude, latitude } = item;
   if (id !== undefined && (typeof id !== 'string' || !/^[\w-]{1,100}$/.test(id))) return false;
@@ -16,24 +16,31 @@ export function validAnnotation(item) {
   if (start === undefined) return end === undefined && kind === undefined && Boolean(hasCoordinates || item.place?.trim());
   return Number.isInteger(start) && start >= -99999 && start <= 100000 &&
     ['确定', '推测', '约略'].includes(confidence) &&
-    (kind === 'point' ? end === undefined || end === start :
+    (kind === 'point' ? end === undefined || end === start || (legacyWork && id === undefined) :
       ['range', 'window'].includes(kind) && Number.isInteger(end) && end > start && end <= 100000);
 }
 
-export function validAnnotations(items) {
-  if (!Array.isArray(items) || !items.every(validAnnotation)) return false;
+export function validAnnotations(items, options) {
+  if (!Array.isArray(items) || !items.every(item => validAnnotation(item, options))) return false;
   const ids = items.map(item => item.id).filter(Boolean);
   return new Set(ids).size === ids.length;
 }
 
 export function workAnnotations(work) {
   const occurrences = new Map();
+  const used = new Set(work.segments.map(segment => segment.id).filter(Boolean));
   return work.segments.map(segment => {
     if (segment.id) return segment;
     const fingerprint = hash([work.id, Object.entries(segment).sort(([a], [b]) => a.localeCompare(b))]);
-    const index = occurrences.get(fingerprint) ?? 0;
-    occurrences.set(fingerprint, index + 1);
-    return { ...segment, id: `legacy-${fingerprint}-${index}` };
+    let index = occurrences.get(fingerprint) ?? 0;
+    let id;
+    do { id = `legacy-${fingerprint}-${index++}`; } while (used.has(id));
+    occurrences.set(fingerprint, index);
+    used.add(id);
+    // Pre-V7 stores could carry an unused end field on point segments.
+    const result = { ...segment, id };
+    if (result.kind === 'point' && result.end !== result.start) delete result.end;
+    return result;
   });
 }
 

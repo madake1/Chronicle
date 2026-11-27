@@ -273,6 +273,14 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal((await get(base)).tags.find(tag => tag.id === child.id).parentId, null);
     });
     await t.test('个人时空立即反映实体与标注写入，拒绝旧快照', async () => {
+      const oldWorks = await get('/api/works');
+      const legacy = { id: 'legacy-point', title: '旧版点年代', type: '小说', status: '未开始',
+        segments: [{ kind: 'point', start: 0, end: 50, confidence: '确定' }] };
+      assert.equal((await put('/api/works', [...oldWorks, legacy])).status, 200);
+      assert.deepEqual((await get('/api/works')).at(-1), legacy);
+      const legacyProjection = (await get('/api/spacetime?layer=work')).rows.find(row => row.entityId === 'work:legacy-point');
+      assert.equal(legacyProjection.start, 0);
+      assert.equal(legacyProjection.end, undefined);
       const route = `${base}/${randomUUID()}`;
       const original = await request('/api/works?annotations=1');
       const version = original.headers.get('ETag');

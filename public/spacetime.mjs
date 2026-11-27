@@ -28,6 +28,7 @@ const initialWork = new URLSearchParams(location.search).get('work');
 let initialSelection = new URLSearchParams(location.search).get('annotation') ??
   (initialWork && 'work:' + initialWork);
 let recentTimeMode = '';
+let missingDeepLink = false;
 let view = 'timeline';
 if (initialSelection?.startsWith('knowledge:')) {
   $('knowledge-layer').checked = true;
@@ -377,7 +378,7 @@ function render() {
       unknown: $('unknown').checked,
       bounds: bounds && { west: bounds.getWest(), east: bounds.getEast(), north: bounds.getNorth(), south: bounds.getSouth() },
     });
-    $('error').textContent = '';
+    $('error').textContent = missingDeepLink ? '该时空标注已不可用。' : '';
   } catch (error) { rows = []; $('error').textContent = error.message; }
   limits = timelineBounds(rows.filter(dated));
   viewYears = constrainView(viewYears, limits);
@@ -392,7 +393,10 @@ function render() {
         const center = [row.longitude, row.latitude];
         queueMicrotask(() => map?.jumpTo({ center }));
       }
-    } else $('error').textContent = '该时空标注已不可用。';
+    } else {
+      missingDeepLink = true;
+      $('error').textContent = '该时空标注已不可用。';
+    }
     initialSelection = undefined;
   }
   $('count').textContent = visibleLayers.length ? `${new Set(rows.map(row => row.entityId)).size} 个条目 · ${rows.length} 条标注` : '请选择要查看的图层';

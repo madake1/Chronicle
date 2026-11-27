@@ -9,6 +9,8 @@ test('旧片段身份可重现，保留重复片段和公元前一年', () => {
   const first = workAnnotations(work);
   assert.deepEqual(workAnnotations(structuredClone(work)), first);
   assert.notEqual(first[0].id, first[1].id);
+  const mixed = workAnnotations({ ...work, segments: [first[0], segment] });
+  assert.deepEqual(mixed, first);
   assert.equal(projectSpacetime([work], [], []).rows[0].start, 0);
   assert.equal(work.segments[0].id, undefined);
   assert.ok(validAnnotations([{ place: '虚构地名' }, { longitude: 0, latitude: 0 }, segment]));

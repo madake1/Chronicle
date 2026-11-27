@@ -1,4 +1,4 @@
-import { projectSpacetime, saveAnnotations, validAnnotations, workAnnotations, worksVersion } from './spacetime.mjs';
+import { projectSpacetime, validAnnotations, workAnnotations, worksVersion } from './spacetime.mjs';
 import { createServer } from 'node:http';
 import { createKnowledgeService } from './knowledge.mjs';
 import { readFile, mkdir, rm } from 'node:fs/promises';
@@ -136,7 +136,7 @@ function validWork(work) {
     ['region', 'period', 'basis', 'rating', 'synopsis', 'notes', 'links'].every(key =>
       work[key] === undefined || typeof work[key] === 'string') &&
     (work.experience === undefined || !experienceError(work.experience)) &&
-    validAnnotations(work.segments);
+    validAnnotations(work.segments, { legacyWork: true });
 }
 
 function send(response, status, value) {
@@ -333,7 +333,7 @@ const server = createServer(async (request, response) => {
         }
         const notes = new Map(current.map(work => [work.id, work.notePath]));
         const next = works.map(work => ({ ...work, notePath: notes.get(work.id),
-          segments: version === undefined ? work.segments : saveAnnotations(work.segments) }));
+          segments: version === undefined ? work.segments : workAnnotations(work) }));
         await writeWorks(next, version !== undefined);
         response.setHeader('ETag', worksVersion(next));
         if ([...notes.keys()].some(id => !works.some(work => work.id === id))) await knowledge.reconcile(next);
