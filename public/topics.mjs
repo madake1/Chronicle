@@ -16,6 +16,29 @@ const labeled = (text, control) => {
   return label;
 };
 
+function toolsMenu(label, controls, className = '') {
+  const menu = element('details', null, 'topic-menu ' + className);
+  const trigger = element('summary', label);
+  const panel = element('div', null, 'topic-menu-items');
+  panel.append(...controls);
+  panel.addEventListener('click', event => {
+    if (!event.target.closest('button,a')) return;
+    menu.open = false;
+    if (document.activeElement === document.body) trigger.focus({ preventScroll: true });
+  });
+  menu.addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || !menu.open) return;
+    menu.open = false;
+    trigger.focus();
+    event.stopPropagation();
+  });
+  menu.addEventListener('focusout', event => {
+    if (event.relatedTarget && !menu.contains(event.relatedTarget)) menu.open = false;
+  });
+  menu.append(trigger, panel);
+  return menu;
+}
+
 function dialog(title, canClose = () => true) {
   const pane = element('dialog', null, 'topic-dialog');
   const heading = element('div', null, 'dialog-head');
@@ -110,7 +133,7 @@ export async function mountTopics(root, params, editKnowledge) {
   const blockId = params.get('block');
   const endpoint = api + (topicId ? '/' + encodeURIComponent(topicId) : '');
   const articleEndpoint = endpoint + '/articles/' + encodeURIComponent(articleId ?? '');
-  let topic, dirty = false, busy = false;
+  let topic, dirty = false, busy = false, editorObserver;
   const status = element('p', '', 'topic-status');
   status.setAttribute('role', 'alert');
   const report = error => { status.textContent = error.message; };
@@ -227,7 +250,9 @@ export async function mountTopics(root, params, editKnowledge) {
       wrapper.append(element('p', '原始知识已删除', 'reference-missing'), element('small', block.hint || '无标题知识', 'meta'));
       return wrapper;
     }
-    const open = action('展开 · ' + label, () => expand(true));
+    const open = action(label, () => expand(true));
+    open.className = 'reference-toggle';
+    open.setAttribute('aria-label', '展开 · ' + label);
     const content = element('div', null, 'reference-reader');
     content.hidden = true;
     open.setAttribute('aria-expanded', 'false');
@@ -250,6 +275,8 @@ export async function mountTopics(root, params, editKnowledge) {
       try {
         const note = await readJson('/api/knowledge/' + encodeURIComponent(block.knowledgeId));
         if (revision !== request) return;
+        open.textContent = noteTitle(note);
+        open.setAttribute('aria-label', '展开 · ' + noteTitle(note));
         const bar = readerBar(noteTitle(note), [link('打开原条目', owner),
           action('编辑原知识', () => editKnowledge(note, () => expand())), close]);
         const markdown = element('article', null, 'note-preview');
@@ -272,7 +299,8 @@ export async function mountTopics(root, params, editKnowledge) {
             }
           }
         }
-        content.replaceChildren(initial, element('p', '原始知识暂时无法读取。', 'meta'), action('重试', expand));
+        if (revision !== request) return;
+        content.replaceChildren(initial, element('p', '原始知识暂时无法读取。', 'meta'), action('重试', () => expand(true)));
       }
     }
     wrapper.append(open, content);
@@ -290,63 +318,137 @@ export async function mountTopics(root, params, editKnowledge) {
     title.value = article.title;
     title.maxLength = 180;
     title.setAttribute('aria-label', '文章标题');
-    const blocks = element('div', null, 'article-blocks');
+    title.className = 'draft-title';
+    const paper = element('div', null, 'draft-paper');
     const state = element('span', '未修改', 'meta');
+    state.setAttribute('role', 'status');
+    const savedScroll = window.scrollY;
+    const views = new Map();
     function changed() { dirty = true; state.textContent = '有未保存的修改'; }
     title.oninput = changed;
-    function renderBlocks(focusIndex) {
-      blocks.replaceChildren(...units.map((block, index) => {
-        const unit = element('section', null, 'editor-unit');
-        const controls = element('div', null, 'topic-tools');
-        const move = direction => {
-          const next = index + direction;
-          [units[index], units[next]] = [units[next], units[index]];
+
+    function focusUnit(index) {
+      const focus = units[index] ? views.get(units[index].id)?.target :
+        paper.querySelector('.draft-gap summary');
+      restoreReading(focus);
+    }
+    function makeUnit(block) {
+      const unit = element('section', null, 'editor-unit');
+      unit.dataset.blockId = block.id;
+      const move = direction => {
+        const index = units.indexOf(block);
+        const next = index + direction;
+        [units[index], units[next]] = [units[next], units[index]];
+        changed();
+        renderBlocks(next);
+      };
+      const up = action('上移', () => move(-1)), down = action('下移', () => move(1));
+      const remove = action('移除', () => {
+        const index = units.indexOf(block);
+        units.splice(index, 1);
+        views.delete(block.id);
+        changed();
+        renderBlocks(Math.min(index, units.length - 1));
+      });
+      const controls = [up, down, remove];
+      let target;
+      if (block.type === 'markdown') {
+        const input = element('textarea');
+        input.rows = 1;
+        input.value = block.markdown;
+        input.placeholder = '写下正文（Markdown）';
+        input.oninput = () => { block.markdown = input.value; changed(); resizeDraft(input); };
+        unit.append(input);
+        target = input;
+      } else {
+        unit.classList.add('editor-reference');
+        const label = element('span');
+        function labelReference() {
+          label.textContent = block.deleted ? '原始知识已删除 · ' + (block.hint || '无标题知识') : block.hint || '无标题知识';
+        }
+        labelReference();
+        unit.append(label);
+        controls.unshift(action('替换引用', () => picker('knowledge', item => {
+          Object.assign(block, { knowledgeId: item.id, hint: item.title || '', deleted: false });
+          labelReference();
           changed();
-          renderBlocks(next);
-        };
-        const up = action('上移', () => move(-1)), down = action('下移', () => move(1));
+          restoreReading(target);
+        }, editKnowledge)));
+      }
+      const menu = toolsMenu('⋯', controls, 'draft-block-menu');
+      unit.append(menu);
+      const trigger = menu.querySelector('summary');
+      target ??= trigger;
+      return { node: unit, target, menu: trigger, up, down };
+    }
+    function resizeDraft(input) {
+      input.style.height = 'auto';
+      input.style.height = input.scrollHeight + 'px';
+    }
+    function insert(index, block) {
+      units.splice(index, 0, { id: crypto.randomUUID(), ...block });
+      changed();
+      renderBlocks(index);
+    }
+    function gap(index) {
+      const menu = toolsMenu('＋', [
+        action('插入 Markdown 正文', () => insert(index, { type: 'markdown', markdown: '' })),
+        action('插入知识引用', () => picker('knowledge', item => insert(index, {
+          type: 'knowledge', knowledgeId: item.id, hint: item.title || '',
+        }), editKnowledge)),
+      ], 'draft-gap');
+      menu.querySelector('summary').setAttribute('aria-label', '在位置 ' + (index + 1) + ' 插入内容');
+      return menu;
+    }
+    function renderBlocks(focusIndex) {
+      const next = [];
+      units.forEach((block, index) => {
+        if (!views.has(block.id)) views.set(block.id, makeUnit(block));
+        const { node, target, menu, up, down } = views.get(block.id);
         up.disabled = index === 0;
         down.disabled = index === units.length - 1;
-        controls.append(element('strong', block.type === 'markdown' ? 'Markdown 正文' : '知识引用'), up, down,
-          action('移除', () => { units.splice(index, 1); changed(); renderBlocks(Math.min(index, units.length - 1)); }));
-        unit.append(controls);
-        if (block.type === 'markdown') {
-          const input = element('textarea');
-          input.rows = 7;
-          input.value = block.markdown;
-          input.setAttribute('aria-label', 'Markdown 正文 ' + (index + 1));
-          input.oninput = () => { block.markdown = input.value; changed(); };
-          unit.append(input);
-        } else {
-          const replace = item => {
-            Object.assign(block, { knowledgeId: item.id, hint: item.title || '', deleted: false });
-            changed();
-            renderBlocks(index);
-          };
-          unit.append(element('p', block.deleted ? '原始知识已删除 · ' + (block.hint || '无标题知识') : block.hint || '无标题知识'),
-            action('替换引用', () => picker('knowledge', replace, editKnowledge)));
-        }
-        return unit;
-      }));
-      if (focusIndex !== undefined) blocks.children[focusIndex]?.querySelector('textarea, button:enabled')?.focus();
+        menu.setAttribute('aria-label', '第 ' + (index + 1) + ' 块操作');
+        if (block.type === 'markdown') target.setAttribute('aria-label', 'Markdown 正文 ' + (index + 1));
+        next.push(gap(index), node);
+      });
+      next.push(gap(units.length));
+      paper.replaceChildren(...next);
+      for (const input of paper.querySelectorAll('textarea')) resizeDraft(input);
+      if (focusIndex !== undefined) focusUnit(Math.max(0, focusIndex));
     }
-    function insert(block) { units.push({ id: crypto.randomUUID(), ...block }); changed(); renderBlocks(units.length - 1); }
+
     const tools = element('div', null, 'topic-tools article-edit-tools');
-    tools.append(action('＋ 正文', () => insert({ type: 'markdown', markdown: '' })),
-      action('＋ 引用知识', () => picker('knowledge', item => insert({ type: 'knowledge', knowledgeId: item.id, hint: item.title || '' }), editKnowledge)),
-      action('保存文章', () => mutate(articleEndpoint, 'PUT', { version: topic.version, title: title.value,
-        blocks: units.map(({ deleted, ...block }) => block) }, () => navigate(topicId, articleId))),
-      action('取消编辑', () => {
-        if (dirty && !confirm('放弃未保存的修改？')) return;
-        dirty = false;
-        renderDetail();
-      }), state);
-    container.replaceChildren(labeled('文章标题', title), tools, blocks);
+    const save = action('保存文章', () => mutate(articleEndpoint, 'PUT', { version: topic.version, title: title.value,
+      blocks: units.map(({ deleted, ...block }) => block) }, () => navigate(topicId, articleId, blockId)));
+    save.className = 'primary';
+    tools.append(state, save, action('取消编辑', () => {
+      if (dirty && !confirm('放弃未保存的修改？')) return;
+      dirty = false;
+      renderDetail();
+      window.scrollTo(0, savedScroll);
+    }));
+    container.classList.add('topic-editing');
+    status.textContent = '';
+    tools.append(status);
+    container.replaceChildren(tools, title, paper);
     renderBlocks();
-    title.focus();
+    let paperWidth = 0;
+    const resize = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width === paperWidth) return;
+      paperWidth = entry.contentRect.width;
+      for (const input of paper.querySelectorAll('textarea')) resizeDraft(input);
+    });
+    resize.observe(paper, { box: 'border-box' });
+    // The observer only needs the available width, and is disconnected on cancel.
+    editorObserver?.disconnect();
+    editorObserver = resize;
+    title.focus({ preventScroll: true });
+    tools.scrollIntoView({ block: 'nearest' });
   }
 
   function renderDetail() {
+    editorObserver?.disconnect();
+    breadcrumb.after(status);
     breadcrumb.replaceChildren(link('知识专题', topicHref()), element('span', ' / '), link(topic.title, topicHref(topic.id)));
     if (topic.article) breadcrumb.append(element('span', ' / ' + topic.article.title));
     const layout = element('div', null, 'topic-layout');
@@ -362,6 +464,11 @@ export async function mountTopics(root, params, editKnowledge) {
       row.append(itemLink);
       links.append(row);
     }
+    const overviewItem = element('li');
+    const overviewLink = link('专题概述', topicHref(topic.id));
+    if (!articleId) overviewLink.setAttribute('aria-current', 'page');
+    overviewItem.append(overviewLink);
+    links.prepend(overviewItem);
     index.append(links);
     index.append(action('＋ 新建文章', () => {
       if (dirty && !confirm('放弃未保存的修改？')) return;
@@ -388,62 +495,89 @@ export async function mountTopics(root, params, editKnowledge) {
     }));
     side.append(index);
     const reading = element('section', null, 'panel topic-reading');
-    const toolbar = element('div', null, 'topic-tools');
+    const header = element('header', null, 'reading-heading');
+    const toolbar = element('div', null, 'topic-tools reading-tools');
     const scope = new URLSearchParams({ topic: topic.id });
     if (articleId) scope.set('article', articleId);
-    toolbar.append(link('在个人时空中查看', '/spacetime?' + scope));
+    const spaceLink = link('在个人时空中查看', '/spacetime?' + scope);
+    toolbar.append(spaceLink);
     if (topic.article) {
       const article = topic.article;
       const order = topic.articles.map(item => item.id);
       const at = order.indexOf(article.id);
       function reorder(direction) {
-        [order[at], order[at + direction]] = [order[at + direction], order[at]];
-        void mutate(endpoint + '/order', 'PUT', { version: topic.version, articleIds: order }, () => navigate(topicId, articleId));
+        const updated = [...order];
+        [updated[at], updated[at + direction]] = [updated[at + direction], updated[at]];
+        void mutate(endpoint + '/order', 'PUT', { version: topic.version, articleIds: updated }, () => navigate(topicId, articleId));
       }
       const earlier = action('目录上移', () => reorder(-1));
       const later = action('目录下移', () => reorder(1));
       earlier.disabled = at === 0;
       later.disabled = at === order.length - 1;
-      toolbar.append(action('编辑文章', () => enterEditor(reading, article)), earlier, later,
-        action('删除文章', () => {
-          if (confirm('删除这篇文章及其中的引用？原始知识会保留。')) {
-            void mutate(articleEndpoint, 'DELETE', { version: topic.version }, () => navigate(topicId));
-          }
-        }));
-      reading.append(element('h1', article.title), toolbar);
+      const deletion = action('删除文章', () => {
+        if (confirm('删除这篇文章及其中的引用？原始知识会保留。')) {
+          void mutate(articleEndpoint, 'DELETE', { version: topic.version }, () => navigate(topicId));
+        }
+      });
+      deletion.className = 'topic-danger';
+      toolbar.append(action('编辑文章', () => enterEditor(reading, article)), toolsMenu('更多', [earlier, later, deletion]));
+      header.append(toolbar, element('h1', article.title));
+      reading.append(header);
+      const text = element('div', null, 'article-text');
       for (const block of article.blocks) {
         if (block.type === 'knowledge') {
           const row = reference(block);
           if (block.deleted) row.append(action('移除或替换引用', () => enterEditor(reading, article)));
-          reading.append(row);
+          text.append(row);
         } else {
           const markdown = element('article', null, 'note-preview article-markdown');
           markdown.innerHTML = block.html;
-          reading.append(markdown);
+          text.append(markdown);
         }
       }
-      if (!article.blocks.length) reading.append(element('p', '这篇文章还是空的。点击「编辑文章」开始写作。', 'meta'));
+      if (!article.blocks.length) text.append(element('p', '这篇文章还是空的。点击「编辑文章」开始写作。', 'meta'));
+      reading.append(text);
+      const adjacent = element('nav', null, 'article-turn');
+      adjacent.setAttribute('aria-label', '相邻文章');
+      if (at > 0) adjacent.append(link('← ' + topic.articles[at - 1].title, topicHref(topicId, order[at - 1])));
+      if (at < order.length - 1) adjacent.append(link(topic.articles[at + 1].title + ' →', topicHref(topicId, order[at + 1])));
+      if (adjacent.childElementCount) reading.append(adjacent);
       if (blockId && !article.blocks.some(block => block.id === blockId)) status.textContent = '该引用已移除。';
     } else {
-      toolbar.append(action('编辑专题', () => topicForm(topic)), action('删除专题', () => {
+      const deletion = action('删除专题', () => {
         if (confirm('删除专题及全部文章？原始知识和作品会保留。')) {
           void mutate(endpoint, 'DELETE', { version: topic.version }, () => navigate());
         }
-      }));
+      });
+      deletion.className = 'topic-danger';
+      toolbar.append(action('编辑专题', () => topicForm(topic)), toolsMenu('更多', [deletion]));
+      const cover = element('div', null, 'frontispiece');
+      cover.dataset.cover = topic.cover;
+      cover.append(element('h1', topic.title),
+        element('p', `${topic.articles.length} 篇文章 · ${topic.knowledge.length} 条有效收录`, 'meta'));
+      header.append(toolbar, cover);
+      reading.append(header);
       const overview = element('article', null, 'note-preview article-markdown');
       overview.innerHTML = topic.overviewHtml;
-      reading.append(element('h1', topic.title), toolbar, overview);
-      if (!topic.articles.length) reading.append(element('p', '还没有文章，可从文章目录新建。', 'meta'));
+      if (topic.overview.trim()) reading.append(overview);
       if (topic.works.length) {
-        const works = element('div', null, 'topic-tools');
-        works.append(element('h2', '关联作品'), ...topic.works.map(item => item.deleted ?
+        const works = element('div', null, 'topic-tools overview-works meta');
+        works.append(element('span', '关联作品'), ...topic.works.map(item => item.deleted ?
           element('span', '已删除作品', 'meta') : link(item.title, '/?work=' + encodeURIComponent(item.id))));
         reading.append(works);
       }
-      const knowledge = element('details', null, 'topic-knowledge');
-      knowledge.append(element('summary', '收录知识 · ' + topic.knowledge.length));
-      knowledge.append(...topic.knowledge.map(note => reference({ knowledgeId: note.id, title: note.title })));
-      reading.append(knowledge);
+      const contents = element('section', null, 'contents-list');
+      contents.append(element('h2', '目录'));
+      if (topic.articles.length) {
+        const entries = element('ol');
+        for (const item of topic.articles) {
+          const entry = element('li');
+          entry.append(link(item.title, topicHref(topic.id, item.id)));
+          entries.append(entry);
+        }
+        contents.append(entries);
+      } else contents.append(element('p', '还没有文章，可从文章目录新建。', 'meta'));
+      reading.append(contents);
     }
     layout.append(side, reading);
     body.replaceChildren(layout);

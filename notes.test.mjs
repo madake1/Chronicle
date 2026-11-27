@@ -384,6 +384,16 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal(membership.impact.articles, 1);
       const unfiled = async () => (await get(base + '?topic=unfiled&tag=' + tag.id + '&q=Markdown')).notes.map(note => note.id);
       assert.deepEqual(await unfiled(), [secondId]);
+      const filed = await get(base + '?collection=filed&tag=' + tag.id + '&q=Markdown');
+      assert.deepEqual(filed.notes.map(note => note.id), [noteId]);
+      assert.equal((await get(base + '?topic=' + topic.id)).topicTitle, '测试专题');
+      assert.equal((await request(base + '?collection=unknown')).status, 400);
+      const savedNote = await get(base + '/' + secondId);
+      assert.equal((await put(base + '/' + secondId, { content: '## 可读标题\n\n![附件](./assets/test.png)\n\n**正文** 与 [链接](https://example.com) Markdown',
+        revision: savedNote.revision })).status, 200);
+      const filtered = await get(base + '?collection=unfiled&tag=' + tag.id + '&q=assets/test.png');
+      assert.equal(filtered.notes.find(note => note.id === secondId).excerpt, '可读标题 正文 与 链接 Markdown');
+
       const joined = await create(other + '/references', { version: detail.version, knowledgeId: noteId });
       assert.equal((await request(base + '/' + noteId + '?topicImpact=' + membership.impact.version, { method: 'DELETE' })).status, 409);
       detail = await get(url + '?article=' + first.id);

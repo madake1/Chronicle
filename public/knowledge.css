@@ -74,3 +74,13 @@
   .knowledge-layout{grid-template-columns:minmax(0,1fr);gap:.75rem}
   .knowledge-index{position:static;padding:.65rem .9rem}
 }
+.record-heading{display:flex;gap:.7rem;align-items:center;flex-wrap:wrap}
+.record-heading #manage-tags{border:0;width:auto;background:transparent;color:var(--muted);font-size:.88rem;padding:.3rem .4rem}
+.knowledge-index .record-navigation{margin:0 0 .75rem;padding-bottom:.55rem;border-bottom:1px solid var(--line)}
+#tag-tree{margin-top:.5rem}
+.knowledge-list-heading{justify-content:space-between;flex-wrap:wrap}
+.knowledge-list-heading>div{display:flex;align-items:baseline;gap:.65rem}
+.collection-filter{display:flex;align-items:center;gap:.35rem;color:var(--muted);font-size:.86rem}
+.collection-filter select{padding:.26rem .45rem}
+.record-filters{display:flex;flex-wrap:wrap;gap:.4rem;margin:.2rem 0 .7rem}
+.record-filters button{font-size:.82rem;color:var(--accent);background:var(--soft);border-radius:50px;padding:.2rem .65rem}

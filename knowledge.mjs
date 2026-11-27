@@ -3,7 +3,7 @@ import { saveAnnotations } from './spacetime.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { readdir } from 'node:fs/promises';
 import { atomicWrite } from './atomic-write.mjs';
-import { checkedRead, directory, loadNoteImage, NoteError, renderNoteMarkdown, saveNoteImage } from './note-files.mjs';
+import { checkedRead, directory, loadNoteImage, markdownExcerpt, NoteError, renderNoteMarkdown, saveNoteImage } from './note-files.mjs';
 import { exportNoteContent, imageLimit, noteLimit } from './note-storage.mjs';
 
 const kinds = new Set(['knowledge', 'work', 'work-note']);
@@ -45,8 +45,6 @@ function countTags(state) {
   }
   return state.tags.map(tag => ({ ...tag, count: counts.get(tag.id) ?? 0, directCount: direct.get(tag.id) ?? 0 }));
 }
-
-const excerpt = text => text.trim().replace(/\s+/g, ' ').slice(0, 120);
 
 export function createKnowledgeService({ data, readWorks, readJson, readBody, send, queueWrite, readTopics, topicImpact }) {
   const root = new URL('knowledge/', data);
@@ -113,7 +111,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       }
       const text = await content(notes.get(entry.id));
       if (titleMatches || text.toLowerCase().includes(query)) {
-        results.push({ ...entry, excerpt: excerpt(text) });
+        results.push({ ...entry, excerpt: markdownExcerpt(text) });
       }
     }
     return results;
@@ -159,10 +157,12 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     const paths = query ? tagPaths(state.tags) : null;
     let notes = state.notes;
     const topic = url.searchParams.get('topic');
-    if (topic) {
+    const collection = url.searchParams.get('collection') || (topic === 'unfiled' ? 'unfiled' : '');
+    const topicScope = topic && topic !== 'unfiled' ? topics.find(entry => entry.id === topic) : null;
+    if (topic || collection) {
       const index = topicIndex(topics, notes);
-      notes = topic === 'unfiled' ? notes.filter(note => !index.memberships.has(note.id)) :
-        notes.filter(note => index.byTopic.get(topic)?.has(note.id));
+      if (topic && topic !== 'unfiled') notes = notes.filter(note => index.byTopic.get(topic)?.has(note.id));
+      if (collection) notes = notes.filter(note => index.memberships.has(note.id) === (collection === 'filed'));
     }
     if (tag === 'untagged') notes = notes.filter(note => !note.tagIds.length);
     if (selected) notes = notes.filter(note => note.tagIds.some(id => selected.has(id)));
@@ -175,12 +175,12 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       const text = await content(note);
       if (query && !note.title.toLowerCase().includes(query) && !text.toLowerCase().includes(query) &&
           !note.tagIds.some(id => paths.get(id)?.includes(query))) continue;
-      results.push({ ...note, excerpt: excerpt(text) });
+      results.push({ ...note, excerpt: markdownExcerpt(text) });
     }
     results.reverse().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const target = catalogue.get(relatedTo);
     const [relatedTarget] = target ? await describeTargets(state, [target]) : [];
-    return send(response, 200, { notes: results, tags: countTags(topic ? { ...state, notes: results } : state), relatedTarget });
+    return send(response, 200, { notes: results, tags: countTags(topic || collection ? { ...state, notes: results } : state), relatedTarget, topicTitle: topicScope?.title });
   }
   async function tagRequest(request, response, id) {
     const input = request.method === 'DELETE' ? {} : await readJson(request, 8192);
@@ -222,7 +222,9 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     const { method } = request;
     const path = url.pathname;
     if (path === '/api/knowledge' && method === 'GET') {
-      const [state, topics] = url.searchParams.get('topic') ?
+      const collection = url.searchParams.get('collection');
+      if (collection && !['filed', 'unfiled'].includes(collection)) fail(400, '收录状态无效');
+      const [state, topics] = url.searchParams.get('topic') || collection ?
         await queueWrite(() => Promise.all([read(), readTopics()])) : [await read(), []];
       return list(response, url, state, topics);
     }

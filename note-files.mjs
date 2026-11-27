@@ -43,6 +43,26 @@ export function renderNoteMarkdown(content, assetsUrl) {
   return markdown.render(content, { assetsUrl });
 }
 
+export function markdownExcerpt(content, limit = 120) {
+  let excerpt = '';
+  for (const token of markdown.parse(content, {})) {
+    let text = '';
+    if (token.type === 'inline') {
+      text = token.children.map(child => {
+        if (child.type === 'text' || child.type === 'code_inline') return child.content;
+        if (child.type === 'softbreak' || child.type === 'hardbreak') return ' ';
+        return '';
+      }).join('');
+    } else if (token.type === 'fence' || token.type === 'code_block') {
+      text = token.content;
+    }
+    const readable = text.trim().replace(/\s+/g, ' ');
+    if (readable) excerpt += (excerpt ? ' ' : '') + readable;
+    if (Array.from(excerpt).length >= limit) break;
+  }
+  return Array.from(excerpt).slice(0, limit).join('');
+}
+
 function imageExtension(bytes) {
   if (bytes.length >= 33 && bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])) &&
       bytes.toString('ascii', 12, 16) === 'IHDR') return 'png';

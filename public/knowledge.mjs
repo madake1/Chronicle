@@ -9,12 +9,16 @@ const base = '/api/knowledge';
 const params = new URLSearchParams(location.search);
 const topicsMode = params.get('section') === 'topics';
 let selectedTopic = params.get('topic') ?? '';
+let collection = params.get('collection') ?? (selectedTopic === 'unfiled' ? 'unfiled' : '');
+if (selectedTopic === 'unfiled') selectedTopic = '';
+if (!['filed', 'unfiled'].includes(collection)) collection = '';
 const types = { knowledge: '知识', work: '作品', 'work-note': '作品笔记' };
 $('note-dialog').querySelector('.note-editor').after($('metadata-template').content);
 const editor = createNoteDialog($('note-dialog'), { entity: '知识', untitledFile: '无标题知识' });
 const entityKey = item => `${item.type}:${item.id}`;
 const entityLabel = item => item.title || item.excerpt || '无标题知识';
-const collapsedTags = new Set();
+const expandedTags = new Set();
+let revealLinkedTag = params.has('tag');
 const recordDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' });
 let tags = [], selectedTag = params.get('tag') ?? '', selectedNote = null, metadata;
 let visibleNotes = new Set();
@@ -57,19 +61,21 @@ function tree(parent = null) {
     const control = button(tag.name, () => browse(tag.id));
     control.setAttribute('aria-pressed', String(selectedTag === tag.id));
     control.className = 'tag-filter';
+    control.dataset.tagControl = 'select-' + tag.id;
     control.append(el('span', tag.count, 'tag-count'));
     if (tags.some(child => child.parentId === tag.id)) {
       const children = tree(tag.id);
       children.id = `tag-group-${tag.id}`;
       const toggle = button('', () => {
-        if (collapsedTags.has(tag.id)) collapsedTags.delete(tag.id);
-        else collapsedTags.add(tag.id);
+        if (expandedTags.has(tag.id)) expandedTags.delete(tag.id);
+        else expandedTags.add(tag.id);
         updateToggle();
       });
       toggle.className = 'tag-toggle';
+      toggle.dataset.tagControl = 'expand-' + tag.id;
       toggle.setAttribute('aria-controls', children.id);
       function updateToggle() {
-        const expanded = !collapsedTags.has(tag.id);
+        const expanded = expandedTags.has(tag.id);
         children.hidden = !expanded;
         toggle.textContent = expanded ? '▾' : '▸';
         toggle.setAttribute('aria-expanded', String(expanded));
@@ -86,19 +92,45 @@ function tree(parent = null) {
   }
   return list;
 }
-function browse(tag) {
+function writeFilterUrl() {
+  const url = new URL(location.href);
+  const values = { tag: selectedTag, topic: selectedTopic, collection, related: relatedTo,
+    q: $('knowledge-search').value.trim() };
+  for (const [key, value] of Object.entries(values)) {
+    if (value) url.searchParams.set(key, value);
+    else url.searchParams.delete(key);
+  }
+  history.replaceState(null, '', url);
+}
+function reloadFilters() {
+  clearTimeout(searchTimer);
   supersedeReaderRequest();
+  writeFilterUrl();
+  void loadList().catch(report);
+}
+function browse(tag) {
   selectedTag = tag;
   relatedTo = null;
-  if (mobile.matches) $('tag-index').open = false;
-  const url = new URL(location.href);
-  url.searchParams.delete('related');
-  if (selectedTag) url.searchParams.set('tag', selectedTag);
-  else url.searchParams.delete('tag');
-  if (selectedTopic) url.searchParams.set('topic', selectedTopic);
-  else url.searchParams.delete('topic');
-  history.replaceState(null, '', url);
-  void loadList().catch(report);
+  reloadFilters();
+}
+function renderFilters(result) {
+  const filters = $('record-filters');
+  filters.replaceChildren();
+  function chip(label, callback) {
+    const item = button(label + ' ×', callback);
+    item.setAttribute('aria-label', '清除' + label);
+    filters.append(item);
+  }
+  if (collection) chip(collection === 'filed' ? '已收录' : '未收录', () => {
+    collection = '';
+    $('collection-filter').value = '';
+    reloadFilters();
+  });
+  if (selectedTopic) chip(result.topicTitle ? '专题范围 · ' + result.topicTitle : '专题范围已失效', () => {
+    selectedTopic = '';
+    reloadFilters();
+  });
+  filters.hidden = !filters.childElementCount;
 }
 async function loadList() {
   const version = ++listVersion;
@@ -106,19 +138,25 @@ async function loadList() {
   if (selectedTag) query.set('tag', selectedTag);
   if (relatedTo) query.set('related', relatedTo);
   if (selectedTopic) query.set('topic', selectedTopic);
+  if (collection) query.set('collection', collection);
   if ($('knowledge-search').value.trim()) query.set('q', $('knowledge-search').value.trim());
   const result = await json(`${base}?${query}`);
   if (version !== listVersion) return;
   visibleNotes = new Set(result.notes.map(note => note.id));
   if (selectedNote && !visibleNotes.has(selectedNote)) closeReader();
   tags = result.tags;
+  if (revealLinkedTag) {
+    const parents = new Map(tags.map(tag => [tag.id, tag.parentId]));
+    for (let id = parents.get(selectedTag); id && !expandedTags.has(id); id = parents.get(id)) expandedTags.add(id);
+    revealLinkedTag = false;
+  }
+  const focusedTag = document.activeElement?.dataset.tagControl;
   $('tag-tree').replaceChildren(tags.length ? tree() : el('p', '还没有标签', 'meta'));
+  if (focusedTag) $('tag-tree').querySelector(`[data-tag-control="${CSS.escape(focusedTag)}"]`)?.focus({ preventScroll: true });
   $('list-heading').textContent = relatedTo ? `${result.relatedTarget ? entityLabel(result.relatedTarget) : '此条目'}的关联知识` :
     selectedTag === 'untagged' ? '无标签知识' : tags.find(tag => tag.id === selectedTag)?.name ?? '全部知识';
-  if (selectedTopic === 'unfiled') $('list-heading').textContent += ' · 未收录知识';
-  else if (selectedTopic) $('list-heading').textContent += ' · 专题筛选';
-  $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag && !selectedTopic));
-  $('unfiled').setAttribute('aria-pressed', String(selectedTopic === 'unfiled'));
+  renderFilters(result);
+  $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag && !selectedTopic && !collection && !$('knowledge-search').value.trim()));
   $('untagged').setAttribute('aria-pressed', String(selectedTag === 'untagged'));
   $('list-count').textContent = `${result.notes.length} 条`;
   const rows = result.notes.map(note => {
@@ -364,31 +402,33 @@ function loadMetadata(id, note) {
 }
 async function changeTag(id, method, payload) {
   const result = await json(id ? `${base}/tags/${id}` : `${base}/tags`, method, payload);
-  if (method === 'DELETE' && selectedTag === id) selectedTag = result.parentId ?? '';
+  if (method === 'DELETE') {
+    expandedTags.delete(id);
+    if (selectedTag === id) {
+      selectedTag = result.parentId ?? '';
+      writeFilterUrl();
+    }
+  }
   const visible = await loadList();
   if (visible?.has(selectedNote) && $('tag-dialog').open) await showNote(selectedNote);
   return result;
 }
 for (const control of document.querySelectorAll('[data-close]')) control.onclick = () => control.closest('dialog').close();
 $('new-note').onclick = () => editBody();
-$('all').onclick = () => { selectedTopic = ''; browse(''); $('record-topic').value = ''; };
-$('unfiled').onclick = () => {
-  selectedTopic = selectedTopic === 'unfiled' ? '' : 'unfiled';
-  $('record-topic').value = '';
-  browse(selectedTag);
+$('all').onclick = () => {
+  selectedTopic = selectedTag = collection = '';
+  relatedTo = null;
+  $('collection-filter').value = $('knowledge-search').value = '';
+  reloadFilters();
 };
-$('record-topic').onchange = () => { selectedTopic = $('record-topic').value; browse(selectedTag); };
 $('untagged').onclick = () => browse('untagged');
+$('collection-filter').onchange = event => { collection = event.target.value; reloadFilters(); };
 let searchTimer;
 $('knowledge-search').oninput = () => {
   clearTimeout(searchTimer);
   ++listVersion;
   supersedeReaderRequest();
-  const url = new URL(location.href);
-  const query = $('knowledge-search').value.trim();
-  if (query) url.searchParams.set('q', query);
-  else url.searchParams.delete('q');
-  history.replaceState(null, '', url);
+  writeFilterUrl();
   searchTimer = setTimeout(() => void loadList().catch(report), 160);
 };
 const tagManager = createTagManager($('tag-dialog'), { paths: tagPaths, changeTag });
@@ -405,11 +445,6 @@ $('inline-add').onclick = async () => {
     metadataChoices();
   } catch (error) { $('metadata-error').textContent = error.message; }
 };
-const mobile = matchMedia('(max-width: 700px)');
-function syncTagIndex() { $('tag-index').open = !mobile.matches; }
-syncTagIndex();
-mobile.addEventListener('change', syncTagIndex);
-
 if (topicsMode) {
   $('records-area').hidden = true;
   $('topics-area').hidden = false;
@@ -426,16 +461,8 @@ if (topicsMode) {
   });
 } else {
   $('knowledge-search').value = params.get('q') ?? '';
-  const filter = $('record-topic');
-  filter.closest('details').ontoggle = async event => {
-    if (!event.target.open) return;
-    try {
-      const { topics } = await json('/api/topics');
-      filter.replaceChildren(new Option('全部专题', ''), ...topics.map(item => new Option(item.title, item.id)));
-      filter.value = selectedTopic === 'unfiled' ? '' : selectedTopic;
-    } catch (error) { report(error); }
-  };
-  if (selectedTopic && selectedTopic !== 'unfiled') filter.closest('details').open = true;
+  $('collection-filter').value = collection;
+  writeFilterUrl();
   try {
     const visible = await loadList();
     const linkedNote = params.get('note');
