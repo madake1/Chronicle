@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
+import { DatabaseSync } from 'node:sqlite';
 import { once } from 'node:events';
-import { cp, mkdtemp, readFile, rename, rm, symlink, writeFile } from 'node:fs/promises';
+import { cp, mkdtemp, readdir, rm, symlink } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -13,7 +14,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
   const root = await mkdtemp(join(tmpdir(), 'chronicle-notes-'));
   let server;
   try {
-    for (const name of ['server.mjs', 'runtime-config.mjs', 'knowledge.mjs','topics.mjs', 'spacetime.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
+    for (const name of ['server.mjs', 'personal-library.mjs', 'personal-maintenance.mjs', 'personal-store.mjs', 'personal-document.mjs', 'personal-document-schema.mjs', 'runtime-config.mjs', 'knowledge.mjs','topics.mjs', 'spacetime.mjs', 'atlas-sources.mjs', 'note-storage.mjs', 'note-files.mjs', 'atomic-write.mjs', 'fixtures.json', 'public/experience.mjs']) {
       await cp(new URL(name, import.meta.url), join(root, name));
     }
     await symlink(fileURLToPath(new URL('node_modules', import.meta.url)), join(root, 'node_modules'), 'junction');
@@ -31,8 +32,8 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.ok(address);
       return address;
     }
-    let url = await start();
-    const request = (path, options) => fetch(url + path, options);
+    let address = await start();
+    const request = (path, options) => fetch(address + path, options);
     const put = (path, value) => request(path, {
       method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value),
     });
@@ -66,12 +67,12 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
     assert.doesNotMatch(saved.html, /<svg|href="javascript:/);
     assert.equal((await put(path, { content: '旧页覆盖', revision: null })).status, 409);
     assert.equal((await put('/api/works', works)).status, 200);
-    const index = JSON.parse(await readFile(join(root, 'data', 'chronicle.json'), 'utf8'));
-    assert.equal(index.works.at(-1).notePath, saved.notePath);
-    assert.deepEqual(index.works.at(-1).segments, []);
-    assert.equal(await (await request(path + '/export.md')).text(), content);
+    const updated = await (await request('/api/works')).json();
+    assert.equal(updated.at(-1).hasNote, saved.hasNote);
+    assert.deepEqual(updated.at(-1).segments, []);
+    assert.equal(await (await request(path + '/export.md')).text(), saved.content);
     const zip = unzipSync(new Uint8Array(await (await request(path + '/export.zip')).arrayBuffer()));
-    assert.equal(Buffer.from(zip['note.md']).toString(), content);
+    assert.equal(Buffer.from(zip['note.md']).toString(), saved.content);
     assert.deepEqual(Buffer.from(zip[image]), png);
     assert.deepEqual(Buffer.from(await (await request(`${path}/${image}`)).arrayBuffer()), png);
     assert.equal((await request(`/api/works/${works[0].id}/note/${image}`)).status, 404);
@@ -86,7 +87,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
     const bundle = await batch([id, other.id]);
     assert.equal(bundle.status, 200);
     const combined = unzipSync(new Uint8Array(await bundle.arrayBuffer()));
-    assert.equal(Buffer.from(combined['1 - 无年代作品/note.md']).toString(), content);
+    assert.equal(Buffer.from(combined['1 - 无年代作品/note.md']).toString(), saved.content);
     assert.deepEqual(Buffer.from(combined[`1 - 无年代作品/${image}`]), png);
     const otherPath = Object.keys(combined).find(name => name.startsWith('2 - ') && name.endsWith('/note.md'));
     assert.equal(Buffer.from(combined[otherPath]).toString(), '第二份笔记');
@@ -105,25 +106,6 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal(result.status, 201);
       return result.json();
     };
-    const indexPath = join(root, 'data', 'knowledge', 'index.json');
-    await t.test('索引缺失且正文仍在时拒绝读取或重建知识库', async () => {
-      const id = randomUUID();
-      const route = `${base}/${id}`;
-      const original = await (await put(route, { content: '保留这份正文', revision: null })).json();
-      const archived = indexPath + '.backup';
-      await rename(indexPath, archived);
-      try {
-        const missing = await request(base);
-        assert.equal(missing.status, 409);
-        assert.match((await missing.json()).error, /索引缺失.*已存正文/);
-        assert.equal((await put(`${base}/${randomUUID()}`, { content: '不能重建', revision: null })).status, 409);
-        await assert.rejects(readFile(indexPath), { code: 'ENOENT' });
-      } finally {
-        await rename(archived, indexPath);
-      }
-      assert.equal((await get(route)).revision, original.revision);
-      assert.equal((await remove(route)).status, 200);
-    });
     await t.test('知识录入、层级标签、双向关联及清理', async () => {
       const a = randomUUID(), b = randomUUID();
       const first = `${base}/${a}`, second = `${base}/${b}`;
@@ -205,9 +187,13 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.deepEqual((await get(second)).related, []);
       assert.deepEqual((await get(survivingWork)).related, []);
       assert.equal((await get(`/api/works/${other.id}/note`)).content, '第二份笔记');
-      const saved = JSON.parse(await readFile(indexPath, 'utf8'));
-      assert.deepEqual(saved.relations, []);
-      assert.equal(saved.notes.length, 1);
+      const database = new DatabaseSync(join(root, 'data', 'chronicle.sqlite'), { readOnly: true });
+      try {
+        assert.equal(database.prepare('SELECT count(*) AS count FROM relations').get().count, 0);
+        assert.equal(database.prepare('SELECT count(*) AS count FROM knowledge').get().count, 1);
+      } finally {
+        database.close();
+      }
     });
     await t.test('并发移动和重命名只更新各自字段，保留另一窗口的修改', async () => {
       const oldParent = await addTag('原父级');
@@ -246,11 +232,11 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       const duplicate = await note([top.id, middle.id, extra.id]);
       const inherits = await note([middle.id]);
       const descendant = await note([leaf.id]);
-      const before = await readFile(indexPath, 'utf8');
+      const before = await get(base);
       const blocked = await remove(base + '/tags/' + middle.id);
       assert.equal(blocked.status, 409);
       assert.match((await blocked.json()).error, /先重命名或移动/);
-      assert.equal(await readFile(indexPath, 'utf8'), before);
+      assert.deepEqual(await get(base), before);
       assert.equal((await remove(base + '/tags/' + conflict.id)).status, 200);
       assert.equal((await remove(base + '/tags/' + middle.id)).status, 200);
       assert.deepEqual((await get(duplicate)).tagIds, [top.id, extra.id]);
@@ -260,9 +246,9 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal(snapshot.tags.find(tag => tag.id === child.id).parentId, top.id);
       assert.equal(snapshot.tags.find(tag => tag.id === leaf.id).parentId, child.id);
       assert.equal(snapshot.tags.find(tag => tag.id === top.id).directCount, 2);
-      const beforeTop = await readFile(indexPath, 'utf8');
+      const beforeTop = await get(base);
       assert.equal((await remove(base + '/tags/' + top.id)).status, 409);
-      assert.equal(await readFile(indexPath, 'utf8'), beforeTop);
+      assert.deepEqual(await get(base), beforeTop);
       assert.equal((await remove(base + '/tags/' + rootConflict.id)).status, 200);
       assert.equal((await remove(base + '/tags/' + top.id)).status, 200);
       assert.deepEqual((await get(duplicate)).tagIds, [extra.id]);
@@ -303,7 +289,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
         id: 'bc', kind: 'point', start: 0, confidence: '确定',
       });
       const [first, stale] = await Promise.all([saveWorks(list, version), saveWorks(list, version)]);
-      assert.deepEqual([first.status, stale.status].sort(), [200, 409]);
+      assert.deepEqual([first.status, stale.status].sort(), [200, 409], await first.clone().text());
       assert.equal((await put('/api/works', list.map(entry => ({ ...entry, segments: [] })))).status, 409);
       const metadata = { title: '', tagIds: [], related: [{ type: 'work', id }],
         annotations: [{ id: 'place', longitude: 0, latitude: 0 }], version: null };
@@ -339,7 +325,7 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       const stopped = once(server, 'exit');
       server.kill();
       await stopped;
-      url = await start();
+      address = await start();
       assert.deepEqual(await rows(), beforeRestart);
       assert.equal((await put('/api/works', [])).status, 409);
     });
@@ -420,31 +406,14 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
       assert.equal(detail.article.blocks[0].id, block.id);
       assert.equal((await put(url + '/order', { version: detail.version, articleIds: [second.id, first.id] })).status, 200);
       const snapshot = await get(url + '?article=' + first.id);
-      const topicIndexPath = join(root, 'data', 'topics.json');
-      const originalIndex = await readFile(topicIndexPath);
       const closed = once(server, 'exit');
       server.kill();
       await closed;
-      await writeFile(topicIndexPath, '{broken');
-      // Starting the program still allows the underlying knowledge to be read.
       server = undefined;
       const restored = await start();
-      const bad = await fetch(restored + topicApi);
-      assert.equal(bad.status, 500);
-      assert.equal((await fetch(restored + topicApi, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: '不得覆盖坏索引' }) })).status, 500);
-      assert.equal(await readFile(topicIndexPath, 'utf8'), '{broken');
-      await writeFile(topicIndexPath, originalIndex);
+      address = restored;
       const recovered = await (await fetch(restored + url + '?article=' + first.id)).json();
       assert.deepEqual(recovered.article.blocks, snapshot.article.blocks);
-      const stored = JSON.parse(originalIndex).topics[0].articles.find(item => item.id === first.id).blocks.find(item => item.type === 'markdown');
-      const bodyPath = join(root, 'data', 'topics', stored.revision + '.md');
-      await rename(bodyPath, bodyPath + '.backup');
-      assert.equal((await fetch(restored + url + '?article=' + first.id)).status, 500);
-      await rename(bodyPath + '.backup', bodyPath);
-      await rename(topicIndexPath, topicIndexPath + '.backup');
-      assert.equal((await fetch(restored + topicApi)).status, 500);
-      await rename(topicIndexPath + '.backup', topicIndexPath);
       const removed = await fetch(restored + article, { method: 'DELETE', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ version: recovered.version }) });
       assert.equal(removed.status, 200);
@@ -454,6 +423,53 @@ test('作品笔记、图片及导出通过本机 API 往返', async t => {
         body: JSON.stringify({ version: (await removed.json()).version }) })).status, 200);
       assert.equal((await fetch(restored + base + '/' + secondId)).status, 200);
       assert.equal((await fetch(restored + scoped)).status, 404);
+    });
+    await t.test('知识、作品笔记和文章各保存 100 次，只保留当前正文', async () => {
+      const work = (await get('/api/works'))[0];
+      const workRoute = `/api/works/${work.id}/note`;
+      const noteId = randomUUID();
+      const noteRoute = `${base}/${noteId}`;
+      const create = async (path, body) => {
+        const response = await request(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        assert.ok(response.ok);
+        return response.json();
+      };
+      const topic = await create('/api/topics', { title: '百次保存' });
+      const topicRoute = '/api/topics/' + topic.id;
+      let article = await create(topicRoute + '/articles', { title: '正文', version: topic.version });
+      const articleRoute = topicRoute + '/articles/' + article.id;
+      const blockId = randomUUID();
+      let workRevision = (await get(workRoute)).revision;
+      let noteRevision = null;
+      for (let index = 0; index < 100; index++) {
+        const markdown = '正文第 ' + index + ' 次';
+        const workResult = await put(workRoute, { content: markdown, revision: workRevision });
+        assert.equal(workResult.status, 200);
+        workRevision = (await workResult.json()).revision;
+        const noteResult = await put(noteRoute, { content: markdown, revision: noteRevision });
+        assert.equal(noteResult.status, 200);
+        noteRevision = (await noteResult.json()).revision;
+        const result = await put(articleRoute, {
+          version: article.version, blocks: [{ id: blockId, type: 'markdown', markdown }],
+        });
+        assert.equal(result.status, 200);
+        article = await result.json();
+      }
+      const paths = await readdir(join(root, 'data'));
+      assert.ok(paths.includes('chronicle.sqlite'));
+      assert.ok(paths.every(name => /^chronicle\.sqlite(?:-wal|-shm)?$/.test(name)));
+      const database = new DatabaseSync(join(root, 'data', 'chronicle.sqlite'), { readOnly: true });
+      try {
+        const row = database.prepare(`
+          SELECT count(*) AS count FROM documents WHERE work_id = ? OR knowledge_id = ? OR block_id = ?
+        `).get(work.id, noteId, blockId);
+        assert.equal(row.count, 3);
+      } finally {
+        database.close();
+      }
+      assert.equal((await get(noteRoute)).content, '正文第 99 次');
+      assert.equal((await get(workRoute)).content, '正文第 99 次');
+      assert.equal((await get(topicRoute + '?article=' + article.id)).article.blocks[0].markdown, '正文第 99 次');
     });
   } finally {
     if (server && server.exitCode === null && server.signalCode === null) {

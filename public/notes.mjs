@@ -7,6 +7,6 @@ export function openNote(work, onSaved) {
     title: work.title,
     url: `/api/works/${encodeURIComponent(work.id)}/note`,
     relatedUrl: `/knowledge?related=${encodeURIComponent(`work-note:${work.id}`)}`,
-    onSaved: note => onSaved(note.notePath),
+    onSaved: note => onSaved(note.hasNote),
   });
 }

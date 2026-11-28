@@ -9,3 +9,9 @@
 .env.*
 !.env.example
 /credentials/
+
+# SQLite libraries, snapshots, and journal sidecars
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal

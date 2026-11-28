@@ -18,9 +18,9 @@ New-Item -ItemType Directory -Path $app,$runtime -Force | Out-Null
 # Archive an explicit allowlist from Git. Local changes, data and secrets are excluded.
 $sourceZip = Join-Path $stage 'source.zip'
 $entries = @('package.json','package-lock.json','server.mjs','runtime-config.mjs','portable-launch.mjs',
-  'atomic-write.mjs','note-files.mjs','note-storage.mjs','knowledge.mjs','topics.mjs','spacetime.mjs','atlas-sources.mjs',
+  'atomic-write.mjs','personal-library.mjs','personal-maintenance.mjs','scripts/personal-library.mjs','personal-store.mjs','personal-document.mjs','personal-document-schema.mjs','note-files.mjs','note-storage.mjs','knowledge.mjs','topics.mjs','spacetime.mjs','atlas-sources.mjs',
   'atlas-place-index.mjs','atlas-event-catalog.mjs','fixtures.json','public','portable','README.md',
-  'docs/DATA_SOURCES.md','docs/HANDOFF.md')
+  'docs/DATA_SOURCES.md','docs/HANDOFF.md','docs/V9_STORAGE.md')
 git -C $repo archive --format=zip --output=$sourceZip $commit -- $entries
 if ($LASTEXITCODE -ne 0) { throw 'Unable to archive the source commit.' }
 Expand-Archive -LiteralPath $sourceZip -DestinationPath $app

@@ -8,8 +8,10 @@ import { once } from 'node:events';
 import { pathToFileURL } from 'node:url';
 import { atomicWrite } from './atomic-write.mjs';
 import { NoteError } from './note-files.mjs';
-import { exportNote, exportNotes, imageLimit, loadImage, loadNote, noteLimit,
-  notePath, saveImage, saveNote } from './note-storage.mjs';
+import { exportNote, exportNotes, imageLimit, loadNote, noteLimit } from './note-storage.mjs';
+import { openLibrary } from './personal-library.mjs';
+import { personalStore, workDocument } from './personal-store.mjs';
+import { join } from 'node:path';
 import { atlasYears } from './atlas-sources.mjs';
 import { experienceError } from './public/experience.mjs';
 import { asDirectory, configure, locateData, lockData, loopback } from './runtime-config.mjs';
@@ -22,10 +24,7 @@ try {
   throw new Error('无法打开指定的资料目录。请核对配置或从备份恢复；全新安装需要显式初始化。', { cause: error });
 }
 const guard = await lockData(paths.identity);
-const dataDirectory = asDirectory(paths.canonical);
 const atlasDirectory = asDirectory(config.atlas);
-const dataFile = new URL('chronicle.json', dataDirectory);
-const modeFile = new URL('.chronicle-mode', dataDirectory);
 const assets = new Map([
   ['/topics.mjs', ['topics.mjs', 'text/javascript']],
   ['/topics.css', ['topics.css', 'text/css']],
@@ -87,26 +86,6 @@ function queueWrite(action) {
   return result;
 }
 
-async function readWorksIndex() {
-  const saved = JSON.parse(await readFile(dataFile, 'utf8'));
-  if (saved?.schemaVersion !== 1 || !Array.isArray(saved.works) ||
-      !saved.works.every(validWork) || new Set(saved.works.map(work => work.id)).size !== saved.works.length) {
-    throw new Error('作品索引格式无效');
-  }
-  return saved;
-}
-
-async function readWorks() {
-  return (await readWorksIndex()).works;
-}
-
-let versionedWrites = false;
-
-async function writeWorks(works, versioned = versionedWrites) {
-  await atomicWrite(dataFile, JSON.stringify({ schemaVersion: 1, versionedWrites: versioned || undefined, works }, null, 2));
-  versionedWrites = versioned;
-}
-
 async function readBody(request, limit) {
   const chunks = [];
   let size = 0;
@@ -148,34 +127,29 @@ function send(response, status, value) {
   response.end(JSON.stringify(value));
 }
 
+let db;
+let store;
 try {
-  if (paths.newDirectory) {
-    await mkdir(paths.canonical);
-    const works = config.mode === 'demo' ? JSON.parse(await readFile(new URL('./fixtures.json', import.meta.url), 'utf8')) : [];
-    await atomicWrite(modeFile, config.mode);
-    await writeWorks(works);
-  } else {
-    const prior = await readFile(modeFile, 'utf8').catch(error => {
-      if (error.code === 'ENOENT' && config.mode === 'formal') return 'formal';
-      throw error;
-    });
-    if (prior.trim() !== config.mode) throw new Error('资料库运行模式不匹配');
+  if (paths.newDirectory) await mkdir(paths.canonical);
+  db = await openLibrary(join(paths.canonical, 'chronicle.sqlite'), { mode: config.mode, initialize: paths.newDirectory });
+  store = personalStore(db);
+  if (paths.newDirectory && config.mode === 'demo') {
+    const works = JSON.parse(await readFile(new URL('./fixtures.json', import.meta.url), 'utf8'));
+    store.writeWorks(works, false);
   }
-  versionedWrites = Boolean((await readWorksIndex()).versionedWrites);
 } catch (error) {
-  throw new Error('资料库无法验证。请核对运行模式和资料目录，并从备份恢复缺失或损坏的索引。', { cause: error });
+  db?.close();
+  guard.close();
+  throw new Error('资料库无法验证。请核对运行模式和 SQLite 资料目录，或从备份恢复。', { cause: error });
 }
+const { readWorks, writeWorks } = store;
 const allowedOrigins = new Set();
 const token = randomBytes(32).toString('hex');
 let stopping = false;
 let address;
-const knowledge = createKnowledgeService({ data: dataDirectory, readWorks, readJson, readBody, send, queueWrite,
+const knowledge = createKnowledgeService({ store, readWorks, readJson, readBody, send, queueWrite,
   readTopics: () => topics.read(), topicImpact: (id, notes, index) => topics.impact(id, notes, index) });
-const topics = createTopicService({ data: dataDirectory, readWorks, readKnowledge: knowledge.read, readJson, send, queueWrite });
-await knowledge.reconcile().catch(error => {
-  throw new Error('知识库索引无法读取，请从同一份资料备份恢复。', { cause: error });
-});
-
+const topics = createTopicService({ store, readWorks, readKnowledge: knowledge.read, readJson, send, queueWrite });
 async function handleNote(request, response, id, suffix, name) {
   const findWork = works => {
     const work = works.find(item => item.id === id);
@@ -184,15 +158,15 @@ async function handleNote(request, response, id, suffix, name) {
   };
   if (request.method === 'GET') {
     const work = findWork(await readWorks());
-    if (!suffix) return send(response, 200, await loadNote(dataDirectory, work));
+    if (!suffix) return send(response, 200, await loadNote(store, work));
     if (suffix === 'assets' && name) {
-      const { bytes, type } = await loadImage(dataDirectory, id, name);
+      const { bytes, type } = await store.loadImage(workDocument(id), name);
       response.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'private, no-store' });
       return response.end(bytes);
     }
     if (!name && (suffix === 'export.md' || suffix === 'export.zip')) {
       const zip = suffix.endsWith('.zip');
-      const bytes = await exportNote(dataDirectory, work, zip);
+      const bytes = await exportNote(store, work, zip);
       response.writeHead(200, {
         'Content-Type': zip ? 'application/zip' : 'text/markdown; charset=utf-8',
         'Content-Disposition': `attachment; filename="note.${zip ? 'zip' : 'md'}"`,
@@ -211,13 +185,8 @@ async function handleNote(request, response, id, suffix, name) {
     const saved = await queueWrite(async () => {
       const works = await readWorks();
       const work = findWork(works);
-      const path = notePath(id);
-      await saveNote(dataDirectory, work, note.content, note.revision);
-      if (work.notePath !== path) {
-        work.notePath = path;
-        await writeWorks(works);
-      }
-      return { ...await loadNote(dataDirectory, work), notePath: path };
+      store.saveWorkNote(id, note.content, note.revision);
+      return { ...loadNote(store, work), hasNote: true };
     });
     return send(response, 200, saved);
   }
@@ -225,18 +194,14 @@ async function handleNote(request, response, id, suffix, name) {
     const bytes = await readBody(request, imageLimit);
     const path = await queueWrite(async () => {
       findWork(await readWorks());
-      return saveImage(dataDirectory, id, bytes, request.headers['content-type']);
+      return store.upload(workDocument(id), bytes, request.headers['content-type']);
     });
     return send(response, 201, { path });
   }
   if (request.method === 'DELETE' && !suffix) {
     await queueWrite(async () => {
-      const works = await readWorks();
-      const work = findWork(works);
-      if (!work.notePath) throw new NoteError(404, '找不到已保存的作品笔记');
-      delete work.notePath;
-      await writeWorks(works);
-      await knowledge.reconcile(works);
+      findWork(readWorks());
+      if (!store.deleteWorkNote(id)) throw new NoteError(404, '找不到已保存的作品笔记');
     });
     return send(response, 200, { deleted: true });
   }
@@ -290,10 +255,10 @@ const server = createServer(async (request, response) => {
       }
       const byId = new Map((await readWorks()).map(work => [work.id, work]));
       const works = ids.map(id => byId.get(id));
-      if (works.some(work => !work?.notePath)) {
+      if (works.some(work => !work?.hasNote)) {
         throw new NoteError(409, '部分作品的笔记已不可用，请刷新作品库后重试');
       }
-      const zip = await exportNotes(dataDirectory, works);
+      const zip = await exportNotes(store, works);
       response.writeHead(200, {
         'Content-Type': 'application/zip',
         'Content-Disposition': 'attachment; filename="chronicle-notes.zip"',
@@ -347,18 +312,17 @@ const server = createServer(async (request, response) => {
       await queueWrite(async () => {
         const current = await readWorks();
         const version = request.headers['if-match'];
-        const protectedLibrary = versionedWrites || [...current, ...works].some(work =>
+        const protectedLibrary = store.versionedWrites() || [...current, ...works].some(work =>
           work.segments.some(segment => segment.id || segment.place || segment.description || segment.longitude !== undefined));
         if ((version !== undefined && version !== worksVersion(current)) ||
             (version === undefined && protectedLibrary)) {
           throw new NoteError(409, '作品库已变更，请刷新后重新编辑');
         }
-        const notes = new Map(current.map(work => [work.id, work.notePath]));
-        const next = works.map(work => ({ ...work, notePath: notes.get(work.id),
+        const notes = new Map(current.map(work => [work.id, work.hasNote]));
+        const next = works.map(work => ({ ...work, hasNote: notes.get(work.id),
           segments: version === undefined ? work.segments : workAnnotations(work) }));
         await writeWorks(next, version !== undefined);
         response.setHeader('ETag', worksVersion(next));
-        if ([...notes.keys()].some(id => !works.some(work => work.id === id))) await knowledge.reconcile(next);
       });
       return send(response, 200, { saved: true });
     }
@@ -411,6 +375,7 @@ async function stop() {
   try {
     await new Promise(resolve => server.close(resolve));
     await pendingWrite;
+    db.close();
     if (stateWritten) await rm(paths.state, { force: true });
   } catch (error) {
     console.error('关闭 Chronicle 时出现错误', error);

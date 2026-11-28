@@ -3,7 +3,7 @@ import { NoteError } from './note-files.mjs';
 
 const hash = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 // Note pointers are preserved from the latest index on every work save.
-export const worksVersion = works => '"' + hash(works.map(({ notePath, ...work }) => work)) + '"';
+export const worksVersion = works => '"' + hash(works.map(({ hasNote, ...work }) => work)) + '"';
 
 export function validAnnotation(item, { legacyWork = false } = {}) {
   if (!item || typeof item !== 'object') return false;

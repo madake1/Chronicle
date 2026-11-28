@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=20.19.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "start": "node server.mjs",
@@ -13,6 +13,11 @@
     "atlas:import-places": "node scripts/import-places.mjs"
   },
   "dependencies": {
+    "@tiptap/core": "^3.35.1",
+    "@tiptap/extension-code": "^3.35.1",
+    "@tiptap/extension-image": "^3.35.1",
+    "@tiptap/extension-table": "^3.35.1",
+    "@tiptap/starter-kit": "^3.35.1",
     "entities": "^8.1.0",
     "fflate": "^0.8.3",
     "maplibre-gl": "6.19.0",
