@@ -3,6 +3,8 @@ import { mkdtemp, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
+import { personalStore } from './personal-store.mjs';
+import { restorePersonalBackup, savePersonalBackup, validatePersonalLibrary } from './personal-maintenance.mjs';
 import { backupLibrary, checkLibrary, collectUnreferencedImages, openLibrary, stageImage, syncDocumentImages, transaction } from './personal-library.mjs';
 
 test('SQLite validates mode, rolls back failed writes, and backs up committed WAL data', async () => {
@@ -97,6 +99,45 @@ test('shared images use one BLOB and survive until the last committed or draft r
       checkLibrary(db);
     } finally {
       db.close();
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('backup captures WAL, restore retains the previous library, and rejects wrong mode or inconsistent data', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'Chronicle restore '));
+  const file = join(directory, 'chronicle.sqlite');
+  const backup = join(directory, 'snapshot.sqlite');
+  const previous = join(directory, 'pre-restore.sqlite');
+  const work = { id: 'restore-test', title: 'before', type: '小说', status: '未开始', segments: [] };
+  try {
+    const db = await openLibrary(file, { mode: 'formal', initialize: true });
+    try {
+      const store = personalStore(db);
+      db.exec('PRAGMA wal_autocheckpoint = 0');
+      store.writeWorks([work], false);
+      store.saveWorkNote(work.id, '恢复测试', null);
+      await savePersonalBackup({ data: directory, mode: 'formal', destination: backup });
+      store.writeWorks([{ ...work, title: 'after' }], false);
+      db.exec("INSERT INTO knowledge VALUES ('broken', '{}')");
+      assert.throws(() => validatePersonalLibrary(db), /缺少正文/);
+      db.exec("DELETE FROM knowledge WHERE id = 'broken'");
+    } finally {
+      db.close();
+    }
+    await assert.rejects(restorePersonalBackup({ data: directory, mode: 'demo', source: backup, previous }), /模式不匹配/);
+    await restorePersonalBackup({ data: directory, mode: 'formal', source: backup, previous });
+    for (const [path, title] of [[file, 'before'], [previous, 'after']]) {
+      const opened = await openLibrary(path, { mode: 'formal' });
+      try {
+        validatePersonalLibrary(opened);
+        const store = personalStore(opened);
+        assert.equal(store.readWorks()[0].title, title);
+        assert.equal(store.readDocument('work-note:' + work.id).content, '恢复测试');
+      } finally {
+        opened.close();
+      }
     }
   } finally {
     await rm(directory, { recursive: true, force: true });

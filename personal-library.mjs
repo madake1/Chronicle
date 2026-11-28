@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { backup, DatabaseSync } from 'node:sqlite';
-import { open } from 'node:fs/promises';
+import { open, rm } from 'node:fs/promises';
 import { constants } from 'node:fs';
 
 const applicationId = 0x4348524e;
@@ -35,9 +35,10 @@ const migrations = [`
   ) STRICT;
   CREATE TABLE topic_works (
     topic_id TEXT REFERENCES topics(id) ON DELETE CASCADE,
-    work_id TEXT REFERENCES works(id) ON DELETE CASCADE,
+    original_work_id TEXT NOT NULL, work_id TEXT REFERENCES works(id) ON DELETE SET NULL,
     position INTEGER NOT NULL,
-    PRIMARY KEY (topic_id, work_id), UNIQUE (topic_id, position)
+    PRIMARY KEY (topic_id, original_work_id), UNIQUE (topic_id, position),
+    CHECK (work_id IS NULL OR work_id = original_work_id)
   ) STRICT, WITHOUT ROWID;
   CREATE INDEX topic_works_work ON topic_works(work_id);
   CREATE TABLE articles (
@@ -157,23 +158,38 @@ export function checkLibrary(db) {
       db.prepare('PRAGMA foreign_key_check').get()) throw new Error('Chronicle 资料库完整性检查失败');
 }
 
-export async function backupLibrary(db, destination, mode) {
-  const handle = await open(destination, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR);
-  await handle.close();
-  await backup(db, destination);
-  const snapshot = new DatabaseSync(destination, { readOnly: true, enableForeignKeyConstraints: true });
+export function openLibrarySnapshot(file, mode) {
+  const db = new DatabaseSync(file, { readOnly: true, enableForeignKeyConstraints: true });
   try {
-    if (snapshot.prepare('PRAGMA application_id').get().application_id !== applicationId ||
-        snapshot.prepare('PRAGMA user_version').get().user_version !== librarySchemaVersion ||
-        snapshot.prepare('SELECT mode FROM library WHERE singleton = 1').get()?.mode !== mode) {
+    const id = db.prepare('PRAGMA application_id').get().application_id;
+    const version = db.prepare('PRAGMA user_version').get().user_version;
+    if (id !== applicationId || version !== librarySchemaVersion ||
+        db.prepare('SELECT mode FROM library WHERE singleton = 1').get()?.mode !== mode) {
       throw new Error('Chronicle 备份格式或资料库模式不匹配');
     }
-    checkLibrary(snapshot);
-  } finally {
-    snapshot.close();
+    return db;
+  } catch (cause) {
+    db.close();
+    throw cause;
   }
 }
 
+export async function backupLibrary(db, destination, mode, validate = checkLibrary) {
+  const handle = await open(destination, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR);
+  await handle.close();
+  try {
+    await backup(db, destination);
+    const snapshot = openLibrarySnapshot(destination, mode);
+    try {
+      validate(snapshot);
+    } finally {
+      snapshot.close();
+    }
+  } catch (cause) {
+    await rm(destination, { force: true });
+    throw cause;
+  }
+}
 // Draft aliases are scoped to their owner. A commit promotes only the aliases it uses.
 // Run synchronization in the same transaction as the corresponding document write.
 export function stageImage(db, { owner, name, mime, bytes, expiresAt }) {
@@ -212,13 +228,14 @@ export function syncDocumentImages(db, documentId, names, now = Date.now()) {
   }
 }
 
-export function collectUnreferencedImages(db, now = Date.now()) {
-  return transaction(db, () => {
+export function collectUnreferencedImages(db, now = Date.now(), ownTransaction = true) {
+  const collect = () => {
     db.prepare('DELETE FROM draft_images WHERE expires_at <= ?').run(now);
     return db.prepare(`
       DELETE FROM images
       WHERE NOT EXISTS (SELECT 1 FROM document_images WHERE image_id = images.id)
         AND NOT EXISTS (SELECT 1 FROM draft_images WHERE image_id = images.id)
     `).run().changes;
-  });
+  };
+  return ownTransaction ? transaction(db, collect) : collect();
 }

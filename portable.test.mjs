@@ -38,7 +38,7 @@ test('便携启动、模式隔离、同库独占、停止和崩溃恢复', { tim
   let foreign;
   let verifiedPid;
   try {
-    for (const name of ['server.mjs', 'runtime-config.mjs', 'portable-launch.mjs', 'atomic-write.mjs', 'knowledge.mjs','topics.mjs', 'spacetime.mjs',
+    for (const name of ['server.mjs', 'personal-library.mjs', 'personal-store.mjs', 'personal-document.mjs', 'personal-document-schema.mjs', 'runtime-config.mjs', 'portable-launch.mjs', 'atomic-write.mjs', 'knowledge.mjs','topics.mjs', 'spacetime.mjs',
       'note-files.mjs', 'note-storage.mjs', 'atlas-sources.mjs', 'fixtures.json', 'public/experience.mjs', 'public/index.html']) {
       await cp(new URL(name, import.meta.url), join(app, name));
     }
@@ -84,7 +84,7 @@ test('便携启动、模式隔离、同库独占、停止和崩溃恢复', { tim
     }), /运行模式不匹配/);
     const otherRoot = join(root, '其他正式资料');
     await mkdir(otherRoot);
-    await writeFile(join(otherRoot, 'chronicle.json'), '{"schemaVersion":1,"works":[]}');
+    await writeFile(join(otherRoot, 'chronicle.sqlite'), '{"schemaVersion":1,"works":[]}');
     await start();
     verifiedPid = (await live()).pid;
     await writeFile(config, JSON.stringify({ port, dataDir: otherRoot }));
@@ -124,11 +124,11 @@ test('便携启动、模式隔离、同库独占、停止和崩溃恢复', { tim
     await rename(data, join(root, 'saved-data'));
     await assert.rejects(start(), /资料目录缺失/);
     await rename(join(root, 'saved-data'), data);
-    await writeFile(join(data, 'chronicle.json'), 'damaged');
+    await writeFile(join(data, 'chronicle.sqlite'), 'damaged');
     await assert.rejects(run('server.mjs', [], {
       PORT: '0', CHRONICLE_MODE: 'formal', CHRONICLE_DATA_DIR: data, CHRONICLE_INIT: '1',
-    }), /请核对运行模式和资料目录/);
-    assert.equal(await readFile(join(data, 'chronicle.json'), 'utf8'), 'damaged');
+    }), /请核对运行模式和 SQLite 资料目录/);
+    assert.equal(await readFile(join(data, 'chronicle.sqlite'), 'utf8'), 'damaged');
   } finally {
     if (foreign?.listening) await closed(foreign);
     if (verifiedPid) {

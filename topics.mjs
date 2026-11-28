@@ -1,7 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { readdir } from 'node:fs/promises';
-import { atomicWrite } from './atomic-write.mjs';
-import { checkedRead, directory, NoteError, renderNoteMarkdown } from './note-files.mjs';
+import { NoteError, renderNoteMarkdown } from './note-files.mjs';
 
 const uuid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/;
 const fail = (status, message) => { throw new NoteError(status, message); };
@@ -39,7 +37,7 @@ export function topicIndex(topics, notes) {
     byTopic.set(topic.id, topicKnowledge);
     for (const article of topic.articles) {
       for (const block of article.blocks) {
-        if (block.type !== 'knowledge' || !known.has(block.knowledgeId)) continue;
+        if (block.type !== 'knowledge' || block.deleted || !known.has(block.knowledgeId)) continue;
         topicKnowledge.add(block.knowledgeId);
         if (!memberships.has(block.knowledgeId)) memberships.set(block.knowledgeId, []);
         memberships.get(block.knowledgeId).push({ topicId: topic.id, topicTitle: topic.title,
@@ -59,42 +57,9 @@ function topicImpact(references) {
   };
 }
 
-export function createTopicService({ data, readKnowledge, readWorks, readJson, send, queueWrite }) {
-  const file = new URL('topics.json', data);
-  const bodyRoot = new URL('topics/', data);
-  async function markdownFile(revision, create = false) {
-    await directory(data, create);
-    return new URL(revision + '.md', await directory(bodyRoot, create));
-  }
-  async function loadMarkdown(revision) {
-    try {
-      const bytes = await checkedRead(await markdownFile(revision));
-      if (hash(bytes) !== revision) throw new Error('正文校验失败');
-      return bytes.toString('utf8');
-    } catch (error) {
-      throw new Error('专题文章正文无法读取，请核对资料备份', { cause: error });
-    }
-  }
-  async function read() {
-    let raw;
-    try { raw = await checkedRead(file); }
-    catch (error) {
-      if (error.code !== 'ENOENT') throw new Error('专题索引无法读取', { cause: error });
-      const files = await readdir(bodyRoot).catch(failure => {
-        if (failure.code === 'ENOENT') return [];
-        throw failure;
-      });
-      if (files.some(name => /^[a-f0-9]{64}\.md$/.test(name))) {
-        try { raw = await checkedRead(file); }
-        catch (failure) { throw new Error('专题索引缺失，请从同一份备份恢复专题索引与文章正文', { cause: failure }); }
-      } else return [];
-    }
-    const index = JSON.parse(raw);
-    if (index?.schemaVersion !== 1 || !Array.isArray(index.topics) || !index.topics.every(validTopic) ||
-        !unique(index.topics.map(item => item.id))) throw new Error('专题索引格式无效');
-    return index.topics;
-  }
-  const write = topics => atomicWrite(file, JSON.stringify({ schemaVersion: 1, topics }, null, 2));
+export function createTopicService({ store, readKnowledge, readWorks, readJson, send, queueWrite }) {
+  const read = store.readTopics;
+  const write = store.writeTopics;
   const requireTopic = (topics, id) => topics.find(topic => topic.id === id) ?? fail(404, '专题不存在');
   const requireArticle = (topic, id) => topic.articles.find(article => article.id === id) ?? fail(404, '文章不存在');
   const version = (topic, expected) => {
@@ -127,7 +92,7 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
     }
     if (!validTopic(topic)) fail(400, '专题名称、简介或作品关联无效');
   }
-  async function updateArticle(article, input, notes) {
+  function updateArticle(article, input, notes) {
     if (Object.hasOwn(input, 'title')) {
       if (!text(input.title, 180, true)) fail(400, '请填写文章标题');
       article.title = input.title.trim();
@@ -136,25 +101,15 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
     if (!validBlocks(input.blocks)) fail(400, '文章内容单元无效');
     const known = new Map(notes.map(note => [note.id, note]));
     const former = new Map(article.blocks.filter(block => block.type === 'knowledge').map(block => [block.id, block]));
-    const pending = new Map();
     const blocks = input.blocks.map(block => {
       if (block.type === 'markdown') {
-        const markdown = Buffer.from(block.markdown);
-        const revision = hash(markdown);
-        pending.set(revision, markdown);
-        return { id: block.id, type: block.type, revision };
+        return { id: block.id, type: block.type, revision: hash(block.markdown), markdown: block.markdown };
       }
       const existing = former.get(block.id);
-      const note = known.get(block.knowledgeId);
+      const note = existing?.deleted && existing.knowledgeId === block.knowledgeId ? null : known.get(block.knowledgeId);
       if (!note && existing?.knowledgeId !== block.knowledgeId) fail(409, '引用的知识已不存在，请重新选择');
-      return { id: block.id, type: block.type, knowledgeId: block.knowledgeId, hint: note?.title ?? existing.hint };
+      return { id: block.id, type: block.type, knowledgeId: block.knowledgeId, hint: note?.title ?? existing.hint, deleted: !note };
     });
-    const present = new Set(article.blocks.filter(block => block.type === 'markdown').map(block => block.revision));
-    for (const [revision, markdown] of pending) {
-      const file = await markdownFile(revision, true);
-      if (present.has(revision)) await loadMarkdown(revision);
-      else await atomicWrite(file, markdown);
-    }
     article.blocks = blocks;
   }
 
@@ -164,7 +119,7 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
     const [, topicId, collection, articleId, action] = match;
     const method = request.method;
     if (method === 'GET' && !collection) {
-      const [topics, { notes, tags }, works] = await queueWrite(() => Promise.all([read(), readKnowledge(), topicId ? readWorks() : []]));
+      const [topics, { notes, tags }, works] = await queueWrite(() => Promise.all([read({ overviews: true, bodies: Boolean(topicId) }), readKnowledge(), topicId ? readWorks() : []]));
       const index = topicIndex(topics, notes);
       if (!topicId) return send(response, 200, { topics: topics.map(topic => summary(topic, index)) });
       const topic = requireTopic(topics, topicId);
@@ -175,8 +130,8 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
       const rendered = article && {
         ...article,
         blocks: await Promise.all(article.blocks.map(async block => {
-          if (block.type !== 'markdown') return { ...block, deleted: !known.has(block.knowledgeId), title: known.get(block.knowledgeId)?.title };
-          const markdown = await loadMarkdown(block.revision);
+          if (block.type !== 'markdown') return { ...block, deleted: block.deleted || !known.has(block.knowledgeId), title: block.deleted ? undefined : known.get(block.knowledgeId)?.title };
+          const markdown = block.markdown;
           return { id: block.id, type: block.type, markdown, html: renderNoteMarkdown(markdown) };
         })),
       };
@@ -189,19 +144,19 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
     const input = await readJson(request, 4 * 1024 * 1024);
     if (!input || typeof input !== 'object' || Array.isArray(input)) fail(400, '专题请求无效');
     return queueWrite(async () => {
-      const topics = await read();
+      const topics = read({ overviews: true });
       if (!topicId && method === 'POST') {
         const topic = { id: randomUUID(), version: 1, title: '', overview: '', cover: 'fern', workIds: [], articles: [] };
         updateTopic(topic, input, await readWorks());
         topics.push(topic);
-        await write(topics);
+        write(topics, topic.id);
         return send(response, 201, { id: topic.id, version: topic.version });
       }
       const topic = requireTopic(topics, topicId);
       version(topic, input.version);
       let article;
       if (!collection && method === 'DELETE') {
-        await write(topics.filter(item => item.id !== topic.id));
+        write(topics.filter(item => item.id !== topic.id), topic.id);
         return send(response, 200, { deleted: true });
       }
       if (!collection && method === 'PUT') updateTopic(topic, input, await readWorks());
@@ -216,7 +171,7 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
       } else if (collection === 'articles' && articleId) {
         article = requireArticle(topic, articleId);
         if (!action && method === 'DELETE') topic.articles = topic.articles.filter(item => item.id !== articleId);
-        else if (!action && method === 'PUT') await updateArticle(article, input, (await readKnowledge()).notes);
+        else if (!action && method === 'PUT') updateArticle(article, input, (await readKnowledge()).notes);
         else if (action === 'references' && method === 'POST') {
           const { notes } = await readKnowledge();
           const note = notes.find(item => item.id === input.knowledgeId);
@@ -225,12 +180,12 @@ export function createTopicService({ data, readKnowledge, readWorks, readJson, s
           const block = { id: randomUUID(), type: 'knowledge', knowledgeId: note.id, hint: note.title };
           article.blocks.push(block);
           topic.version++;
-          await write(topics);
+          write(topics, topic.id);
           return send(response, 201, { id: block.id, version: topic.version });
         } else fail(404, '文章接口不存在');
       } else fail(404, '专题接口不存在');
       topic.version++;
-      await write(topics);
+      write(topics, topic.id);
       return send(response, 200, { id: article?.id ?? topic.id, version: topic.version });
     });
   }

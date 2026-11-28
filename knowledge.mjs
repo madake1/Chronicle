@@ -1,9 +1,8 @@
 import { topicIndex } from './topics.mjs';
 import { saveAnnotations } from './spacetime.mjs';
-import { createHash, randomUUID } from 'node:crypto';
-import { readdir } from 'node:fs/promises';
-import { atomicWrite } from './atomic-write.mjs';
-import { checkedRead, directory, loadNoteImage, markdownExcerpt, NoteError, renderNoteMarkdown, saveNoteImage } from './note-files.mjs';
+import { createHash, randomBytes, randomUUID } from 'node:crypto';
+import { markdownExcerpt, NoteError, renderNoteMarkdown } from './note-files.mjs';
+import { knowledgeDocument } from './personal-store.mjs';
 import { exportNoteContent, imageLimit, noteLimit } from './note-storage.mjs';
 
 const kinds = new Set(['knowledge', 'work', 'work-note']);
@@ -46,56 +45,20 @@ function countTags(state) {
   return state.tags.map(tag => ({ ...tag, count: counts.get(tag.id) ?? 0, directCount: direct.get(tag.id) ?? 0 }));
 }
 
-export function createKnowledgeService({ data, readWorks, readJson, readBody, send, queueWrite, readTopics, topicImpact }) {
-  const root = new URL('knowledge/', data);
-  const index = new URL('index.json', root);
-  const blank = () => ({ schemaVersion: 1, notes: [], tags: [], relations: [] });
-  async function readIndex() {
-    const state = JSON.parse(await checkedRead(index));
-    if (state?.schemaVersion !== 1 || ![state.notes, state.tags, state.relations].every(Array.isArray)) {
-      throw new Error('知识库索引格式无效');
-    }
-    return state;
-  }
-  async function entries(path) {
-    try { return await readdir(path, { withFileTypes: true }); }
-    catch (error) { if (error.code === 'ENOENT') return []; throw error; }
-  }
-  async function read() {
-    try { return await readIndex(); }
-    catch (error) { if (error.code !== 'ENOENT') throw error; }
-    for (const item of await entries(root)) {
-      if (!item.isDirectory() || !/^note-[a-z0-9-]{36}$/.test(item.name)) continue;
-      const files = await entries(new URL(`${item.name}/`, root));
-      if (files.some(file => file.isFile() && /^[a-f0-9]{64}\.md$/.test(file.name))) {
-        try { return await readIndex(); } // A first save may have just published the index.
-        catch (error) {
-          if (error.code !== 'ENOENT') throw error;
-          fail(409, '知识索引缺失，但检测到已存正文。请停止服务，从同一备份恢复知识索引和资料。');
-        }
-      }
-    }
-    return blank();
-  }
-  async function write(state) {
-    await directory(data, true);
-    await directory(root, true);
-    await atomicWrite(index, JSON.stringify(state, null, 2));
-  }
-  async function folder(id, create = false) {
-    await directory(data, create);
-    await directory(root, create);
-    return directory(new URL(`note-${id}/`, root), create);
-  }
-  async function content(note) {
-    return (await checkedRead(new URL(`${note.revision}.md`, await folder(note.id)))).toString('utf8');
+export function createKnowledgeService({ store, readWorks, readJson, readBody, send, queueWrite, readTopics, topicImpact }) {
+  const read = store.readKnowledge;
+  const write = store.writeKnowledge;
+  function content(note) {
+    const document = store.readDocument(knowledgeDocument(note.id));
+    if (!document) throw new Error('知识条目缺少正文');
+    return document.content;
   }
   function targets(state, works) {
     return new Map([
       ...state.notes.map(note => ({ type: 'knowledge', id: note.id, title: note.title })),
       ...works.flatMap(work => {
         const entry = { type: 'work', id: work.id, title: work.title };
-        return work.notePath ? [entry, { ...entry, type: 'work-note' }] : [entry];
+        return work.hasNote ? [entry, { ...entry, type: 'work-note' }] : [entry];
       }),
     ].map(item => [key(item), item]));
   }
@@ -141,13 +104,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     for (const link of links) state.relations.push([own, link].sort());
     Object.assign(note, { title: input.title.trim(), tagIds: [...new Set(input.tagIds)], updatedAt: new Date().toISOString() });
   }
-  async function reconcile(works = null) {
-    const state = await read();
-    if (!state.relations.length) return;
-    const catalogue = targets(state, works ?? await readWorks());
-    const valid = state.relations.filter(pair => pair.every(item => catalogue.has(item)));
-    if (valid.length !== state.relations.length) await write({ ...state, relations: valid });
-  }
+
   async function list(response, url, state, topics = []) {
     const catalogue = targets(state, await readWorks());
     const tag = url.searchParams.get('tag');
@@ -292,20 +249,19 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
         html: renderNoteMarkdown(text, `${noteUrl}/assets`), related: await describeTargets(state, links) });
     }
     if (method === 'GET' && suffix === 'assets' && name) {
-      find((await read()).notes, id);
-      const { bytes, type } = await loadNoteImage(() => folder(id), name);
+      const { bytes, type } = store.loadImage(knowledgeDocument(id), name);
       response.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'private, no-store' });
       return response.end(bytes);
     }
     if (method === 'POST' && suffix === 'assets' && !name) {
       const bytes = await readBody(request, imageLimit);
-      const asset = await queueWrite(() => saveNoteImage(() => folder(id, true), bytes, request.headers['content-type']));
+      const asset = await queueWrite(() => store.upload(knowledgeDocument(id), bytes, request.headers['content-type']));
       return send(response, 201, { path: asset });
     }
     if (method === 'GET' && !name && ['export.md', 'export.zip'].includes(suffix)) {
       const note = find((await read()).notes, id);
       const zip = suffix.endsWith('.zip');
-      const bytes = await exportNoteContent(await content(note), asset => loadNoteImage(() => folder(id), asset), zip);
+      const bytes = await exportNoteContent(await content(note), asset => store.loadImage(knowledgeDocument(id), asset, false), zip);
       response.writeHead(200, { 'Content-Type': zip ? 'application/zip' : 'text/markdown; charset=utf-8',
         'Content-Disposition': `attachment; filename="knowledge.${zip ? 'zip' : 'md'}"; filename*=UTF-8''${encodeURIComponent('知识条目')}.${zip ? 'zip' : 'md'}` });
       return response.end(bytes);
@@ -318,7 +274,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
         const state = await read();
         const previous = state.notes.find(item => item.id === id);
         if (input.revision !== (previous?.revision ?? null)) fail(409, '知识已变更，请重新打开后核对');
-        const revision = createHash('sha256').update(input.content).digest('hex');
+        const revision = randomBytes(32).toString('hex');
         const now = new Date().toISOString();
         const note = { id, title: '', tagIds: [], createdAt: now, ...previous, revision, updatedAt: now };
         const catalogue = targets(state, await readWorks());
@@ -328,10 +284,9 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
           applyMetadata(state, catalogue, note, input.metadata, previous ? metadataVersion(previous, links) : null);
         }
         const links = await describeTargets(state, related(state, catalogue, own));
-        await atomicWrite(new URL(`${revision}.md`, await folder(id, true)), input.content);
         if (previous) Object.assign(previous, note);
         else state.notes.push(note);
-        await write(state);
+        write(state, { id, revision, source: input.content });
         return send(response, 200, { ...note, content: input.content, related: links,
           metadataVersion: metadataVersion(note, links), html: renderNoteMarkdown(input.content, `${noteUrl}/assets`) });
       });
@@ -363,5 +318,5 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     }
     fail(404, '找不到知识库接口');
   }
-  return { read, handle, reconcile };
+  return { read, handle };
 }

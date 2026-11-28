@@ -56,9 +56,9 @@ function select(work) {
 }
 
 function noteButton(work) {
-  const control = button(work.notePath ? '查看笔记' : '创建笔记', () => {
-    openNote(work, notePath => {
-      work.notePath = notePath;
+  const control = button(work.hasNote ? '查看笔记' : '创建笔记', () => {
+    openNote(work, hasNote => {
+      work.hasNote = hasNote;
       for (const item of document.querySelectorAll('[data-note-work]')) {
         if (item.dataset.noteWork === work.id) {
           item.textContent = '查看笔记';

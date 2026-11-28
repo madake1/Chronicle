@@ -1,16 +1,27 @@
 # V9.0 个人资料存储
 
-本分支正在开发 V9.0。V8 已合入 main，V7.1 停止分发，原发行标签保留。旧 release 分支流程暂停。V9.2 再评估正式发行。
+V9 使用全新 SQLite 库。V7.1 和 V8 的文件格式及迁移不进入 V9。V8 已合入 main，V7.1 停止分发，历史标签保留。旧 release 分支流程暂停。V9.1 接入正式 Tiptap 编辑器以及单篇 HTML、PDF 和 Markdown ZIP 导出。V9.2 做界面优化。
 
-## 当前实现
+## 数据与事务
 
-- `personal-library.mjs` 定义 SQLite 应用标记、schema 1、资料库模式、事务以及外键。SQLite 由便携 Node.js 24.22.3 自带。知识、作品、专题概述和文章正文各使用唯一文档行。专题有序块保留原知识 ID 和可空外键，删除知识时保留块及标题提示。
-- 图片按 SHA-256 去重并保存原始 BLOB。正文图片表记录所有者别名，草稿租约按所有者隔离。清理同时检查正文引用和草稿租约。
-- `personal-document.mjs` 定义文档格式 1。正文使用 ProseMirror 风格节点树，支持标题、段落、引用、列表、代码、表格、链接及基础 marks。表格分区和软换行为扩展节点，图片用附件 ID 与正文内的兼容别名。Markdown 重新序列化后会重解析并逐一对比结构，发现往返变化时拒绝转换。
-- `legacy-library.mjs` 提供只读盘点与独立 SQLite 目标导入的内部接口。旧目标路径已存在时拒绝覆盖。校验当前正文的散列，统计已识别的旧正文和未被当前正文引用的附件。已可访问的旧附件保留所有者授权。合成 V7.1 库验证通过。
+- 每个资料目录含一个 `chronicle.sqlite`。模块校验 SQLite 应用标记、`user_version` 和资料库模式。日志、配置、个人数据库与 `atlas-data/` 相互独立。开发默认使用独立局部目录，演示必须显式启用。
+- `personal-library.mjs` 提供事务、外键及快照；`personal-store.mjs` 是 HTTP 业务的个人资料存储入口。作品、知识、专题和文档有稳定 ID。标签关系、专题作品关系、双向关联与有序文章块由外键约束。
+- 所有正文使用 `documents` 表和正文 schema 1。保存只更新当前行，知识和作品笔记使用独立随机修订令牌，专题使用乐观版本号。删除知识时，引用块继续保留原 ID、原位置及标题提示。有效专题反查和个人时空从当前资料派生。
+- `personal-document-schema.mjs` 通过 Tiptap 的 `getSchema` 建立实际 ProseMirror schema，并调用 `Node.check()` 检验正文。使用标准表格行、单元格及段落，扩展单元格对齐、软换行和图片附件属性。支持标题、列表、引用、代码块、粗体、斜体、删除线、链接、行内代码和换行。过渡编辑器将 JSON 转成规范 Markdown，排版标记如链接写法可被规范化；无法表示的内容返回错误并保留原记录。
+- 图片 BLOB 在整库按 SHA-256 去重。正文中的可访问图片需要所有者授权，保存事务同步附件关系。草稿上传租约为 24 小时；正文写入和清理检查所有有效引用和草稿。外部图片仍按原界面规则显示替代文字，内嵌 Base64 图片应使用附件上传。
+- 作品摘要、简评等纯文本留在各自元数据中。历史时空数据、地图查询与构建流程沿用原有格式。
 
-## 切换与恢复边界
+## 初始化、备份与恢复
 
-SQLite 在线备份使用 Node 的 backup 接口，可纳入 WAL 中已提交的数据。快照随后检查应用标记、schema、资料库模式、完整性和外键。恢复作业和业务一致性校验仍待接入。
+源码启动需要 Node.js 24。正式模式下，设 `CHRONICLE_MODE=formal`、绝对 `CHRONICLE_DATA_DIR` 和 `CHRONICLE_INIT=1`，指定尚不存在的独立资料目录可初始化。便携首次使用默认目录可由 BAT 初始化。已经存在的资料目录缺库时，服务拒绝创建空库。V9 不读取旧 JSON 或 Markdown 文件库。
 
-正常服务仍走旧文件库。下一步是在统一事务入口接入现有 HTTP 业务，完成新库初始化和旧库拒绝写入、迁移发布与恢复命令、V8 全量回归、浏览器和便携包验收。当前接口仅用于合成库开发。真实库启用须另行取得授权，并保留原库和经过校验的完整快照。旧程序回滚时使用原格式的独立快照。
+使用下列命令创建经校验的单文件 SQLite 快照。便携版可用 `runtime/node.exe app/scripts/personal-library.mjs` 代替命令前缀。第三个参数选择与资料库匹配的模式。
+
+```powershell
+node scripts/personal-library.mjs backup formal E:/Chronicle/V9-Library E:/Chronicle/Backups/v9-latest.sqlite
+node scripts/personal-library.mjs restore formal E:/Chronicle/V9-Library E:/Chronicle/Backups/v9-latest.sqlite E:/Chronicle/Backups/v9-before-restore.sqlite
+```
+
+备份允许服务运行，包含 WAL 中已提交的数据。恢复须停止服务，维护工具获取同一资料目录锁。先验证来源，再为现有库另建快照，最后替换数据库。已有备份文件拒绝覆盖。校验涵盖 SQLite 完整性、外键、资料模式、正文 schema 和附件散列。损坏库应保留原目录，将有效快照恢复到新建的空目录，再修改配置。定期保留数份独立快照，至少有一份位于另一块磁盘。运行时 `-wal` 和 `-shm` 是事务辅助文件，运行期间应通过备份命令取快照。
+
+旧资料目录、程序、配置、现有备份和地图资料分别管理。V9 测试使用新建的隔离数据库，现有正式实例无需更改。

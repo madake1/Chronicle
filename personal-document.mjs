@@ -1,11 +1,12 @@
 import MarkdownIt from 'markdown-it';
+import { checkDocument } from './personal-document-schema.mjs';
 
 const parser = new MarkdownIt({ html: false });
 const blockNodes = {
   paragraph: 'paragraph', heading: 'heading', blockquote: 'blockquote',
   bullet_list: 'bulletList', ordered_list: 'orderedList', list_item: 'listItem',
   table: 'table', tr: 'tableRow', th: 'tableHeader', td: 'tableCell',
-  thead: 'tableHead', tbody: 'tableBody',
+
 };
 const markTypes = { strong: 'bold', em: 'italic', s: 'strike', link: 'link' };
 export const documentFormatVersion = 1;
@@ -41,6 +42,7 @@ function appendInline(parent, tokens, resolveImage) {
         break;
       case 'image': {
         const src = token.attrGet('src');
+        if (/^data:/i.test(src)) throw new Error('请通过附件上传图片，正文不接受内嵌图片数据');
         const name = /^(?:\.\/)?assets\/([a-f0-9-]{36}\.(?:png|jpg|gif|webp))$/.exec(src)?.[1];
         const attachmentId = name ? resolveImage(name) : null;
         if (name && !attachmentId) throw new Error(`找不到正文附件 ${name}`);
@@ -67,7 +69,13 @@ export function markdownDocument(source, resolveImage = () => undefined) {
     const content = parent.content ??= [];
     const base = token.type.replace(/_(open|close)$/, '');
     if (token.type === 'inline') {
-      appendInline(parent, token.children ?? [], resolveImage);
+      if (parent.type === 'tableHeader' || parent.type === 'tableCell') {
+        const paragraph = { type: 'paragraph', content: [] };
+        appendInline(paragraph, token.children ?? [], resolveImage);
+        content.push(paragraph);
+      } else appendInline(parent, token.children ?? [], resolveImage);
+    } else if (base === 'thead' || base === 'tbody') {
+      continue;
     } else if (token.nesting === -1 && blockNodes[base]) {
       parents.pop();
     } else if (token.nesting === 1 && blockNodes[base]) {
@@ -89,6 +97,8 @@ export function markdownDocument(source, resolveImage = () => undefined) {
       throw new Error(`不支持 Markdown 块节点 ${token.type}`);
     }
   }
+  if (!root.content.length) root.content.push({ type: 'paragraph', content: [] });
+  checkDocument(root);
   return root;
 }
 
@@ -129,7 +139,7 @@ function inlineMarkdown(nodes = []) {
       case 'image': {
         const { attachmentId, name, src, alt, title } = node.attrs;
         const target = attachmentId ? 'assets/' + name : src;
-        parts.push(`![${alt.replace(/[\\\[\]]/g, '\\$&')}](<${target}>${title ? ' ' + JSON.stringify(title) : ''})`);
+        parts.push(`![${alt.replace(/[\\\[\]]/g, '\\$&')}](${attachmentId ? target : "<" + target + ">"}${title ? ' ' + JSON.stringify(title) : ''})`);
         break;
       }
       case 'hardBreak':
@@ -152,7 +162,7 @@ function blockMarkdown(node) {
     case 'doc':
       return blocks.map(blockMarkdown).join('\n\n');
     case 'paragraph':
-      return inlineMarkdown(blocks);
+      return inlineMarkdown(blocks).replace(/^(\d{1,9})([.)])(?=\s)/gm, '$1\\$2');
     case 'heading':
       return '#'.repeat(node.attrs.level) + ' ' + inlineMarkdown(blocks);
     case 'blockquote':
@@ -174,11 +184,11 @@ function blockMarkdown(node) {
       }).join(tight ? '\n' : '\n\n');
     }
     case 'table': {
-      const [header, body] = blocks;
-      const cells = header.content[0].content;
-      const row = cells => '| ' + cells.map(cell => inlineMarkdown(cell.content)).join(' | ') + ' |';
+      const [header, ...rows] = blocks;
+      const cells = header.content;
+      const row = cells => '| ' + cells.map(cell => inlineMarkdown(cell.content[0].content)).join(' | ') + ' |';
       const align = cells.map(cell => ({ left: ':---', center: ':---:', right: '---:' })[cell.attrs.align] ?? '---');
-      return [row(cells), '| ' + align.join(' | ') + ' |', ...(body?.content ?? []).map(item => row(item.content))].join('\n');
+      return [row(cells), '| ' + align.join(' | ') + ' |', ...rows.map(item => row(item.content))].join('\n');
     }
     default:
       throw new Error(`无法输出块节点 ${node.type}`);

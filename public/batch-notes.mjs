@@ -50,7 +50,7 @@ function renderPage() {
 }
 
 export function openBatchNotes(library) {
-  works = library.filter(work => work.notePath)
+  works = library.filter(work => work.hasNote)
     .sort((left, right) => left.title.localeCompare(right.title, 'zh-CN'));
   page = 0;
   selected.clear();
