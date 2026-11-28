@@ -34,13 +34,33 @@ export async function checkedRead(file) {
 markdown.renderer.rules.image = (tokens, index, options, env, self) => {
   const token = tokens[index];
   const name = assetReference.exec(token.attrGet('src'))?.[1];
-  if (!name || !assetName.test(name)) return markdown.utils.escapeHtml(token.content);
+  if (!env.assetsUrl || !name || !assetName.test(name)) return markdown.utils.escapeHtml(token.content);
   token.attrSet('src', `${env.assetsUrl}/${name}`);
   return renderImage(tokens, index, options, env, self);
 };
 
 export function renderNoteMarkdown(content, assetsUrl) {
   return markdown.render(content, { assetsUrl });
+}
+
+export function markdownExcerpt(content, limit = 120) {
+  let excerpt = '';
+  for (const token of markdown.parse(content, {})) {
+    let text = '';
+    if (token.type === 'inline') {
+      text = token.children.map(child => {
+        if (child.type === 'text' || child.type === 'code_inline') return child.content;
+        if (child.type === 'softbreak' || child.type === 'hardbreak') return ' ';
+        return '';
+      }).join('');
+    } else if (token.type === 'fence' || token.type === 'code_block') {
+      text = token.content;
+    }
+    const readable = text.trim().replace(/\s+/g, ' ');
+    if (readable) excerpt += (excerpt ? '\n' : '') + readable;
+    if (Array.from(excerpt).length >= limit) break;
+  }
+  return Array.from(excerpt).slice(0, limit).join('');
 }
 
 function imageExtension(bytes) {

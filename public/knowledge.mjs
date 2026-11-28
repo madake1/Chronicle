@@ -1,3 +1,5 @@
+import { closeToolMenu, link, readerBar, restoreReading, toolsMenu } from './knowledge-reader.mjs';
+import { chooseArticle, mountTopics, topicHref } from './topics.mjs';
 import { annotationEditor } from './annotation-editor.mjs';
 import { createNoteDialog, noteRequest } from './note-dialog.mjs';
 import { createTagManager } from './tag-manager.mjs';
@@ -5,15 +7,22 @@ import { createTagManager } from './tag-manager.mjs';
 const $ = id => document.getElementById(id);
 const base = '/api/knowledge';
 const params = new URLSearchParams(location.search);
+const topicsMode = params.get('section') === 'topics';
+let selectedTopic = params.get('topic') ?? '';
+let collection = params.get('collection') ?? (selectedTopic === 'unfiled' ? 'unfiled' : '');
+if (selectedTopic === 'unfiled') selectedTopic = '';
+if (!['filed', 'unfiled'].includes(collection)) collection = '';
 const types = { knowledge: '知识', work: '作品', 'work-note': '作品笔记' };
 $('note-dialog').querySelector('.note-editor').after($('metadata-template').content);
 const editor = createNoteDialog($('note-dialog'), { entity: '知识', untitledFile: '无标题知识' });
 const entityKey = item => `${item.type}:${item.id}`;
 const entityLabel = item => item.title || item.excerpt || '无标题知识';
-const collapsedTags = new Set();
+const expandedTags = new Set();
+let revealLinkedTag = params.has('tag');
 const recordDate = new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium' });
-let tags = [], selectedTag = '', selectedNote = null, metadata;
+let tags = [], selectedTag = params.get('tag') ?? '', selectedNote = null, metadata;
 let visibleNotes = new Set();
+let pendingNote;
 let relatedTo = params.get('related'), listVersion = 0, readerVersion = 0;
 
 function el(tag, text, className) {
@@ -53,19 +62,21 @@ function tree(parent = null) {
     const control = button(tag.name, () => browse(tag.id));
     control.setAttribute('aria-pressed', String(selectedTag === tag.id));
     control.className = 'tag-filter';
+    control.dataset.tagControl = 'select-' + tag.id;
     control.append(el('span', tag.count, 'tag-count'));
     if (tags.some(child => child.parentId === tag.id)) {
       const children = tree(tag.id);
       children.id = `tag-group-${tag.id}`;
       const toggle = button('', () => {
-        if (collapsedTags.has(tag.id)) collapsedTags.delete(tag.id);
-        else collapsedTags.add(tag.id);
+        if (expandedTags.has(tag.id)) expandedTags.delete(tag.id);
+        else expandedTags.add(tag.id);
         updateToggle();
       });
       toggle.className = 'tag-toggle';
+      toggle.dataset.tagControl = 'expand-' + tag.id;
       toggle.setAttribute('aria-controls', children.id);
       function updateToggle() {
-        const expanded = !collapsedTags.has(tag.id);
+        const expanded = expandedTags.has(tag.id);
         children.hidden = !expanded;
         toggle.textContent = expanded ? '▾' : '▸';
         toggle.setAttribute('aria-expanded', String(expanded));
@@ -82,86 +93,145 @@ function tree(parent = null) {
   }
   return list;
 }
-function browse(tag) {
+function writeFilterUrl() {
+  const url = new URL(location.href);
+  const values = { tag: selectedTag, topic: selectedTopic, collection, related: relatedTo,
+    q: $('knowledge-search').value.trim() };
+  for (const [key, value] of Object.entries(values)) {
+    if (value) url.searchParams.set(key, value);
+    else url.searchParams.delete(key);
+  }
+  history.replaceState(null, '', url);
+}
+function reloadFilters() {
+  clearTimeout(searchTimer);
   supersedeReaderRequest();
+  writeFilterUrl();
+  void loadList().catch(report);
+}
+function browse(tag) {
   selectedTag = tag;
   relatedTo = null;
-  if (mobile.matches) $('tag-index').open = false;
-  const url = new URL(location.href);
-  url.searchParams.delete('related');
-  history.replaceState(null, '', url);
-  void loadList().catch(report);
+  reloadFilters();
+}
+function renderFilters(result) {
+  const filters = $('record-filters');
+  filters.replaceChildren();
+  function chip(label, callback) {
+    const item = button(label + ' ×', callback);
+    item.setAttribute('aria-label', '清除' + label);
+    filters.append(item);
+  }
+  if (collection) chip(collection === 'filed' ? '已收录' : '未收录', () => {
+    collection = '';
+    $('collection-filter').value = '';
+    reloadFilters();
+  });
+  if (selectedTopic) chip(result.topicTitle ? '专题范围 · ' + result.topicTitle : '专题范围已失效', () => {
+    selectedTopic = '';
+    reloadFilters();
+  });
+  filters.hidden = !filters.childElementCount;
 }
 async function loadList() {
   const version = ++listVersion;
   const query = new URLSearchParams();
   if (selectedTag) query.set('tag', selectedTag);
   if (relatedTo) query.set('related', relatedTo);
+  if (selectedTopic) query.set('topic', selectedTopic);
+  if (collection) query.set('collection', collection);
   if ($('knowledge-search').value.trim()) query.set('q', $('knowledge-search').value.trim());
   const result = await json(`${base}?${query}`);
   if (version !== listVersion) return;
   visibleNotes = new Set(result.notes.map(note => note.id));
   if (selectedNote && !visibleNotes.has(selectedNote)) closeReader();
   tags = result.tags;
+  if (revealLinkedTag) {
+    const parents = new Map(tags.map(tag => [tag.id, tag.parentId]));
+    for (let id = parents.get(selectedTag); id && !expandedTags.has(id); id = parents.get(id)) expandedTags.add(id);
+    revealLinkedTag = false;
+  }
+  const focusedTag = document.activeElement?.dataset.tagControl;
   $('tag-tree').replaceChildren(tags.length ? tree() : el('p', '还没有标签', 'meta'));
+  if (focusedTag) $('tag-tree').querySelector(`[data-tag-control="${CSS.escape(focusedTag)}"]`)?.focus({ preventScroll: true });
   $('list-heading').textContent = relatedTo ? `${result.relatedTarget ? entityLabel(result.relatedTarget) : '此条目'}的关联知识` :
     selectedTag === 'untagged' ? '无标签知识' : tags.find(tag => tag.id === selectedTag)?.name ?? '全部知识';
-  $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag));
+  renderFilters(result);
+  $('all').setAttribute('aria-pressed', String(!relatedTo && !selectedTag && !selectedTopic && !collection && !$('knowledge-search').value.trim()));
   $('untagged').setAttribute('aria-pressed', String(selectedTag === 'untagged'));
   $('list-count').textContent = `${result.notes.length} 条`;
   const rows = result.notes.map(note => {
     const row = el('article', null, 'knowledge-row');
     row.dataset.noteId = note.id;
     const open = button('', () => {
-      if (selectedNote === note.id) closeReader();
+      if (selectedNote === note.id) closeReader(true);
+      else if (pendingNote === note.id) supersedeReaderRequest();
       else void showNote(note.id).catch(report);
     });
     open.className = 'knowledge-entry';
     open.setAttribute('aria-expanded', String(note.id === selectedNote && !$('reader').hidden));
     open.setAttribute('aria-controls', 'reader');
-    if (note.title) open.append(el('strong', note.title));
-    open.append(el('span', note.excerpt, 'knowledge-excerpt'));
-    row.append(open);
+    const text = el('span', null, 'knowledge-entry-text');
+    if (note.title) text.append(el('strong', note.title));
+    if (note.excerpt) text.append(el('span', note.excerpt, 'knowledge-excerpt'));
+    open.append(text);
     const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
-    const footer = el('div', null, 'entry-meta');
+    const footer = el('span', null, 'entry-meta');
     for (const name of names) footer.append(el('span', name, 'knowledge-tag'));
     const time = el('time', recordDate.format(new Date(note.createdAt)), 'meta');
     time.dateTime = note.createdAt;
     footer.append(time);
-    row.append(footer);
+    text.append(footer);
+    row.append(open);
     return row;
   });
   const reader = $('reader');
+  const focus = reader.contains(document.activeElement) ? document.activeElement : null;
+  closeToolMenu();
   $('knowledge-list').after(reader);
   $('knowledge-list').replaceChildren(...(rows.length ? rows : [el('p', '没有符合条件的知识', 'meta')]));
   placeReader();
+  if (!reader.hidden && focus?.isConnected) focus.focus({ preventScroll: true });
   return visibleNotes;
+}
+function noteEntry(id) {
+  return document.querySelector(`[data-note-id="${CSS.escape(id ?? '')}"] .knowledge-entry`);
 }
 function placeReader() {
   const reader = $('reader');
-  $('knowledge-list').after(reader);
+  let attached = false;
   for (const row of $('knowledge-list').children) {
-    const isOpen = !reader.hidden && row.dataset.noteId === selectedNote;
-    row.querySelector('.knowledge-entry')?.setAttribute('aria-expanded', String(isOpen));
-    if (isOpen) row.append(reader);
+    const control = row.querySelector('.knowledge-entry');
+    if (!control) continue;
+    const expanded = !reader.hidden && row.dataset.noteId === selectedNote;
+    row.classList.toggle('knowledge-row-open', expanded);
+    control.setAttribute('aria-expanded', String(expanded));
+    control.hidden = expanded;
+    if (expanded) {
+      if (reader.parentElement !== row) row.append(reader);
+      attached = true;
+    }
   }
+  if (!attached && reader.previousElementSibling !== $('knowledge-list')) $('knowledge-list').after(reader);
 }
-function closeReader() {
+function closeReader(restore = false) {
+  const original = noteEntry(selectedNote);
   ++readerVersion;
-  selectedNote = null;
+  selectedNote = pendingNote = null;
+  closeToolMenu();
   const reader = $('reader');
   reader.hidden = true;
-  $('knowledge-list').after(reader);
   placeReader();
   const url = new URL(location.href);
   url.searchParams.delete('note');
   history.replaceState(null, '', url);
+  if (restore) restoreReading(original ?? $('list-heading'));
 }
 function supersedeReaderRequest() {
-  if (selectedNote && $('reader').hidden) closeReader();
-  else ++readerVersion;
+  pendingNote = null;
+  ++readerVersion;
 }
-function editBody(note = null) {
+function editBody(note = null, onSave) {
   const id = note?.id ?? crypto.randomUUID();
   editor.open({
     title: note?.title,
@@ -177,7 +247,12 @@ function editBody(note = null) {
         catch { return true; }
       },
     },
-    onSaved: async () => {
+    onSaved: async saved => {
+      if (onSave) {
+        $('note-dialog').close();
+        try { await onSave(saved); } catch (error) { report(error); }
+        return;
+      }
       const intent = readerVersion;
       try {
         const visible = await loadList();
@@ -188,40 +263,69 @@ function editBody(note = null) {
 }
 async function showNote(id, { external = false } = {}) {
   if (!external && !visibleNotes.has(id)) return;
-  if (selectedNote !== id) {
-    $('reader').hidden = true;
-    placeReader();
-  }
-  selectedNote = id;
+  pendingNote = id;
+  $('knowledge-status').textContent = '';
   const version = ++readerVersion;
   let note;
   try {
     note = await json(`${base}/${id}`);
   } catch (error) {
     if (version !== readerVersion) return;
-    closeReader();
+    pendingNote = null;
+    if (external && !selectedNote) closeReader();
     throw error;
   }
   if (version !== readerVersion) return;
+  const reader = $('reader');
+  const moveFocus = document.activeElement === noteEntry(id) ||
+    (reader.contains(document.activeElement) && !reader.hidden);
+  selectedNote = id;
+  pendingNote = null;
+  closeToolMenu();
   const url = new URL(location.href);
   url.searchParams.set('note', id);
   history.replaceState(null, '', url);
-  const time = el('p', `记录于 ${recordDate.format(new Date(note.createdAt))}`, 'meta');
+  const time = el('time', `记录于 ${recordDate.format(new Date(note.createdAt))}`, 'meta');
+  time.dateTime = note.createdAt;
   const article = el('article', null, 'note-preview');
   article.innerHTML = note.html;
-  const actions = el('div', null, 'knowledge-actions');
-  actions.append(button('编辑知识', () => editBody(note)),
-    button('删除知识', async () => {
-      if (!confirm('删除这条知识及其关联？')) return;
+  const topics = el('section', null, 'detail-section');
+  const topicList = el('div', null, 'knowledge-memberships');
+  topics.append(el('h3', '所属专题'), topicList, button('加入专题文章', () => {
+    void chooseArticle(id, renderMembership);
+  }));
+  async function renderMembership() {
+    try {
+      const { references } = await json(`${base}/${id}/topics`);
+      if (!reader.contains(topicList) || reader.hidden) return;
+      const counts = new Map();
+      const displayed = new Map();
+      for (const item of references) counts.set(item.articleId, (counts.get(item.articleId) ?? 0) + 1);
+      topicList.replaceChildren(...references.map(item => {
+        const next = (displayed.get(item.articleId) ?? 0) + 1;
+        displayed.set(item.articleId, next);
+        const suffix = counts.get(item.articleId) > 1 ? ` · 引用 ${next}` : '';
+        return link(`${item.topicTitle} / ${item.articleTitle}${suffix}`, topicHref(item.topicId, item.articleId, item.blockId));
+      }));
+      if (!references.length) topicList.append(el('span', '未收录', 'meta'));
+    } catch (error) {
+      if (reader.contains(topicList) && !reader.hidden) topicList.textContent = error.message;
+    }
+  }
+  const close = button('收起', () => closeReader(true));
+  close.setAttribute('aria-controls', 'reader');
+  close.setAttribute('aria-expanded', 'true');
+  const remove = button('删除知识', async () => {
       try {
-        await json(`${base}/${id}`, 'DELETE');
-        if (selectedNote === id) {
-          closeReader();
-        }
+        const { impact } = await json(`${base}/${id}/topics`);
+        if (!confirm(`删除这条知识？它被 ${impact.topics} 个专题的 ${impact.articles} 篇文章引用，${impact.references} 处引用将保留已删除占位。`)) return;
+        await json(`${base}/${id}?topicImpact=${impact.version}`, 'DELETE');
+        if (selectedNote === id) closeReader();
         await loadList();
         $('knowledge-status').textContent = '知识已删除';
       } catch (error) { report(error); }
-    }));
+    });
+  const actions = [button('编辑知识', () => editBody(note)), toolsMenu('更多', [remove]), close];
   const links = el('section', null, 'detail-section');
   if (note.related.length) {
     links.append(el('h3', '关联条目'));
@@ -230,14 +334,18 @@ async function showNote(id, { external = false } = {}) {
     }
   }
   const names = note.tagIds.map(id => tags.find(tag => tag.id === id)?.name).filter(Boolean);
-  $('reader').replaceChildren();
-  if (note.title || !visibleNotes.has(id)) $('reader').append(el('h3', note.title || '无标题知识'));
-  $('reader').append(time);
-  if (names.length) $('reader').append(el('p', names.join(' · '), 'meta'));
-  $('reader').append(article, actions);
-  if (note.related.length) $('reader').append(links);
-  $('reader').hidden = false;
+  const header = readerBar(note.title, actions);
+  const heading = header.querySelector('h3');
+  heading.tabIndex = -1;
+  const meta = el('div', null, 'entry-meta reader-meta');
+  for (const name of names) meta.append(el('span', name, 'knowledge-tag'));
+  meta.append(time);
+  reader.replaceChildren(header, meta, article, topics);
+  if (note.related.length) reader.append(links);
+  reader.hidden = false;
   placeReader();
+  if (moveFocus || (external && document.activeElement === document.body)) restoreReading(heading);
+  void renderMembership();
 }
 async function preview(item) {
   const dialog = $('related-preview');
@@ -322,20 +430,33 @@ function loadMetadata(id, note) {
 }
 async function changeTag(id, method, payload) {
   const result = await json(id ? `${base}/tags/${id}` : `${base}/tags`, method, payload);
-  if (method === 'DELETE' && selectedTag === id) selectedTag = result.parentId ?? '';
+  if (method === 'DELETE') {
+    expandedTags.delete(id);
+    if (selectedTag === id) {
+      selectedTag = result.parentId ?? '';
+      writeFilterUrl();
+    }
+  }
   const visible = await loadList();
   if (visible?.has(selectedNote) && $('tag-dialog').open) await showNote(selectedNote);
   return result;
 }
 for (const control of document.querySelectorAll('[data-close]')) control.onclick = () => control.closest('dialog').close();
 $('new-note').onclick = () => editBody();
-$('all').onclick = () => browse('');
+$('all').onclick = () => {
+  selectedTopic = selectedTag = collection = '';
+  relatedTo = null;
+  $('collection-filter').value = $('knowledge-search').value = '';
+  reloadFilters();
+};
 $('untagged').onclick = () => browse('untagged');
+$('collection-filter').onchange = event => { collection = event.target.value; reloadFilters(); };
 let searchTimer;
 $('knowledge-search').oninput = () => {
   clearTimeout(searchTimer);
   ++listVersion;
   supersedeReaderRequest();
+  writeFilterUrl();
   searchTimer = setTimeout(() => void loadList().catch(report), 160);
 };
 const tagManager = createTagManager($('tag-dialog'), { paths: tagPaths, changeTag });
@@ -352,13 +473,27 @@ $('inline-add').onclick = async () => {
     metadataChoices();
   } catch (error) { $('metadata-error').textContent = error.message; }
 };
-const mobile = matchMedia('(max-width: 700px)');
-function syncTagIndex() { $('tag-index').open = !mobile.matches; }
-syncTagIndex();
-mobile.addEventListener('change', syncTagIndex);
-
-try {
-  const visible = await loadList();
-  const linkedNote = params.get('note');
-  if (visible && linkedNote && !selectedNote) await showNote(linkedNote, { external: true });
-} catch (error) { report(error); }
+if (topicsMode) {
+  $('records-area').hidden = true;
+  $('topics-area').hidden = false;
+  $('records-nav').removeAttribute('aria-current');
+  $('topics-nav').setAttribute('aria-current', 'page');
+  void mountTopics($('topics-area'), params, async (note, done) => {
+    try {
+      tags = (await json(base + '/tags')).tags;
+      editBody(note, done);
+    } catch (error) {
+      const status = $('topics-area').querySelector('[role=alert]');
+      status.textContent = error.message;
+    }
+  });
+} else {
+  $('knowledge-search').value = params.get('q') ?? '';
+  $('collection-filter').value = collection;
+  writeFilterUrl();
+  try {
+    const visible = await loadList();
+    const linkedNote = params.get('note');
+    if (visible && linkedNote && !selectedNote) await showNote(linkedNote, { external: true });
+  } catch (error) { report(error); }
+}

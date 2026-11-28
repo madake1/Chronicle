@@ -7,52 +7,81 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/notes.css">
   <link rel="stylesheet" href="/knowledge.css">
+  <link rel="stylesheet" href="/topics.css">
   <script type="module" src="/app-shell.mjs"></script>
   <script type="module" src="/knowledge.mjs"></script>
 </head>
 <body>
   <header class="top" data-app-shell></header>
   <main class="knowledge-main">
+    <nav class="knowledge-subnav" aria-label="知识库子板块">
+      <a class="nav-link" id="records-nav" aria-current="page" href="/knowledge">知识记录</a>
+      <a class="nav-link" id="topics-nav" href="/knowledge?section=topics">知识专题</a>
+    </nav>
+    <section id="topics-area" hidden></section>
+    <div id="records-area">
     <div class="knowledge-heading">
-      <h1>知识库</h1>
+      <div class="record-heading"><h1>知识库</h1><button id="manage-tags" class="quiet" type="button">管理标签</button></div>
       <input id="knowledge-search" type="search" aria-label="搜索标题、正文或标签" placeholder="搜索标题、正文或标签">
       <button id="new-note" class="primary" type="button">＋ 记录知识</button>
     </div>
     <p id="knowledge-status" role="status"></p>
     <div class="knowledge-layout">
       <aside class="panel knowledge-panel knowledge-index" aria-label="标签索引">
-       <details id="tag-index" open>
-        <summary>标签索引</summary>
-        <div class="knowledge-actions"><button id="all" type="button">全部知识</button><button id="untagged" type="button">无标签知识</button></div>
-        <div id="tag-tree"></div>
-        <button id="manage-tags" type="button">管理标签</button>
-       </details>
+        <div class="knowledge-actions record-navigation">
+          <button id="all" type="button">全部知识</button>
+          <button id="untagged" type="button">无标签知识</button>
+        </div>
+        <details id="tag-index" open>
+          <summary>标签索引</summary>
+          <div id="tag-tree"></div>
+        </details>
       </aside>
       <section class="panel knowledge-panel" aria-label="知识列表">
-        <div class="knowledge-list-heading"><h2 id="list-heading">全部知识</h2><span id="list-count" class="meta"></span></div>
+        <div class="knowledge-list-heading">
+          <div><h2 id="list-heading" tabindex="-1">全部知识</h2><span id="list-count" class="meta" aria-live="polite"></span></div>
+          <label class="collection-filter">收录状态 <select id="collection-filter" aria-label="收录状态">
+            <option value="">全部</option><option value="filed">已收录</option><option value="unfiled">未收录</option>
+          </select></label>
+        </div>
+        <div class="record-filters" id="record-filters" hidden></div>
         <div id="knowledge-list"></div>
         <section id="reader" aria-label="知识详情" hidden></section>
       </section>
     </div>
+    </div>
   </main>
-  <dialog id="tag-dialog" aria-labelledby="tag-heading">
-    <div class="dialog-head"><h2 id="tag-heading">管理标签</h2><button type="button" data-close aria-label="关闭">×</button></div>
+  <dialog id="tag-dialog" aria-labelledby="tag-heading" data-pane="tree">
+    <div class="dialog-head">
+      <h2 id="tag-heading">管理标签</h2><button id="tag-management-close" type="button" aria-label="关闭">×</button>
+    </div>
     <div class="tag-manager-toolbar">
       <input id="tag-management-search" type="search" aria-label="搜索标签名称或路径" placeholder="搜索标签名称或路径">
-      <button id="new-root-tag" class="primary" type="button">＋ 新建顶级标签</button>
+      <button id="new-root-tag" type="button">＋ 新建顶级标签</button>
     </div>
-    <p class="meta">知识数量含下级并去重</p>
-    <div id="tag-management-actions" hidden>
-      <p id="tag-management-selection"></p>
-      <div class="tag-selected-actions" role="group" aria-label="选中标签的操作">
-        <button type="button" data-tag-action="child">添加子标签</button>
-        <button type="button" data-tag-action="rename">重命名</button>
-        <button type="button" data-tag-action="move">移动</button>
-        <button type="button" data-tag-action="delete">删除</button>
-      </div>
+    <div class="tag-manager-panes">
+      <section class="tag-manager-tree-pane" aria-labelledby="tag-tree-heading">
+        <h3 id="tag-tree-heading">标签树</h3>
+        <p class="meta">知识数量含下级并去重</p>
+        <div id="tag-management-tree" tabindex="0"></div>
+      </section>
+      <section class="tag-manager-detail-pane" aria-label="标签详情">
+        <button id="tag-management-back" type="button">← 返回标签树</button>
+        <p id="tag-management-empty" class="meta">从标签树选择一个标签，或在上方新建顶级标签。</p>
+        <div id="tag-management-actions" hidden>
+          <h3 id="tag-management-selection"></h3>
+          <p id="tag-management-path" class="meta"></p>
+          <p id="tag-management-count" class="meta"></p>
+          <div class="tag-selected-actions" role="group" aria-label="选中标签的操作">
+            <button type="button" data-tag-action="child">添加子标签</button>
+            <button type="button" data-tag-action="rename">重命名</button>
+            <button type="button" data-tag-action="move">移动</button>
+            <button type="button" data-tag-action="delete">删除</button>
+          </div>
+        </div>
+        <div id="tag-management-editor"></div>
+      </section>
     </div>
-    <div id="tag-management-editor"></div>
-    <div id="tag-management-tree"></div>
     <p id="tag-management-status" role="status"></p>
   </dialog>
   <template id="metadata-template">

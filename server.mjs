@@ -1,3 +1,4 @@
+import { createTopicService } from './topics.mjs';
 import { projectSpacetime, validAnnotations, workAnnotations, worksVersion } from './spacetime.mjs';
 import { createServer } from 'node:http';
 import { createKnowledgeService } from './knowledge.mjs';
@@ -26,6 +27,9 @@ const atlasDirectory = asDirectory(config.atlas);
 const dataFile = new URL('chronicle.json', dataDirectory);
 const modeFile = new URL('.chronicle-mode', dataDirectory);
 const assets = new Map([
+  ['/topics.mjs', ['topics.mjs', 'text/javascript']],
+  ['/topics.css', ['topics.css', 'text/css']],
+  ['/knowledge-reader.mjs', ['knowledge-reader.mjs', 'text/javascript']],
   ['/app-shell.mjs', ['app-shell.mjs', 'text/javascript']],
   ['/map-reference.mjs', ['map-reference.mjs', 'text/javascript']],
   ['/timeline-layout.mjs', ['timeline-layout.mjs', 'text/javascript']],
@@ -165,7 +169,9 @@ const allowedOrigins = new Set();
 const token = randomBytes(32).toString('hex');
 let stopping = false;
 let address;
-const knowledge = createKnowledgeService({ data: dataDirectory, readWorks, readJson, readBody, send, queueWrite });
+const knowledge = createKnowledgeService({ data: dataDirectory, readWorks, readJson, readBody, send, queueWrite,
+  readTopics: () => topics.read(), topicImpact: (id, notes, index) => topics.impact(id, notes, index) });
+const topics = createTopicService({ data: dataDirectory, readWorks, readKnowledge: knowledge.read, readJson, send, queueWrite });
 await knowledge.reconcile().catch(error => {
   throw new Error('知识库索引无法读取，请从同一份资料备份恢复。', { cause: error });
 });
@@ -295,19 +301,35 @@ const server = createServer(async (request, response) => {
       });
       return response.end(zip);
     }
+    if (/^\/api\/topics(?:[/?]|$)/.test(request.url)) {
+      return await topics.handle(request, response, new URL(request.url, 'http://localhost'));
+    }
     if (/^\/api\/knowledge(?:[/?]|$)/.test(request.url)) {
       return await knowledge.handle(request, response, new URL(request.url, 'http://localhost'));
     }
     if (/^\/api\/spacetime(?:\?|$)/.test(request.url) && request.method === 'GET') {
-      const layer = new URL(request.url, 'http://localhost').searchParams.get('layer');
+      const params = new URL(request.url, 'http://localhost').searchParams;
+      const layer = params.get('layer');
+      const topicId = params.get('topic');
+      const articleId = params.get('article');
       if (layer !== null && !['work', 'knowledge', 'both'].includes(layer)) {
         return send(response, 400, { error: '未知的个人时空图层' });
       }
-      const [works, { notes, tags }] = await queueWrite(() => Promise.all([
-        layer === 'knowledge' ? [] : readWorks(),
-        layer === 'work' ? { notes: [], tags: [] } : knowledge.read(),
-      ]));
-      return send(response, 200, projectSpacetime(works, notes, tags));
+      if (params.has('topic') && !topicId || params.has('article') && (!articleId || !topicId)) {
+        return send(response, 400, { error: '无效的专题或文章范围' });
+      }
+      const [works, { notes, tags }, scope] = await queueWrite(async () => {
+        const [works, knowledgeState] = await Promise.all([
+          layer === 'knowledge' ? [] : readWorks(),
+          layer === 'work' && !topicId ? { notes: [], tags: [] } : knowledge.read(),
+        ]);
+        return [works, knowledgeState, topicId ? await topics.scope(topicId, articleId, knowledgeState.notes) : null];
+      });
+      const ids = scope && new Set(scope.knowledgeIds);
+      const worksInScope = scope ? works.filter(work => scope.workIds.includes(work.id)) : works;
+      const notesInScope = layer === 'work' ? [] : scope ? notes.filter(note => ids.has(note.id)) : notes;
+      const result = projectSpacetime(worksInScope, notesInScope, layer === 'work' ? [] : tags);
+      return send(response, 200, scope ? { ...result, scope: { title: scope.title } } : result);
     }
     if (['/api/works', '/api/works?annotations=1'].includes(request.url) && request.method === 'GET') {
       const works = await readWorks();

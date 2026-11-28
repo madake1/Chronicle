@@ -1,8 +1,9 @@
+import { topicIndex } from './topics.mjs';
 import { saveAnnotations } from './spacetime.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { readdir } from 'node:fs/promises';
 import { atomicWrite } from './atomic-write.mjs';
-import { checkedRead, directory, loadNoteImage, NoteError, renderNoteMarkdown, saveNoteImage } from './note-files.mjs';
+import { checkedRead, directory, loadNoteImage, markdownExcerpt, NoteError, renderNoteMarkdown, saveNoteImage } from './note-files.mjs';
 import { exportNoteContent, imageLimit, noteLimit } from './note-storage.mjs';
 
 const kinds = new Set(['knowledge', 'work', 'work-note']);
@@ -45,9 +46,7 @@ function countTags(state) {
   return state.tags.map(tag => ({ ...tag, count: counts.get(tag.id) ?? 0, directCount: direct.get(tag.id) ?? 0 }));
 }
 
-const excerpt = text => text.trim().replace(/\s+/g, ' ').slice(0, 120);
-
-export function createKnowledgeService({ data, readWorks, readJson, readBody, send, queueWrite }) {
+export function createKnowledgeService({ data, readWorks, readJson, readBody, send, queueWrite, readTopics, topicImpact }) {
   const root = new URL('knowledge/', data);
   const index = new URL('index.json', root);
   const blank = () => ({ schemaVersion: 1, notes: [], tags: [], relations: [] });
@@ -100,10 +99,11 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       }),
     ].map(item => [key(item), item]));
   }
-  async function describeTargets(state, entries, query = '') {
+  async function describeTargets(state, entries, query = '', limit = Infinity) {
     const notes = new Map(state.notes.map(note => [note.id, note]));
     const results = [];
     for (const entry of entries) {
+      if (results.length >= limit) break;
       const titleMatches = entry.title.toLowerCase().includes(query);
       if (entry.type !== 'knowledge' || (entry.title && titleMatches)) {
         if (titleMatches) results.push(entry);
@@ -111,7 +111,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       }
       const text = await content(notes.get(entry.id));
       if (titleMatches || text.toLowerCase().includes(query)) {
-        results.push({ ...entry, excerpt: excerpt(text) });
+        results.push({ ...entry, excerpt: markdownExcerpt(text) });
       }
     }
     return results;
@@ -148,7 +148,7 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     const valid = state.relations.filter(pair => pair.every(item => catalogue.has(item)));
     if (valid.length !== state.relations.length) await write({ ...state, relations: valid });
   }
-  async function list(response, url, state) {
+  async function list(response, url, state, topics = []) {
     const catalogue = targets(state, await readWorks());
     const tag = url.searchParams.get('tag');
     const selected = tag && tag !== 'untagged' ? descendants(state.tags, tag) : null;
@@ -156,6 +156,14 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     const query = url.searchParams.get('q')?.trim().toLowerCase();
     const paths = query ? tagPaths(state.tags) : null;
     let notes = state.notes;
+    const topic = url.searchParams.get('topic');
+    const collection = url.searchParams.get('collection') || (topic === 'unfiled' ? 'unfiled' : '');
+    const topicScope = topic && topic !== 'unfiled' ? topics.find(entry => entry.id === topic) : null;
+    if (topic || collection) {
+      const index = topicIndex(topics, notes);
+      if (topic && topic !== 'unfiled') notes = notes.filter(note => index.byTopic.get(topic)?.has(note.id));
+      if (collection) notes = notes.filter(note => index.memberships.has(note.id) === (collection === 'filed'));
+    }
     if (tag === 'untagged') notes = notes.filter(note => !note.tagIds.length);
     if (selected) notes = notes.filter(note => note.tagIds.some(id => selected.has(id)));
     if (relatedTo) {
@@ -167,12 +175,12 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       const text = await content(note);
       if (query && !note.title.toLowerCase().includes(query) && !text.toLowerCase().includes(query) &&
           !note.tagIds.some(id => paths.get(id)?.includes(query))) continue;
-      results.push({ ...note, excerpt: excerpt(text) });
+      results.push({ ...note, excerpt: markdownExcerpt(text) });
     }
     results.reverse().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
     const target = catalogue.get(relatedTo);
     const [relatedTarget] = target ? await describeTargets(state, [target]) : [];
-    return send(response, 200, { notes: results, tags: countTags(state), relatedTarget });
+    return send(response, 200, { notes: results, tags: countTags(topic || collection ? { ...state, notes: results } : state), relatedTarget, topicTitle: topicScope?.title });
   }
   async function tagRequest(request, response, id) {
     const input = request.method === 'DELETE' ? {} : await readJson(request, 8192);
@@ -213,12 +221,22 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
   async function handle(request, response, url) {
     const { method } = request;
     const path = url.pathname;
-    if (path === '/api/knowledge' && method === 'GET') return list(response, url, await read());
+    if (path === '/api/knowledge' && method === 'GET') {
+      const collection = url.searchParams.get('collection');
+      if (collection && !['filed', 'unfiled'].includes(collection)) fail(400, '收录状态无效');
+      const [state, topics] = url.searchParams.get('topic') || collection ?
+        await queueWrite(() => Promise.all([read(), readTopics()])) : [await read(), []];
+      return list(response, url, state, topics);
+    }
+    if (path === '/api/knowledge/tags' && method === 'GET') return send(response, 200, { tags: countTags(await read()) });
     if (path === '/api/knowledge/targets' && method === 'GET') {
       const state = await read();
       const catalogue = targets(state, await readWorks());
       const query = url.searchParams.get('q')?.trim().toLowerCase();
-      return send(response, 200, await describeTargets(state, catalogue.values(), query));
+      const type = url.searchParams.get('type');
+      const limit = type ? 40 : Infinity;
+      const entries = type ? [...catalogue.values()].filter(item => item.type === type) : catalogue.values();
+      return send(response, 200, await describeTargets(state, entries, query, limit));
     }
     const workLink = /^\/api\/knowledge\/works\/([a-zA-Z0-9_-]{1,100})(?:\/([a-z0-9-]{36}))?$/.exec(path);
     if (workLink) {
@@ -252,6 +270,14 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
     if (tag && ((!tag[1] && method === 'POST') || (tag[1] && ['PUT', 'DELETE'].includes(method)))) {
       return tagRequest(request, response, tag[1]);
     }
+    const membership = /^\/api\/knowledge\/([a-z0-9-]{36})\/topics$/.exec(path);
+    if (membership && method === 'GET') return queueWrite(async () => {
+      const state = await read();
+      find(state.notes, membership[1]);
+      const index = topicIndex(await readTopics(), state.notes);
+      return send(response, 200, { references: index.memberships.get(membership[1]) ?? [],
+        impact: await topicImpact(membership[1], state.notes, index) });
+    });
     const match = /^\/api\/knowledge\/([a-z0-9-]{36})(?:\/(assets|export\.md|export\.zip|metadata)(?:\/([a-z0-9.-]+))?)?$/.exec(path);
     if (!match) fail(404, '找不到知识库接口');
     const [, id, suffix, name] = match;
@@ -325,6 +351,10 @@ export function createKnowledgeService({ data, readWorks, readJson, readBody, se
       return queueWrite(async () => {
         const state = await read();
         find(state.notes, id);
+        if (url.searchParams.has('topicImpact') &&
+            (await topicImpact(id, state.notes)).version !== url.searchParams.get('topicImpact')) {
+          fail(409, '专题引用已变更，请重新确认删除影响');
+        }
         state.notes = state.notes.filter(item => item.id !== id);
         state.relations = state.relations.filter(pair => !pair.includes(`knowledge:${id}`));
         await write(state);
